@@ -6,19 +6,11 @@ namespace EventSourcing
 {
     public static class BuildPublisher
     {
-        public static IEnumerable<ICommand> Map(
-            IEnumerable<Notification> notifications,
-            Func<IEnumerable<Correlation>, int> versionByPublisherDataCorrelations)
-        {
-
-            return Enumerable.Empty<ICommand>();
-        }
-
-        public static Func<TNotification, IEnumerable<Notification>> For<TPublisherData, TNotification>(
+        public static Func<TNotification, IEnumerable<PublishedNotification>> For<TPublisherData, TNotification>(
             Func<TPublisherData, TNotification, IEnumerable<IDomainEvent>> publisher,
-            Func<Contract, IEnumerable<CorrelationMap>> correlationMapsByPublisherDataContract,
+            Func<TypeIdentifier, IEnumerable<CorrelationMap>> correlationMapsByPublisherDataContract,
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByPublisherDataCorrelations,
-            Func<Contract, Func<TPublisherData, JsonContent, TPublisherData>> publisherDataBuildersByNotificationContract)
+            Func<TypeIdentifier, Func<TPublisherData, JsonContent, TPublisherData>> publisherDataBuildersByNotificationContract)
             where TPublisherData : class, new()
             where TNotification : IDomainEvent
         {
@@ -27,16 +19,21 @@ namespace EventSourcing
                 Load
                 (
                     notification,
-                    correlationMapsByPublisherDataContract(Contract.For<TPublisherData>()),
+                    correlationMapsByPublisherDataContract(TypeIdentifier.For<TPublisherData>()),
                     notificationsByPublisherDataCorrelations,
                     publisherDataBuildersByNotificationContract
                 ),
                 notification
             )
-            .Select(n => new Notification
+            .Select(n => new PublishedNotification
             {
                 Content = n,
-                PublisherDataCorrelations = CorrelationBuilder.CorrelationsBy(correlationMapsByPublisherDataContract(Contract.For<TPublisherData>()), notification)
+                PublisherDataCorrelations = BuildCorrelationsFor.HandlerDataBy(correlationMapsByPublisherDataContract(TypeIdentifier.For<TPublisherData>()), notification),
+                NotificationCorrelations = BuildCorrelationsFor.CorrelatedNotificationsBy
+                (
+                    correlationMapsByPublisherDataContract(TypeIdentifier.For<TPublisherData>()),
+                    BuildCorrelationsFor.HandlerDataBy(correlationMapsByPublisherDataContract(TypeIdentifier.For<TPublisherData>()), notification)
+                ).Where(x => x.Contract.Equals(new TypeIdentifier(n)))
             });
         }
 
@@ -44,7 +41,7 @@ namespace EventSourcing
             TNotification notification,
             IEnumerable<CorrelationMap> handlerDataCorrelationMaps,
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
-            Func<Contract, Func<THandlerData, JsonContent, THandlerData>> handlerDataBuildersByNotificationContract) 
+            Func<TypeIdentifier, Func<THandlerData, JsonContent, THandlerData>> handlerDataBuildersByNotificationContract) 
                 where THandlerData : class, new()
                 where TNotification : IDomainEvent
         {
@@ -53,17 +50,17 @@ namespace EventSourcing
                 handlerDataBuildersByNotificationContract, 
                 notificationsByCorrelations
                 (
-                    CorrelationBuilder.CorrelationsBy
+                    BuildCorrelationsFor.CorrelatedNotificationsBy
                     (
-                        handlerDataCorrelationMaps, 
-                        handlerDataCorrelations: CorrelationBuilder.CorrelationsBy(handlerDataCorrelationMaps, notification)
+                        handlerDataCorrelationMaps,
+                        BuildCorrelationsFor.HandlerDataBy(handlerDataCorrelationMaps, notification)                        
                     )
                 )
             );
         }
 
         public static THandlerData Build<THandlerData>(
-            Func<Contract, Func<THandlerData, JsonContent, THandlerData>> handlerDataMappersByNotificationContract,
+            Func<TypeIdentifier, Func<THandlerData, JsonContent, THandlerData>> handlerDataMappersByNotificationContract,
             IEnumerable<SerializedNotification> notifications) where THandlerData : class, new()
         {
             var handlerData = new THandlerData();

@@ -5,50 +5,41 @@ using System.Linq.Expressions;
 
 namespace EventSourcing
 {
-    public struct Contract
+    public struct CorrelationMap
     {
-        public static Contract For<TContract>()
-        {
-            return new Contract { TypeName = typeof(TContract).FriendlyName() };
-        }
-        public string TypeName { get; set; }
-    }
-
-    public class CorrelationMap
-    {
-        public Contract HandlerDataContract { get; set; }
-        public string HandlerDataPropertyName { get; set; }
-        public Contract NotificationContract { get; set; }
-        public string NotificationPropertyName { get; set; }
-    }
-
-    public class Correlation       
-    {
-        public Contract Contract { get; set; }
-        public string PropertyName { get; set; }
-        public Lazy<string> PropertyValue { get; set; }
-    }
-    
-    public static class CorrelationBuilder
-    {
-        public static CorrelationMap Map<THandlerData, TNotification>(
-            Expression<Func<THandlerData, dynamic>> handlerDataProperty, 
+        public static CorrelationMap For<THandlerData, TNotification>(
+            Expression<Func<THandlerData, dynamic>> handlerDataProperty,
             Expression<Func<TNotification, dynamic>> notificationProperty)
         {
             return new CorrelationMap
             {
-                HandlerDataContract = Contract.For<THandlerData>(),
-                NotificationContract = Contract.For<TNotification>(),
+                HandlerDataContract = TypeIdentifier.For<THandlerData>(),
+                NotificationContract = TypeIdentifier.For<TNotification>(),
                 NotificationPropertyName = notificationProperty.GetPropertyName(),
                 HandlerDataPropertyName = handlerDataProperty.GetPropertyName()
             };
         }
 
-        public static IEnumerable<Correlation> CorrelationsBy(
-            IEnumerable<CorrelationMap> correlationMaps, 
+        public TypeIdentifier HandlerDataContract { get; set; }
+        public string HandlerDataPropertyName { get; set; }
+        public TypeIdentifier NotificationContract { get; set; }
+        public string NotificationPropertyName { get; set; }
+    }
+
+    public struct Correlation       
+    {
+        public TypeIdentifier Contract { get; set; }
+        public string PropertyName { get; set; }
+        public Lazy<string> PropertyValue { get; set; }
+    }
+    
+    public static class BuildCorrelationsFor
+    {
+        public static IEnumerable<Correlation> CorrelatedNotificationsBy(
+            IEnumerable<CorrelationMap> handlerDataCorrelationMaps,
             IEnumerable<Correlation> handlerDataCorrelations)
         {
-            return correlationMaps.Select(map => new Correlation
+            return handlerDataCorrelationMaps.Select(map => new Correlation
             {
                 PropertyName = map.NotificationPropertyName,
                 Contract = map.NotificationContract,
@@ -56,11 +47,11 @@ namespace EventSourcing
             });
         }
 
-        public static IEnumerable<Correlation> CorrelationsBy<TNotification>(
-            IEnumerable<CorrelationMap> correlationMaps, 
+        public static IEnumerable<Correlation> HandlerDataBy<TNotification>(
+            IEnumerable<CorrelationMap> handlerDataCorrelationMaps, 
             TNotification notification)
         {
-            return correlationMaps.Select(m => new Correlation
+            return handlerDataCorrelationMaps.Select(m => new Correlation
             {
                 PropertyName = m.HandlerDataPropertyName,
                 Contract = m.HandlerDataContract,

@@ -28,7 +28,7 @@ namespace EventSourcing
         public DateTimeOffset When { get; set; }
     }
 
-    public struct StockReservationState
+    public struct StockReservationData
     {
         public string Sku { get; set; }
         public int Available { get; set; }
@@ -36,7 +36,7 @@ namespace EventSourcing
 
     static class ReserveStock
     {      
-        public static IEnumerable<IDomainEvent> On(StockReservationState state, OrderPlaced e)
+        public static IEnumerable<IDomainEvent> On(StockReservationData data, OrderPlaced e)
         {
             return Enumerable.Empty<IDomainEvent>();
         }
