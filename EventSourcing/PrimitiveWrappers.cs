@@ -1,8 +1,7 @@
-﻿namespace EventSourcing
-{
-    public interface IDomainEvent
-    {}
+﻿using System;
 
+namespace EventSourcing
+{
     public interface Unit<TValue>
     {
         TValue Value { get; }
@@ -26,16 +25,23 @@
         public int Value { get; private set; }
     }
 
-    public struct TypeIdentifier : Unit<string>
+    public struct TypeContract : Unit<string>
     {
-        public TypeIdentifier(object t)
+        public TypeContract(Type t)
+        {
+            Value = t.FriendlyName();
+        }
+
+        public TypeContract(object t)
         {
             Value = t.GetType().FriendlyName();
         }
-        public static TypeIdentifier For<TContract>()
+
+        public static TypeContract For<TContract>()
         {
-            return new TypeIdentifier { Value = typeof(TContract).FriendlyName() };
+            return new TypeContract { Value = typeof(TContract).FriendlyName() };
         }
-        public string Value { get; set; }
+
+        public string Value { get; private set; }
     }
 }
