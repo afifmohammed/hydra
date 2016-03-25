@@ -1,51 +1,84 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace EventSourcing
 {
-    class CustomerRegistered : IDomainEvent
+    public class BankLoginReceived : IDomainEvent
     {
-        public string CustomerId { get; set; }
+        public string LoginId { get; set; }
+        public string Bank { get; set; }
+        public string Token { get; set; }
+        public string ApplicationId { get; set; }
     }
 
-    class OrderPlaced : IDomainEvent
+    public class BankAccountNominated : IDomainEvent
     {
-        public string OrderId { get; set; }
-        public string CustomerId { get; set; }
-        public string Sku { get; set; }        
+        public string Bsb { get; set; }
+        public string Acc { get; set; }
+        public string Name { get; set; }
+        public string ApplicationId { get; set; }
     }
 
-    class StockReserved : IDomainEvent
+    public class NominatedBankAccountMatched : IDomainEvent
     {
-        public string OrderId { get; set; }
-        public string Sku { get; set; }        
+        public string AccountId { get; set; }
+        public string ApplicationId { get; set; }
     }
 
-    class OrderOutofStock : IDomainEvent
+    public class NominatedBankAccountNotMatched : IDomainEvent
     {
-        public string OrderId { get; set; }
-        public string Sku { get; set; }
+        public string Bsb { get; set; }
+        public string Acc { get; set; }
+        public string Name { get; set; }
+        public string ApplicationId { get; set; }
     }
 
-    class OrderCancelled : IDomainEvent
+    public class BankAccountsNominated : IDomainEvent
     {
-        public string OrderId { get; set; }
-        public string Sku { get; set; }        
+        public string ApplicationId { get; set; }
     }
 
-    public struct ReserveStock
+    public class BankAccountRetreived : IDomainEvent
     {
-        public string Sku { get; set; }
-        public int Available { get; set; }
+        public string LoginId { get; set; }
+        public string AccountId { get; set; }
+        public string ApplicationId { get; set; }
     }
 
-    static class ReserveStockHandler
-    {      
-        public static IEnumerable<IDomainEvent> On(ReserveStock data, OrderPlaced e)
+    public class BankLoginIncorrect : IDomainEvent
+    {
+        public string LoginId { get; set; }
+        public string Bank { get; set; }        
+        public string ApplicationId { get; set; }
+    }
+
+    public struct MatchNominatedBankAccount
+    {
+        public List<string> PendingLogins { get; set; }
+        public string ApplicationId { get; set; }
+
+    }
+
+    public class JustSpinningMyWheels : IDomainEvent
+    { }
+
+    static class MatchNominatedBankAccountHandler
+    {
+        public static IEnumerable<IDomainEvent> On(BankAccountRetreived e, MatchNominatedBankAccount data)
         {
-            return data.Available >= 1 
-                ? new IDomainEvent[] { new StockReserved { OrderId = e.OrderId, Sku = data.Sku } }
-                : new IDomainEvent[] { new OrderOutofStock { OrderId = e.OrderId, Sku = data.Sku } };
+            yield return new JustSpinningMyWheels();
+        }
+
+        public static IEnumerable<IDomainEvent> On(BankAccountsNominated e, MatchNominatedBankAccount data)
+        {
+            yield return new JustSpinningMyWheels();
+        }
+
+        public static IEnumerable<IDomainEvent> On(BankAccountNominated e, MatchNominatedBankAccount data)
+        {
+            yield return new JustSpinningMyWheels();
         }
     }
 
@@ -54,17 +87,42 @@ namespace EventSourcing
         [Fact]
         public void WorksOutOfTheBox()
         {
-            /*
-            Functions.FoldHandlerData<ReserveStock, OrderPlaced>
-            (
-                new OrderPlaced { OrderId = "1", Sku = "909", CustomerId = "333" },
-                new [] 
+            var correlationMaps = new Dictionary<TypeContract, IEnumerable<CorrelationMap>>
+            {
                 {
-                    CorrelationMap.For<ReserveStock, OrderPlaced>(x => x.Sku, x => x.Sku)
-                },
+                    TypeContract.For<MatchNominatedBankAccount>(),
+                    new List<CorrelationMap>
+                    {
+                        CorrelationMap.For<MatchNominatedBankAccount, BankLoginReceived>(x => x.ApplicationId, x => x.ApplicationId),                        
+                    }
+                }
+            };
 
+            var mappers = new Dictionary<TypeContract, Func<MatchNominatedBankAccount, JsonContent, MatchNominatedBankAccount>>
+            {
+                {
+                    TypeContract.For<BankLoginReceived>(), (d,json) =>
+                    {
+                        var notification = JsonConvert.DeserializeObject<BankLoginReceived>(json.Value);
+                        return new MatchNominatedBankAccount
+                        {
+                            PendingLogins = d.PendingLogins.With(l => l.Add(notification.LoginId)),
+                            ApplicationId = d.ApplicationId
+                        };
+                    }
+                }
+            };
+
+            Functions.GroupNotificationsByPublisher<MatchNominatedBankAccount, BankAccountRetreived>
+            (
+                (e, d) => MatchNominatedBankAccountHandler.On(d, e),
+                correlationMaps,
+                correlations => new List<SerializedNotification>(),
+                notification => new List<Correlation>(),
+                mappers          
             );
-            */
+            
         }
     }
 }
+

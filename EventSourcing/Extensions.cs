@@ -51,5 +51,11 @@ namespace EventSourcing
             var unmangledName = typeDefeninition.Substring(0, typeDefeninition.IndexOf("`"));
             return unmangledName + "(of " + String.Join(",", genericArguments.Select(FriendlyName)) + ")";
         }
+
+        public static T With<T>(this T instance, Action<T> operation)
+        {
+            operation(instance);
+            return instance;
+        }
     }
 }

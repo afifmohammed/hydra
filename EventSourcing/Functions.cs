@@ -25,7 +25,7 @@ namespace EventSourcing
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByPublisherDataCorrelations,
             Func<IDomainEvent, IEnumerable<Correlation>> correlationsByNotification,
             IDictionary<TypeContract, Func<TPublisherData, JsonContent, TPublisherData>> publisherDataMappersByNotificationContract)
-            where TPublisherData : class, new()
+            where TPublisherData : new()
             where TNotification : IDomainEvent
         {
             return notification => new NotificationsByPublisher
@@ -60,7 +60,7 @@ namespace EventSourcing
             IEnumerable<CorrelationMap> handlerDataCorrelationMaps,
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
             IDictionary<TypeContract, Func<THandlerData, JsonContent, THandlerData>> handlerDataMappersByNotificationContract)
-                where THandlerData : class, new()
+                where THandlerData : new()
                 where TNotification : IDomainEvent
         {
             return FoldHandlerData
@@ -103,7 +103,7 @@ namespace EventSourcing
 
         public static THandlerData FoldHandlerData<THandlerData>(
             IDictionary<TypeContract, Func<THandlerData, JsonContent, THandlerData>> handlerDataMappersByNotificationContract,
-            IEnumerable<SerializedNotification> notifications) where THandlerData : class, new()
+            IEnumerable<SerializedNotification> notifications) where THandlerData : new()
         {
             var handlerData = new THandlerData();
 
