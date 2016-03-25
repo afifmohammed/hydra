@@ -21,9 +21,9 @@ namespace EventSourcing
 
         public static Func<TNotification, NotificationsByPublisher> GroupNotificationsByPublisher<TPublisherData, TNotification>(
             Func<TPublisherData, TNotification, IEnumerable<IDomainEvent>> publisher,
-            Func<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByPublisherDataContract,
+            IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByPublisherDataContract,
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByPublisherDataCorrelations,
-            Func<TypeContract, IEnumerable<Correlation>> correlationsByNotificationContract,
+            Func<IDomainEvent, IEnumerable<Correlation>> correlationsByNotification,
             IDictionary<TypeContract, Func<TPublisherData, JsonContent, TPublisherData>> publisherDataMappersByNotificationContract)
             where TPublisherData : class, new()
             where TNotification : IDomainEvent
@@ -35,7 +35,7 @@ namespace EventSourcing
                     FoldHandlerData
                     (
                         notification,
-                        correlationMapsByPublisherDataContract(TypeContract.For<TPublisherData>()),
+                        correlationMapsByPublisherDataContract[TypeContract.For<TPublisherData>()],
                         notificationsByPublisherDataCorrelations,
                         publisherDataMappersByNotificationContract
                     ),
@@ -47,8 +47,8 @@ namespace EventSourcing
                         n,
                         CorrelationsOfMatchingNotificationsBy
                         (
-                            correlationMapsByPublisherDataContract(TypeContract.For<TPublisherData>()),
-                            correlationsByNotificationContract(new TypeContract(n))
+                            correlationMapsByPublisherDataContract[TypeContract.For<TPublisherData>()],
+                            correlationsByNotification(n)
                         ).Where(x => x.Contract.Equals(new TypeContract(n)))
                     )
                 )
