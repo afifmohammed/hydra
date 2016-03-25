@@ -4,27 +4,19 @@ using System.Linq;
 
 namespace EventSourcing
 {
-    class BuildNotificationLog
+    class AppendPublisherVersion
     {
-        public static IEnumerable<NotificationLog> For(
-            IEnumerable<PublishedNotification> notifications,
+        public static NotificationsByPublisherAndVersion To(
+            NotificationsByPublisher notifications,
             Func<IEnumerable<Correlation>, int> versionByPublisherDataCorrelations)
         {
-            return notifications
-                .Select(n => new NotificationLog
-                {
-                    NotificationCorrelations = n.NotificationCorrelations,
-                    Notification = n.Content,
-                    When = DateTimeOffset.Now,
-                    ExpectedVersion = new Version(versionByPublisherDataCorrelations(n.PublisherDataCorrelations))
-                }).Select(n => new NotificationLog
-                {
-                    Notification = n.Notification,
-                    When = n.When,
-                    ExpectedVersion = n.ExpectedVersion,
-                    NotificationCorrelations = n.NotificationCorrelations,
-                    Version = new Version(n.ExpectedVersion.Value + 1)
-                });
+            var v = versionByPublisherDataCorrelations(notifications.PublisherDataCorrelations);
+            return new NotificationsByPublisherAndVersion
+            {
+                NotificationsByPublisher = notifications,
+                ExpectedVersion = new Version(v),
+                Version = new Version(v + 1)
+            };            
         }
     }
 
@@ -34,19 +26,17 @@ namespace EventSourcing
         public JsonContent JsonContent { get; set; }
     }
 
-    public class PublishedNotification
+    public class NotificationsByPublisher
     {
+        public IEnumerable<Tuple<IDomainEvent, IEnumerable<Correlation>>> Notifications { get; set; }
         public IEnumerable<Correlation> PublisherDataCorrelations { get; set; }
-        public IDomainEvent Content { get; set; }
-        public IEnumerable<Correlation> NotificationCorrelations { get; set; }
+        public DateTimeOffset When { get; set; }
     }
 
-    public class NotificationLog
+    public class NotificationsByPublisherAndVersion
     {
-        public IDomainEvent Notification { get; set; }
-        public Version ExpectedVersion { get; set; }
+        public NotificationsByPublisher NotificationsByPublisher { get; set; }
         public Version Version { get; set; }
-        public IEnumerable<Correlation> NotificationCorrelations { get; set; }
-        public DateTimeOffset When { get; set; }
+        public Version ExpectedVersion { get; set; }
     }
 }

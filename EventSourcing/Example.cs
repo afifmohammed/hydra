@@ -7,25 +7,25 @@ namespace EventSourcing
     class OrderPlaced : IDomainEvent
     {
         public string OrderId { get; set; }
-        public string Sku { get; set; }
-        public int Qty { get; set; }
-        public DateTimeOffset When { get; set; }
+        public string Sku { get; set; }        
     }
 
     class StockReserved : IDomainEvent
     {
         public string OrderId { get; set; }
+        public string Sku { get; set; }        
+    }
+
+    class OrderOutofStock : IDomainEvent
+    {
+        public string OrderId { get; set; }
         public string Sku { get; set; }
-        public int Qty { get; set; }
-        public DateTimeOffset When { get; set; }
     }
 
     class OrderCancelled : IDomainEvent
     {
         public string OrderId { get; set; }
-        public string Sku { get; set; }
-        public int Qty { get; set; }
-        public DateTimeOffset When { get; set; }
+        public string Sku { get; set; }        
     }
 
     public struct StockReservationData
@@ -38,7 +38,9 @@ namespace EventSourcing
     {      
         public static IEnumerable<IDomainEvent> On(StockReservationData data, OrderPlaced e)
         {
-            return Enumerable.Empty<IDomainEvent>();
+            return data.Available >= 1 
+                ? new IDomainEvent[] { new StockReserved { OrderId = e.OrderId, Sku = data.Sku } }
+                : new IDomainEvent[] { new OrderOutofStock { OrderId = e.OrderId, Sku = data.Sku } };
         }
     }
 }
