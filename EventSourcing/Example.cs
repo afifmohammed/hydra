@@ -26,15 +26,15 @@ namespace EventSourcing
         public string Sku { get; set; }        
     }
 
-    public struct StockReservationData
+    public struct ReserveStock
     {
         public string Sku { get; set; }
         public int Available { get; set; }
     }
 
-    static class ReserveStock
+    static class ReserveStockHandler
     {      
-        public static IEnumerable<IDomainEvent> On(StockReservationData data, OrderPlaced e)
+        public static IEnumerable<IDomainEvent> On(ReserveStock data, OrderPlaced e)
         {
             return data.Available >= 1 
                 ? new IDomainEvent[] { new StockReserved { OrderId = e.OrderId, Sku = data.Sku } }
