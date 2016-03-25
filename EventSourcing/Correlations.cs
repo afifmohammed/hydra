@@ -6,8 +6,8 @@ namespace EventSourcing
     public struct CorrelationMap
     {
         public static CorrelationMap For<THandlerData, TNotification>(
-            Expression<Func<THandlerData, dynamic>> handlerDataProperty,
-            Expression<Func<TNotification, dynamic>> notificationProperty)
+            Expression<Func<THandlerData, object>> handlerDataProperty,
+            Expression<Func<TNotification, object>> notificationProperty)
         {
             return new CorrelationMap
             {
