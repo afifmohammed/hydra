@@ -24,15 +24,11 @@ namespace EventSourcing
 
     public class NominatedBankAccountMatched : IDomainEvent
     {
-        public string AccountId { get; set; }
         public string ApplicationId { get; set; }
     }
 
     public class NominatedBankAccountNotMatched : IDomainEvent
     {
-        public string Bsb { get; set; }
-        public string Acc { get; set; }
-        public string Name { get; set; }
         public string ApplicationId { get; set; }
     }
 
@@ -59,7 +55,6 @@ namespace EventSourcing
     {
         public List<string> PendingLogins { get; set; }
         public string ApplicationId { get; set; }
-
     }
 
     public class JustSpinningMyWheels : IDomainEvent
@@ -69,44 +64,88 @@ namespace EventSourcing
     {
         public static IEnumerable<IDomainEvent> On(BankAccountRetreived e, MatchNominatedBankAccount data)
         {
-            yield return new JustSpinningMyWheels();
+            yield return new NominatedBankAccountMatched { ApplicationId = e.ApplicationId };
         }
 
         public static IEnumerable<IDomainEvent> On(BankAccountsNominated e, MatchNominatedBankAccount data)
         {
-            yield return new JustSpinningMyWheels();
+            yield return new NominatedBankAccountMatched { ApplicationId = e.ApplicationId };
         }
 
         public static IEnumerable<IDomainEvent> On(BankAccountNominated e, MatchNominatedBankAccount data)
         {
-            yield return new JustSpinningMyWheels();
+            yield return new NominatedBankAccountMatched { ApplicationId = e.ApplicationId };
         }
     }
 
-    class Tests
+    public class Tests
     {
-        readonly IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMaps = 
+        readonly IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByPublisherDataContract = 
             new Dictionary<TypeContract, IEnumerable<CorrelationMap>>
             {
                 {
                     typeof(MatchNominatedBankAccount).Contract(),
                     new List<CorrelationMap>
                     {
-                        CorrelationMap.Between<MatchNominatedBankAccount, BankLoginReceived>(x => x.ApplicationId, x => x.ApplicationId),
+                        CorrelationMap.Between<MatchNominatedBankAccount, BankLoginReceived>(x => x.ApplicationId, x => x.ApplicationId)                        
                     }
-                },
-                // todo: add more
+                }                
             };
 
         readonly IDictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>> CorrelationsByNotificationContract = 
             new Dictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>>
             {
                 {
+                    typeof(BankAccountNominated).Contract(),
+                    e => new []
+                    {
+                        Correlation.Property(x => x.ApplicationId, (BankAccountNominated)e),
+                    }
+                },
+                {
+                    typeof(BankAccountsNominated).Contract(),
+                    e => new []
+                    {
+                        Correlation.Property(x => x.ApplicationId, (BankAccountsNominated)e),
+                    }
+                },
+                {
+                    typeof(BankAccountRetreived).Contract(),
+                    e => new []
+                    {
+                        Correlation.Property(x => x.AccountId, (BankAccountRetreived)e),
+                        Correlation.Property(x => x.LoginId, (BankAccountRetreived)e),
+                        Correlation.Property(x => x.ApplicationId, (BankAccountRetreived)e),
+                    }
+                },
+                {
                     typeof(NominatedBankAccountMatched).Contract(),
                     e => new [] 
                     {
-                        Correlation.Property(x => x.AccountId, (NominatedBankAccountMatched)e),
                         Correlation.Property(x => x.ApplicationId, (NominatedBankAccountMatched)e),
+                    }
+                },
+                {
+                    typeof(NominatedBankAccountNotMatched).Contract(),
+                    e => new []
+                    {
+                        Correlation.Property(x => x.ApplicationId, (NominatedBankAccountNotMatched)e),
+                    }
+                },
+                {
+                    typeof(BankLoginReceived).Contract(),
+                    e => new []
+                    {
+                        Correlation.Property(x => x.LoginId, (BankLoginReceived)e),
+                        Correlation.Property(x => x.ApplicationId, (BankLoginReceived)e),
+                    }
+                },
+                {
+                    typeof(BankLoginIncorrect).Contract(),
+                    e => new []
+                    {
+                        Correlation.Property(x => x.LoginId, (BankLoginIncorrect)e),
+                        Correlation.Property(x => x.ApplicationId, (BankLoginIncorrect)e),
                     }
                 },
                 // todo: add more
@@ -122,7 +161,7 @@ namespace EventSourcing
                         var notification = JsonConvert.DeserializeObject<BankLoginReceived>(json.Value);
                         return new MatchNominatedBankAccount
                         {
-                            PendingLogins = d.PendingLogins.With(l => l.Add(notification.LoginId)),
+                            PendingLogins = (d.PendingLogins ?? new List<string>()).With(l => l.Add(notification.LoginId)),
                             ApplicationId = d.ApplicationId
                         };
                     }
@@ -161,14 +200,14 @@ namespace EventSourcing
             var publisher = Functions.GroupNotificationsByPublisher<MatchNominatedBankAccount, BankAccountRetreived>
             (
                 (e, d) => MatchNominatedBankAccountHandler.On(d, e),
-                correlationMaps,
+                correlationMapsByPublisherDataContract,
                 NotificationsByCorrelations(notifications),
                 CorrelationsByNotificationContract,
                 publisherDataMappers          
             );
 
             var notificationsByPublisher = publisher(new BankAccountRetreived { ApplicationId = "1", AccountId = "A1", LoginId = "L1" });
-
+            var list = notificationsByPublisher.Notifications.ToList();
             // todo: asserts
         }        
     }
