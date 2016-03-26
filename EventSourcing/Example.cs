@@ -85,21 +85,35 @@ namespace EventSourcing
 
     class Tests
     {
-        [Fact]
-        public void WorksOutOfTheBox()
-        {
-            var correlationMaps = new Dictionary<TypeContract, IEnumerable<CorrelationMap>>
+        readonly IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMaps = 
+            new Dictionary<TypeContract, IEnumerable<CorrelationMap>>
             {
                 {
                     typeof(MatchNominatedBankAccount).Contract(),
                     new List<CorrelationMap>
                     {
-                        CorrelationMap.Between<MatchNominatedBankAccount, BankLoginReceived>(x => x.ApplicationId, x => x.ApplicationId),                        
+                        CorrelationMap.Between<MatchNominatedBankAccount, BankLoginReceived>(x => x.ApplicationId, x => x.ApplicationId),
                     }
-                }
+                },
+                // todo: add more
             };
 
-            var mappers = new Dictionary<TypeContract, Func<MatchNominatedBankAccount, JsonContent, MatchNominatedBankAccount>>
+        readonly IDictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>> CorrelationsByNotificationContract = 
+            new Dictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>>
+            {
+                {
+                    typeof(NominatedBankAccountMatched).Contract(),
+                    e => new [] 
+                    {
+                        Correlation.Property(x => x.AccountId, (NominatedBankAccountMatched)e),
+                        Correlation.Property(x => x.ApplicationId, (NominatedBankAccountMatched)e),
+                    }
+                },
+                // todo: add more
+            };
+
+        readonly IDictionary<TypeContract, Func<MatchNominatedBankAccount, JsonContent, MatchNominatedBankAccount>> publisherDataMappers = 
+            new Dictionary<TypeContract, Func<MatchNominatedBankAccount, JsonContent, MatchNominatedBankAccount>>
             {
                 {
                     typeof(BankLoginReceived).Contract(),
@@ -112,44 +126,51 @@ namespace EventSourcing
                             ApplicationId = d.ApplicationId
                         };
                     }
-                }
-            };
-
-            var correlationsByNotificationContract = new Dictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>>
-            {
-                {
-                    typeof(NominatedBankAccountMatched).Contract(),
-                    e => new [] 
-                    {
-                        Correlation.Property(x => x.AccountId, (NominatedBankAccountMatched)e),
-                        Correlation.Property(x => x.ApplicationId, (NominatedBankAccountMatched)e),
-                    }
-                }
-            };
-
-            var notificationsByCorrelations = new IDomainEvent[] 
-            {
-                new BankLoginReceived(), new BankAccountRetreived(), new BankAccountsNominated()
-            }.Select(n => new
-            {
-                Notification = new SerializedNotification
-                {
-                    Contract = n.Contract(),
-                    JsonContent = new JsonContent(n)
                 },
-                Correlations = correlationsByNotificationContract[n.Contract()](n)
-            });
+                // todo: add more
+            };
 
-            Functions.GroupNotificationsByPublisher<MatchNominatedBankAccount, BankAccountRetreived>
+        /// <summary>
+        /// mimics the behavior of a query that goes to the database 
+        /// </summary>        
+        Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> NotificationsByCorrelations(params IDomainEvent[] notifications)
+        {
+            return correlations => notifications
+                .Select(n => new
+                {
+                    Notification = new SerializedNotification
+                    {
+                        Contract = n.Contract(),
+                        JsonContent = new JsonContent(n)
+                    },
+                    Correlations = CorrelationsByNotificationContract[n.Contract()](n)
+                })
+                .Where(n => correlations.All(c => n.Correlations.Any(nc => nc.Equals(c))))
+                .Select(x => x.Notification);
+        }
+
+        [Fact]
+        public void WorksOutOfTheBox()
+        {
+            var notifications = new IDomainEvent[]
+            {
+                new BankLoginReceived { ApplicationId = "1", Bank = "CBA", LoginId = "L1", Token = "T1" },
+                new BankAccountsNominated {ApplicationId = "1"}
+            };
+            
+            var publisher = Functions.GroupNotificationsByPublisher<MatchNominatedBankAccount, BankAccountRetreived>
             (
                 (e, d) => MatchNominatedBankAccountHandler.On(d, e),
                 correlationMaps,
-                correlations => notificationsByCorrelations.Where(x => correlations.All(c => x.Correlations.Any(xc => xc.Equals(c)))).Select(x => x.Notification),
-                correlationsByNotificationContract,
-                mappers          
+                NotificationsByCorrelations(notifications),
+                CorrelationsByNotificationContract,
+                publisherDataMappers          
             );
-            
-        }
+
+            var notificationsByPublisher = publisher(new BankAccountRetreived { ApplicationId = "1", AccountId = "A1", LoginId = "L1" });
+
+            // todo: asserts
+        }        
     }
 }
 
