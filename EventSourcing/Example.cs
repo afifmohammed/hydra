@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace EventSourcing
@@ -92,82 +91,23 @@ namespace EventSourcing
                 }                
             };
 
-        readonly IDictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>> CorrelationsByNotificationContract = 
-            new Dictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>>
+        readonly IDictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>> CorrelationsByNotificationContract =
+            new KeyValuePair<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>>[]
             {
-                {
-                    typeof(BankAccountNominated).Contract(),
-                    e => new []
-                    {
-                        Correlation.Property(x => x.ApplicationId, (BankAccountNominated)e),
-                    }
-                },
-                {
-                    typeof(BankAccountsNominated).Contract(),
-                    e => new []
-                    {
-                        Correlation.Property(x => x.ApplicationId, (BankAccountsNominated)e),
-                    }
-                },
-                {
-                    typeof(BankAccountRetreived).Contract(),
-                    e => new []
-                    {
-                        Correlation.Property(x => x.AccountId, (BankAccountRetreived)e),
-                        Correlation.Property(x => x.LoginId, (BankAccountRetreived)e),
-                        Correlation.Property(x => x.ApplicationId, (BankAccountRetreived)e),
-                    }
-                },
-                {
-                    typeof(NominatedBankAccountMatched).Contract(),
-                    e => new [] 
-                    {
-                        Correlation.Property(x => x.ApplicationId, (NominatedBankAccountMatched)e),
-                    }
-                },
-                {
-                    typeof(NominatedBankAccountNotMatched).Contract(),
-                    e => new []
-                    {
-                        Correlation.Property(x => x.ApplicationId, (NominatedBankAccountNotMatched)e),
-                    }
-                },
-                {
-                    typeof(BankLoginReceived).Contract(),
-                    e => new []
-                    {
-                        Correlation.Property(x => x.LoginId, (BankLoginReceived)e),
-                        Correlation.Property(x => x.ApplicationId, (BankLoginReceived)e),
-                    }
-                },
-                {
-                    typeof(BankLoginIncorrect).Contract(),
-                    e => new []
-                    {
-                        Correlation.Property(x => x.LoginId, (BankLoginIncorrect)e),
-                        Correlation.Property(x => x.ApplicationId, (BankLoginIncorrect)e),
-                    }
-                },
-                // todo: add more
-            };
+                Type<BankAccountNominated>.Correlation(x => x.ApplicationId),
+                Type<BankAccountsNominated>.Correlation(x => x.ApplicationId),
+                Type<BankAccountRetreived>.Correlation(x => x.ApplicationId, x => x.LoginId, x => x.AccountId),
+                Type<NominatedBankAccountMatched>.Correlation(x => x.ApplicationId),
+                Type<NominatedBankAccountNotMatched>.Correlation(x => x.ApplicationId),
+                Type<BankLoginReceived>.Correlation(x => x.ApplicationId, x => x.LoginId),
+                Type<BankLoginIncorrect>.Correlation(x => x.ApplicationId, x => x.LoginId),
+            }.ToDictionary(x => x.Key, x => x.Value);
 
-        readonly IDictionary<TypeContract, Func<MatchNominatedBankAccount, JsonContent, MatchNominatedBankAccount>> publisherDataMappers = 
-            new Dictionary<TypeContract, Func<MatchNominatedBankAccount, JsonContent, MatchNominatedBankAccount>>
+        readonly IDictionary<TypeContract, Func<MatchNominatedBankAccount, JsonContent, MatchNominatedBankAccount>> publisherDataMappers =
+            new KeyValuePair<TypeContract, Func<MatchNominatedBankAccount, JsonContent, MatchNominatedBankAccount>>[]
             {
-                {
-                    typeof(BankLoginReceived).Contract(),
-                    (d,json) =>
-                    {
-                        var notification = JsonConvert.DeserializeObject<BankLoginReceived>(json.Value);
-                        return new MatchNominatedBankAccount
-                        {
-                            PendingLogins = (d.PendingLogins ?? new List<string>()).With(l => l.Add(notification.LoginId)),
-                            ApplicationId = d.ApplicationId
-                        };
-                    }
-                },
-                // todo: add more
-            };
+                Type<MatchNominatedBankAccount>.Maps<BankLoginReceived>(e => d => d.PendingLogins?.Add(e.LoginId))
+            }.ToDictionary(x => x.Key, x => x.Value);            
 
         /// <summary>
         /// mimics the behavior of a query that goes to the database 
