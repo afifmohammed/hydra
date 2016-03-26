@@ -8,6 +8,16 @@ namespace EventSourcing
 {
     static class Extensions
     {
+        public static TypeContract Contract(this Type t)
+        {
+            return new TypeContract(t);
+        }
+
+        public static TypeContract Contract(this object t)
+        {
+            return new TypeContract(t);
+        }
+
         public static TValue Get<TKey, TValue>(this IDictionary<string, object> dictionary)
         {
             return (TValue)dictionary[typeof(TKey).FriendlyName()];

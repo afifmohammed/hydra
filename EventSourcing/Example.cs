@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -90,10 +91,10 @@ namespace EventSourcing
             var correlationMaps = new Dictionary<TypeContract, IEnumerable<CorrelationMap>>
             {
                 {
-                    TypeContract.For<MatchNominatedBankAccount>(),
+                    typeof(MatchNominatedBankAccount).Contract(),
                     new List<CorrelationMap>
                     {
-                        CorrelationMap.For<MatchNominatedBankAccount, BankLoginReceived>(x => x.ApplicationId, x => x.ApplicationId),                        
+                        CorrelationMap.Between<MatchNominatedBankAccount, BankLoginReceived>(x => x.ApplicationId, x => x.ApplicationId),                        
                     }
                 }
             };
@@ -101,7 +102,8 @@ namespace EventSourcing
             var mappers = new Dictionary<TypeContract, Func<MatchNominatedBankAccount, JsonContent, MatchNominatedBankAccount>>
             {
                 {
-                    TypeContract.For<BankLoginReceived>(), (d,json) =>
+                    typeof(BankLoginReceived).Contract(),
+                    (d,json) =>
                     {
                         var notification = JsonConvert.DeserializeObject<BankLoginReceived>(json.Value);
                         return new MatchNominatedBankAccount
@@ -113,12 +115,37 @@ namespace EventSourcing
                 }
             };
 
+            var correlationsByNotificationContract = new Dictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>>
+            {
+                {
+                    typeof(NominatedBankAccountMatched).Contract(),
+                    e => new [] 
+                    {
+                        Correlation.Property(x => x.AccountId, (NominatedBankAccountMatched)e),
+                        Correlation.Property(x => x.ApplicationId, (NominatedBankAccountMatched)e),
+                    }
+                }
+            };
+
+            var notificationsByCorrelations = new IDomainEvent[] 
+            {
+                new BankLoginReceived(), new BankAccountRetreived(), new BankAccountsNominated()
+            }.Select(n => new
+            {
+                Notification = new SerializedNotification
+                {
+                    Contract = n.Contract(),
+                    JsonContent = new JsonContent(n)
+                },
+                Correlations = correlationsByNotificationContract[n.Contract()](n)
+            });
+
             Functions.GroupNotificationsByPublisher<MatchNominatedBankAccount, BankAccountRetreived>
             (
                 (e, d) => MatchNominatedBankAccountHandler.On(d, e),
                 correlationMaps,
-                correlations => new List<SerializedNotification>(),
-                notification => new List<Correlation>(),
+                correlations => notificationsByCorrelations.Where(x => correlations.All(c => x.Correlations.Any(xc => xc.Equals(c)))).Select(x => x.Notification),
+                correlationsByNotificationContract,
                 mappers          
             );
             

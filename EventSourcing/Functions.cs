@@ -23,7 +23,7 @@ namespace EventSourcing
             Func<TPublisherData, TNotification, IEnumerable<IDomainEvent>> publisher,
             IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByPublisherDataContract,
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByPublisherDataCorrelations,
-            Func<IDomainEvent, IEnumerable<Correlation>> correlationsByNotification,
+            IDictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>> correlationsByNotificationContract,
             IDictionary<TypeContract, Func<TPublisherData, JsonContent, TPublisherData>> publisherDataMappersByNotificationContract)
             where TPublisherData : new()
             where TNotification : IDomainEvent
@@ -35,7 +35,7 @@ namespace EventSourcing
                     FoldHandlerData
                     (
                         notification,
-                        correlationMapsByPublisherDataContract[TypeContract.For<TPublisherData>()],
+                        correlationMapsByPublisherDataContract[typeof(TPublisherData).Contract()],
                         notificationsByPublisherDataCorrelations,
                         publisherDataMappersByNotificationContract
                     ),
@@ -47,8 +47,8 @@ namespace EventSourcing
                         n,
                         CorrelationsOfMatchingNotificationsBy
                         (
-                            correlationMapsByPublisherDataContract[TypeContract.For<TPublisherData>()],
-                            correlationsByNotification(n)
+                            correlationMapsByPublisherDataContract[typeof(TPublisherData).Contract()],
+                            correlationsByNotificationContract[new TypeContract(n)](n)
                         ).Where(x => x.Contract.Equals(new TypeContract(n)))
                     )
                 )

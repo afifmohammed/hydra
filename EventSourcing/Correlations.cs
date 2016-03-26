@@ -5,14 +5,14 @@ namespace EventSourcing
 {
     public struct CorrelationMap
     {
-        public static CorrelationMap For<THandlerData, TNotification>(
+        public static CorrelationMap Between<THandlerData, TNotification>(
             Expression<Func<THandlerData, object>> handlerDataProperty,
             Expression<Func<TNotification, object>> notificationProperty)
         {
             return new CorrelationMap
             {
-                HandlerDataContract = TypeContract.For<THandlerData>(),
-                NotificationContract = TypeContract.For<TNotification>(),
+                HandlerDataContract = typeof(THandlerData).Contract(),
+                NotificationContract = typeof(TNotification).Contract(),
                 NotificationPropertyName = notificationProperty.GetPropertyName(),
                 HandlerDataPropertyName = handlerDataProperty.GetPropertyName()
             };
@@ -30,7 +30,7 @@ namespace EventSourcing
         public string PropertyName { get; set; }
         public Lazy<string> PropertyValue { get; set; }
 
-        public static Correlation For<TContract>(Expression<Func<TContract, object>> property, TContract contract)
+        public static Correlation Property<TContract>(Expression<Func<TContract, object>> property, TContract contract)
         {
             return new Correlation
             {
@@ -38,6 +38,18 @@ namespace EventSourcing
                 PropertyName = property.GetPropertyName(),
                 PropertyValue = new Lazy<string>(() => (property.Compile()(contract)).ToString())
             };
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Correlation))
+                return false;
+
+            var other = (Correlation)obj;
+
+            return other.Contract.Equals(Contract)
+                && other.PropertyName == PropertyName
+                && other.PropertyValue.Value == PropertyValue.Value;
         }
     }  
 }
