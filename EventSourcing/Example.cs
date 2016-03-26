@@ -208,7 +208,8 @@ namespace EventSourcing
 
             var notificationsByPublisher = publisher(new BankAccountRetreived { ApplicationId = "1", AccountId = "A1", LoginId = "L1" });
             var list = notificationsByPublisher.Notifications.ToList();
-            // todo: asserts
+
+            Assert.NotEmpty(list);
         }        
     }
 }
