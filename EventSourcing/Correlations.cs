@@ -27,35 +27,52 @@ namespace EventSourcing
         public string NotificationPropertyName { get; set; }
     }
 
-    public static partial class Type<TContract> where TContract : new()
+    public static partial class Type<TSource> where TSource : new()
     {
-        public static KeyValuePair<TypeContract, Func<TContract, JsonContent, TContract>> Maps<TSource>(Func<TSource, Action<TContract>> mapper)
+        public static KeyValuePair<TypeContract, CorrelationMap> Correlates<TContract>(
+            Expression<Func<TSource, object>> handlerDataProperty,
+            Expression<Func<TContract, object>> notificationProperty)
         {
-            return new KeyValuePair<TypeContract, Func<TContract, JsonContent, TContract>>
+            return new KeyValuePair<TypeContract, CorrelationMap>
             (
                 typeof(TSource).Contract(),
-                (d, json) =>
+                new CorrelationMap
                 {
-                    var notification = JsonConvert.DeserializeObject<TSource>(json.Value);
-                    var contract = d;
-                    mapper(notification)(contract);
-                    return contract;                    
+                    HandlerDataContract = typeof(TSource).Contract(),
+                    NotificationContract = typeof(TContract).Contract(),
+                    NotificationPropertyName = notificationProperty.GetPropertyName(),
+                    HandlerDataPropertyName = handlerDataProperty.GetPropertyName()
                 }
             );
         }
 
-        public static KeyValuePair<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>> Correlation(params Expression<Func<TContract, object>>[] properties)
+        public static KeyValuePair<TypeContract, Func<TSource, JsonContent, TSource>> Maps<TContract>(Func<TContract, Action<TSource>> mapper)
         {
-            return new KeyValuePair<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>>(typeof(TContract).Contract(), e => properties.Select(p => Property(p, (TContract)e)));
+            return new KeyValuePair<TypeContract, Func<TSource, JsonContent, TSource>>
+            (
+                typeof(TContract).Contract(),
+                (d, json) =>
+                {
+                    var contract = JsonConvert.DeserializeObject<TContract>(json.Value);
+                    var source = d;
+                    mapper(contract)(source);
+                    return source;                    
+                }
+            );
         }
 
-        public static Correlation Property(Expression<Func<TContract, object>> property, TContract contract)
+        public static KeyValuePair<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>> Correlation(params Expression<Func<TSource, object>>[] properties)
+        {
+            return new KeyValuePair<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>>(typeof(TSource).Contract(), e => properties.Select(p => Property(p, (TSource)e)));
+        }
+
+        public static Correlation Property(Expression<Func<TSource, object>> property, TSource source)
         {
             return new Correlation
             {
-                Contract = new TypeContract(contract),
+                Contract = new TypeContract(source),
                 PropertyName = property.GetPropertyName(),
-                PropertyValue = new Lazy<string>(() => (property.Compile()(contract)).ToString())
+                PropertyValue = new Lazy<string>(() => (property.Compile()(source)).ToString())
             };
         }
     }

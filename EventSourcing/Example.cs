@@ -79,18 +79,16 @@ namespace EventSourcing
 
     public class Tests
     {
-        readonly IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByPublisherDataContract = 
-            new Dictionary<TypeContract, IEnumerable<CorrelationMap>>
+        readonly IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByPublisherDataContract =
+            new KeyValuePair<TypeContract, CorrelationMap>[]
             {
-                {
-                    typeof(MatchNominatedBankAccount).Contract(),
-                    new List<CorrelationMap>
-                    {
-                        CorrelationMap.Between<MatchNominatedBankAccount, BankLoginReceived>(x => x.ApplicationId, x => x.ApplicationId)                        
-                    }
-                }                
-            };
-
+                Type<MatchNominatedBankAccount>.Correlates<BankLoginReceived>(d => d.ApplicationId, e => e.ApplicationId),
+                Type<MatchNominatedBankAccount>.Correlates<BankAccountRetreived>(d => d.ApplicationId, e => e.ApplicationId),
+                Type<MatchNominatedBankAccount>.Correlates<BankLoginIncorrect>(d => d.ApplicationId, e => e.ApplicationId)
+            }
+            .GroupBy(x => x.Key)
+            .ToDictionary(x => x.Key, x => x.Select(a => a.Value));
+            
         readonly IDictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>> CorrelationsByNotificationContract =
             new KeyValuePair<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>>[]
             {
@@ -136,20 +134,24 @@ namespace EventSourcing
                 new BankLoginReceived { ApplicationId = "1", Bank = "CBA", LoginId = "L1", Token = "T1" },
                 new BankAccountsNominated {ApplicationId = "1"}
             };
-            
+
+            var time = new DateTimeOffset(new DateTime(2012,10,10));
+
             var publisher = Functions.GroupNotificationsByPublisher<MatchNominatedBankAccount, BankAccountRetreived>
             (
                 (e, d) => MatchNominatedBankAccountHandler.On(d, e),
                 correlationMapsByPublisherDataContract,
                 NotificationsByCorrelations(notifications),
                 CorrelationsByNotificationContract,
-                publisherDataMappers          
+                publisherDataMappers,
+                () => time
             );
 
             var notificationsByPublisher = publisher(new BankAccountRetreived { ApplicationId = "1", AccountId = "A1", LoginId = "L1" });
-            var list = notificationsByPublisher.Notifications.ToList();
-
-            Assert.NotEmpty(list);
+            
+            Assert.NotEmpty(notificationsByPublisher.Notifications);
+            Assert.NotEmpty(notificationsByPublisher.PublisherDataCorrelations);
+            Assert.Equal(time, notificationsByPublisher.When);
         }        
     }
 }

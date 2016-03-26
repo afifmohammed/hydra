@@ -24,7 +24,8 @@ namespace EventSourcing
             IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByPublisherDataContract,
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByPublisherDataCorrelations,
             IDictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>> correlationsByNotificationContract,
-            IDictionary<TypeContract, Func<TPublisherData, JsonContent, TPublisherData>> publisherDataMappersByNotificationContract)
+            IDictionary<TypeContract, Func<TPublisherData, JsonContent, TPublisherData>> publisherDataMappersByNotificationContract,
+            Func<DateTimeOffset> clock)
             where TPublisherData : new()
             where TNotification : IDomainEvent
         {
@@ -51,7 +52,9 @@ namespace EventSourcing
                             correlationsByNotificationContract[new TypeContract(n)](n)
                         ).Where(x => x.Contract.Equals(new TypeContract(n)))
                     )
-                )
+                ),
+                PublisherDataCorrelations = HandlerDataCorrelationsBy(correlationMapsByPublisherDataContract[typeof(TPublisherData).Contract()], notification),
+                When = clock()
             };
         }
 
@@ -93,12 +96,14 @@ namespace EventSourcing
             IEnumerable<CorrelationMap> handlerDataCorrelationMaps,
             TNotification notification)
         {
-            return handlerDataCorrelationMaps.Select(m => new Correlation
-            {
-                PropertyName = m.HandlerDataPropertyName,
-                Contract = m.HandlerDataContract,
-                PropertyValue = new Lazy<string>(() => (m.NotificationPropertyName.GetPropertySelector<TNotification>().Compile()(notification)).ToString())
-            });
+            return handlerDataCorrelationMaps
+                .Where(m => m.NotificationContract.Equals(typeof(TNotification).Contract()))
+                .Select(m => new Correlation
+                {
+                    PropertyName = m.HandlerDataPropertyName,
+                    Contract = m.HandlerDataContract,
+                    PropertyValue = new Lazy<string>(() => (m.NotificationPropertyName.GetPropertySelector<TNotification>().Compile()(notification)).ToString())
+                });
         }
 
         public static THandlerData FoldHandlerData<THandlerData>(
