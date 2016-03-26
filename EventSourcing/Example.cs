@@ -79,7 +79,7 @@ namespace EventSourcing
 
     public class Tests
     {
-        readonly IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByPublisherDataContract =
+        static readonly IDictionary<TypeContract, IEnumerable<CorrelationMap>> CorrelationMapsByPublisherDataContract =
             new KeyValuePair<TypeContract, CorrelationMap>[]
             {
                 Type<MatchNominatedBankAccount>.Correlates<BankLoginReceived>(d => d.ApplicationId, e => e.ApplicationId),
@@ -88,8 +88,8 @@ namespace EventSourcing
             }
             .GroupBy(x => x.Key)
             .ToDictionary(x => x.Key, x => x.Select(a => a.Value));
-            
-        readonly IDictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>> CorrelationsByNotificationContract =
+
+        static readonly IDictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>> CorrelationsByNotificationContract =
             new KeyValuePair<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>>[]
             {
                 Type<BankAccountNominated>.Correlation(x => x.ApplicationId),
@@ -101,7 +101,7 @@ namespace EventSourcing
                 Type<BankLoginIncorrect>.Correlation(x => x.ApplicationId, x => x.LoginId),
             }.ToDictionary(x => x.Key, x => x.Value);
 
-        readonly IDictionary<TypeContract, Func<MatchNominatedBankAccount, JsonContent, MatchNominatedBankAccount>> publisherDataMappers =
+        static readonly IDictionary<TypeContract, Func<MatchNominatedBankAccount, JsonContent, MatchNominatedBankAccount>> PublisherDataMappers =
             new KeyValuePair<TypeContract, Func<MatchNominatedBankAccount, JsonContent, MatchNominatedBankAccount>>[]
             {
                 Type<MatchNominatedBankAccount>.Maps<BankLoginReceived>(e => d => d.PendingLogins?.Add(e.LoginId))
@@ -110,7 +110,7 @@ namespace EventSourcing
         /// <summary>
         /// mimics the behavior of a query that goes to the database 
         /// </summary>        
-        Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> NotificationsByCorrelations(params IDomainEvent[] notifications)
+        static Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> NotificationsByCorrelations(params IDomainEvent[] notifications)
         {
             return correlations => notifications
                 .Select(n => new
@@ -140,10 +140,10 @@ namespace EventSourcing
             var publisher = Functions.GroupNotificationsByPublisher<MatchNominatedBankAccount, BankAccountRetreived>
             (
                 (e, d) => MatchNominatedBankAccountHandler.On(d, e),
-                correlationMapsByPublisherDataContract,
+                CorrelationMapsByPublisherDataContract,
                 NotificationsByCorrelations(notifications),
                 CorrelationsByNotificationContract,
-                publisherDataMappers,
+                PublisherDataMappers,
                 () => time
             );
 
