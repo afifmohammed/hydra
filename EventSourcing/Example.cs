@@ -13,7 +13,7 @@ namespace EventSourcing
         public string ApplicationId { get; set; }
     }
 
-    public class BankAccountNominated : IDomainEvent
+    public class DepositAccountNominated : IDomainEvent
     {
         public string Bsb { get; set; }
         public string Acc { get; set; }
@@ -21,17 +21,20 @@ namespace EventSourcing
         public string ApplicationId { get; set; }
     }
 
-    public class NominatedBankAccountMatched : IDomainEvent
+    public class NominatedDepositAccountMatched : IDomainEvent
     {
         public string ApplicationId { get; set; }
     }
 
-    public class NominatedBankAccountNotMatched : IDomainEvent
+    public class NominatedDepositAccountNotMatched : IDomainEvent
     {
         public string ApplicationId { get; set; }
     }
 
-    public class BankAccountsNominated : IDomainEvent
+    /// <summary>
+    /// Captures the fact that the user has finished providing logins
+    /// </summary>
+    public class BankLoginsNominated : IDomainEvent
     {
         public string ApplicationId { get; set; }
     }
@@ -50,7 +53,7 @@ namespace EventSourcing
         public string ApplicationId { get; set; }
     }
 
-    public struct MatchNominatedBankAccount
+    public struct MatchNominatedDespositAccount
     {
         public List<string> PendingLogins { get; set; }
         public string ApplicationId { get; set; }
@@ -59,32 +62,43 @@ namespace EventSourcing
     public class JustSpinningMyWheels : IDomainEvent
     { }
 
-    static class MatchNominatedBankAccountHandler
+    static class MatchNominatedDepositAccountHandler
     {
-        public static IEnumerable<IDomainEvent> On(BankAccountRetreived e, MatchNominatedBankAccount data)
+        public static IEnumerable<IDomainEvent> On(BankAccountRetreived e, MatchNominatedDespositAccount data)
         {
-            yield return new NominatedBankAccountMatched { ApplicationId = e.ApplicationId };
+            yield return new NominatedDepositAccountMatched { ApplicationId = e.ApplicationId };
         }
 
-        public static IEnumerable<IDomainEvent> On(BankAccountsNominated e, MatchNominatedBankAccount data)
+        public static IEnumerable<IDomainEvent> On(BankLoginsNominated e, MatchNominatedDespositAccount data)
         {
-            yield return new NominatedBankAccountMatched { ApplicationId = e.ApplicationId };
+            yield return new NominatedDepositAccountMatched { ApplicationId = e.ApplicationId };
         }
 
-        public static IEnumerable<IDomainEvent> On(BankAccountNominated e, MatchNominatedBankAccount data)
+        public static IEnumerable<IDomainEvent> On(DepositAccountNominated e, MatchNominatedDespositAccount data)
         {
-            yield return new NominatedBankAccountMatched { ApplicationId = e.ApplicationId };
+            yield return new NominatedDepositAccountMatched { ApplicationId = e.ApplicationId };
         }
     }
 
     public class Tests
     {
+        /*
+        new UseCase<MatchNominatedDespositAccount>()
+            .Given<BankLoginReceived>(e => d => {})            
+            .When<BankAccountRetrieved>(e => d => {})
+                .Then((e,d) => MatchNominatedBankAccountHandler.On(e,d))
+            .When<BankLoginsNominated>(e => d => {})
+                .Then((e,d) => MatchNominatedBankAccountHandler.On(e,d))
+            .When<DepositAccountNominated>(e => d => {})
+                .Then((e,d) => MatchNominatedBankAccountHandler.On(e,d));
+        */
+
         static readonly IDictionary<TypeContract, IEnumerable<CorrelationMap>> CorrelationMapsByPublisherDataContract =
             new KeyValuePair<TypeContract, CorrelationMap>[]
             {
-                Type<MatchNominatedBankAccount>.Correlates<BankLoginReceived>(d => d.ApplicationId, e => e.ApplicationId),
-                Type<MatchNominatedBankAccount>.Correlates<BankAccountRetreived>(d => d.ApplicationId, e => e.ApplicationId),
-                Type<MatchNominatedBankAccount>.Correlates<BankLoginIncorrect>(d => d.ApplicationId, e => e.ApplicationId)
+                Type<MatchNominatedDespositAccount>.Correlates<BankLoginReceived>(d => d.ApplicationId, e => e.ApplicationId),
+                Type<MatchNominatedDespositAccount>.Correlates<BankAccountRetreived>(d => d.ApplicationId, e => e.ApplicationId),
+                Type<MatchNominatedDespositAccount>.Correlates<BankLoginIncorrect>(d => d.ApplicationId, e => e.ApplicationId)
             }
             .GroupBy(x => x.Key)
             .ToDictionary(x => x.Key, x => x.Select(a => a.Value));
@@ -92,19 +106,19 @@ namespace EventSourcing
         static readonly IDictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>> CorrelationsByNotificationContract =
             new KeyValuePair<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>>[]
             {
-                Type<BankAccountNominated>.Correlation(x => x.ApplicationId),
-                Type<BankAccountsNominated>.Correlation(x => x.ApplicationId),
+                Type<DepositAccountNominated>.Correlation(x => x.ApplicationId),
+                Type<BankLoginsNominated>.Correlation(x => x.ApplicationId),
                 Type<BankAccountRetreived>.Correlation(x => x.ApplicationId, x => x.LoginId, x => x.AccountId),
-                Type<NominatedBankAccountMatched>.Correlation(x => x.ApplicationId),
-                Type<NominatedBankAccountNotMatched>.Correlation(x => x.ApplicationId),
+                Type<NominatedDepositAccountMatched>.Correlation(x => x.ApplicationId),
+                Type<NominatedDepositAccountNotMatched>.Correlation(x => x.ApplicationId),
                 Type<BankLoginReceived>.Correlation(x => x.ApplicationId, x => x.LoginId),
                 Type<BankLoginIncorrect>.Correlation(x => x.ApplicationId, x => x.LoginId),
             }.ToDictionary(x => x.Key, x => x.Value);
 
-        static readonly IDictionary<TypeContract, Func<MatchNominatedBankAccount, JsonContent, MatchNominatedBankAccount>> PublisherDataMappers =
-            new KeyValuePair<TypeContract, Func<MatchNominatedBankAccount, JsonContent, MatchNominatedBankAccount>>[]
+        static readonly IDictionary<TypeContract, Func<MatchNominatedDespositAccount, JsonContent, MatchNominatedDespositAccount>> PublisherDataMappers =
+            new KeyValuePair<TypeContract, Func<MatchNominatedDespositAccount, JsonContent, MatchNominatedDespositAccount>>[]
             {
-                Type<MatchNominatedBankAccount>.Maps<BankLoginReceived>(e => d => d.PendingLogins?.Add(e.LoginId))
+                Type<MatchNominatedDespositAccount>.Maps<BankLoginReceived>(e => d => d.PendingLogins?.Add(e.LoginId))
             }.ToDictionary(x => x.Key, x => x.Value);            
 
         /// <summary>
@@ -132,14 +146,14 @@ namespace EventSourcing
             var notifications = new IDomainEvent[]
             {
                 new BankLoginReceived { ApplicationId = "1", Bank = "CBA", LoginId = "L1", Token = "T1" },
-                new BankAccountsNominated {ApplicationId = "1"}
+                new BankLoginsNominated {ApplicationId = "1"}
             };
 
             var time = new DateTimeOffset(new DateTime(2012,10,10));
 
-            var publisher = Functions.GroupNotificationsByPublisher<MatchNominatedBankAccount, BankAccountRetreived>
+            var publisher = Functions.GroupNotificationsByPublisher<MatchNominatedDespositAccount, BankAccountRetreived>
             (
-                (e, d) => MatchNominatedBankAccountHandler.On(d, e),
+                (e, d) => MatchNominatedDepositAccountHandler.On(d, e),
                 CorrelationMapsByPublisherDataContract,
                 NotificationsByCorrelations(notifications),
                 CorrelationsByNotificationContract,
