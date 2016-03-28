@@ -11,6 +11,14 @@ namespace EventSourcing
         public string Bank { get; set; }
         public string Token { get; set; }
         public string ApplicationId { get; set; }
+
+        public IEnumerable<KeyValuePair<string, object>> Correlations
+        {
+            get
+            {
+                yield return new KeyValuePair<string, object>();
+            }
+        }
     }
 
     public class DepositAccountNominated : IDomainEvent
@@ -19,16 +27,40 @@ namespace EventSourcing
         public string Acc { get; set; }
         public string Name { get; set; }
         public string ApplicationId { get; set; }
+
+        public IEnumerable<KeyValuePair<string, object>> Correlations
+        {
+            get
+            {
+                yield return new KeyValuePair<string, object>();
+            }
+        }
     }
 
     public class NominatedDepositAccountMatched : IDomainEvent
     {
         public string ApplicationId { get; set; }
+
+        public IEnumerable<KeyValuePair<string, object>> Correlations
+        {
+            get
+            {
+                yield return new KeyValuePair<string, object>();
+            }
+        }
     }
 
     public class NominatedDepositAccountNotMatched : IDomainEvent
     {
         public string ApplicationId { get; set; }
+
+        public IEnumerable<KeyValuePair<string, object>> Correlations
+        {
+            get
+            {
+                yield return new KeyValuePair<string, object>();
+            }
+        }
     }
 
     /// <summary>
@@ -37,6 +69,14 @@ namespace EventSourcing
     public class BankLoginsNominated : IDomainEvent
     {
         public string ApplicationId { get; set; }
+
+        public IEnumerable<KeyValuePair<string, object>> Correlations
+        {
+            get
+            {
+                yield return new KeyValuePair<string, object>();
+            }
+        }
     }
 
     public class BankAccountRetreived : IDomainEvent
@@ -44,6 +84,14 @@ namespace EventSourcing
         public string LoginId { get; set; }
         public string AccountId { get; set; }
         public string ApplicationId { get; set; }
+
+        public IEnumerable<KeyValuePair<string, object>> Correlations
+        {
+            get
+            {
+                yield return new KeyValuePair<string, object>();
+            }
+        }
     }
 
     public class BankLoginIncorrect : IDomainEvent
@@ -51,6 +99,14 @@ namespace EventSourcing
         public string LoginId { get; set; }
         public string Bank { get; set; }        
         public string ApplicationId { get; set; }
+
+        public IEnumerable<KeyValuePair<string, object>> Correlations
+        {
+            get
+            {
+                yield return new KeyValuePair<string, object>();
+            }
+        }
     }
 
     public struct MatchNominatedDespositAccount
@@ -60,7 +116,15 @@ namespace EventSourcing
     }
 
     public class JustSpinningMyWheels : IDomainEvent
-    { }
+    {
+        public IEnumerable<KeyValuePair<string, object>> Correlations
+        {
+            get
+            {
+                yield return new KeyValuePair<string, object>();
+            }
+        }
+    }
 
     static class MatchNominatedDepositAccountHandler
     {

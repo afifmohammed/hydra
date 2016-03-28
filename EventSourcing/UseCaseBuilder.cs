@@ -4,12 +4,6 @@ using System.Linq.Expressions;
 
 namespace EventSourcing
 {
-    interface Correlation<TData, TDecision, TTrigger> : When<TData>, Then<TData, TTrigger>
-        where TData : new()
-    {
-        Correlation<TData, TDecision, TTrigger> Correlation(Expression<Func<TDecision, object>> id);
-    }
-
     interface CorrelationMap<TData, TNotification> : Given<TData>, When<TData>, Then<TData, TNotification>
         where TData : new()
     {
@@ -24,7 +18,7 @@ namespace EventSourcing
     interface Then<TData, TNotification> : When<TData>
         where TData : new()
     {
-        Correlation<TData, TDecision, TNotification> Then<TDecision>(Func<TData, TNotification, TDecision> handler);
+        When<TData> Then(Func<TData, TNotification, IEnumerable<IDomainEvent>> handler);
     }
 
     interface Given<TData>

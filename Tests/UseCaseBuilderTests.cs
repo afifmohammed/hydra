@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using EventSourcing;
 using Xunit;
 
@@ -10,6 +11,14 @@ namespace Tests
         {
             public string StateEventAIdM { get; set; }
             public int StateEventASomeCounter { get; set; }
+
+            public IEnumerable<KeyValuePair<string, object>> Correlations
+            {
+                get
+                {
+                    yield return new KeyValuePair<string, object>();
+                }
+            }
         }
 
         public class StateEventB : IDomainEvent
@@ -17,6 +26,14 @@ namespace Tests
             public string StateEventBIdM { get; set; }
             public int StateEventBIdN { get; set; }
             public int StateEventBSomeCounter { get; set; }
+
+            public IEnumerable<KeyValuePair<string, object>> Correlations
+            {
+                get
+                {
+                    yield return new KeyValuePair<string, object>();
+                }
+            }
         }
 
         public class TriggerEventA : IDomainEvent
@@ -24,6 +41,14 @@ namespace Tests
             public string TriggerEventAIdM { get; set; }
             public int TriggerEventAIdN { get; set; }
             public int TriggerEventASomeMinLimit { get; set; }
+
+            public IEnumerable<KeyValuePair<string, object>> Correlations
+            {
+                get
+                {
+                    yield return new KeyValuePair<string, object>();
+                }
+            }
         }
 
         public class TriggerEventB : IDomainEvent
@@ -31,20 +56,30 @@ namespace Tests
             public string TriggerEventBIdM { get; set; }
             public int TriggerEventBIdN { get; set; }
             public int TriggerEventBSomeMaxLimit { get; set; }
+
+            public IEnumerable<KeyValuePair<string, object>> Correlations
+            {
+                get
+                {
+                    yield return new KeyValuePair<string, object>();
+                }
+            }
         }
 
         public class DecisionEventX : IDomainEvent
         {
+            public IEnumerable<KeyValuePair<string, object>> Correlations
+            {
+                get
+                {
+                    yield return new KeyValuePair<string, object>(nameof(DecisionEventXIdM), DecisionEventXIdM);
+                    yield return new KeyValuePair<string, object>(nameof(DecisionEventXIdN), DecisionEventXIdN);
+                }
+            }
+
             public string DecisionEventXIdM { get; set; }
             public int DecisionEventXIdN { get; set; }
             public string DecisionEventXIdO { get; set; }
-        }
-
-        public class DecisionEventY : IDomainEvent
-        {
-            public string DecisionEventYIdM { get; set; }
-            public int DecisionEventYIdN { get; set; }
-            public string DecisionEventYIdO { get; set; }
         }
 
         public struct TakeDecisionX
@@ -55,19 +90,14 @@ namespace Tests
 
         public static class TakeDecisionXHandler
         {
-            public static DecisionEventX OnADoX(TakeDecisionX x, TriggerEventA a)
+            public static IEnumerable<IDomainEvent> OnA(TakeDecisionX x, TriggerEventA a)
             {
-                return new DecisionEventX();
-            }
+                yield return new DecisionEventX();
+            }            
 
-            public static DecisionEventY OnADoY(TakeDecisionX x, TriggerEventA a)
+            public static IEnumerable<IDomainEvent> OnB(TakeDecisionX x, TriggerEventB b)
             {
-                return new DecisionEventY();
-            }
-
-            public static DecisionEventX OnBDoX(TakeDecisionX x, TriggerEventB b)
-            {
-                return new DecisionEventX();
+                yield return new DecisionEventX();
             }
         }
 
@@ -83,20 +113,9 @@ namespace Tests
                 .When<TriggerEventA>(e => d => { })
                     .Correlate(x => x.TriggerEventAIdM, x => x.IdM)
                     .Correlate(x => x.TriggerEventAIdN, x => x.IdN)
-                    .Then(TakeDecisionXHandler.OnADoX)
-                        .Correlation(x => x.DecisionEventXIdM)
-                        .Correlation(x => x.DecisionEventXIdN)
-                        .Correlation(x => x.DecisionEventXIdO)
-                    .Then(TakeDecisionXHandler.OnADoY)
-                        .Correlation(x => x.DecisionEventYIdM)
-                        .Correlation(x => x.DecisionEventYIdN)
-                        .Correlation(x => x.DecisionEventYIdO)
+                    .Then(TakeDecisionXHandler.OnA)                                                                    
                 .When<TriggerEventB>(e => d => { })
-                    .Correlate(x => x.TriggerEventBIdM, x => x.IdM)
-                    .Correlate(x => x.TriggerEventBIdN, x => x.IdN)
-                    .Then(TakeDecisionXHandler.OnBDoX); 
-                    // notice we didn't specify the corelations for DecisionEventX 
-                    // as they have already been specified above for OnA
+                    .Then(TakeDecisionXHandler.OnB);                     
         }
     }
 }
