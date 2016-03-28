@@ -6,6 +6,11 @@ using Newtonsoft.Json;
 
 namespace EventSourcing
 {
+    public interface ICorrelated
+    {
+        IEnumerable<KeyValuePair<string, object>> Correlations { get; }
+    }
+
     public struct CorrelationMap
     {
         public TypeContract HandlerDataContract { get; set; }

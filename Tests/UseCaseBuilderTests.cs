@@ -16,7 +16,7 @@ namespace Tests
             {
                 get
                 {
-                    yield return new KeyValuePair<string, object>();
+                    yield return this.PropertyNameValue(x => x.StateEventAIdM);
                 }
             }
         }
@@ -31,7 +31,8 @@ namespace Tests
             {
                 get
                 {
-                    yield return new KeyValuePair<string, object>();
+                    yield return this.PropertyNameValue(x => x.StateEventBIdM);
+                    yield return this.PropertyNameValue(x => x.StateEventBIdN);
                 }
             }
         }
@@ -46,7 +47,8 @@ namespace Tests
             {
                 get
                 {
-                    yield return new KeyValuePair<string, object>();
+                    yield return this.PropertyNameValue(x => x.TriggerEventAIdM);
+                    yield return this.PropertyNameValue(x => x.TriggerEventAIdN);
                 }
             }
         }
@@ -61,7 +63,8 @@ namespace Tests
             {
                 get
                 {
-                    yield return new KeyValuePair<string, object>();
+                    yield return this.PropertyNameValue(x => x.TriggerEventBIdM);
+                    yield return this.PropertyNameValue(x => x.TriggerEventBIdN);
                 }
             }
         }
@@ -72,8 +75,8 @@ namespace Tests
             {
                 get
                 {
-                    yield return new KeyValuePair<string, object>(nameof(DecisionEventXIdM), DecisionEventXIdM);
-                    yield return new KeyValuePair<string, object>(nameof(DecisionEventXIdN), DecisionEventXIdN);
+                    yield return this.PropertyNameValue(x => x.DecisionEventXIdM);
+                    yield return this.PropertyNameValue(x => x.DecisionEventXIdN);
                 }
             }
 
@@ -105,16 +108,16 @@ namespace Tests
         public void WorksOutofTheBox()
         {
             new UseCase<TakeDecisionX>()
-                .Given<StateEventA>(e => d => { })
+                .Given<StateEventA>(e => d => { /* todo: map e to d */ })
                     .Correlate(x => x.StateEventAIdM, x => x.IdM)
-                .Given<StateEventB>(e => d => { })
+                .Given<StateEventB>(e => d => { /* todo: map e to d */ })
                     .Correlate(x => x.StateEventBIdM, x => x.IdM)
                     .Correlate(x => x.StateEventBIdN, x => x.IdN)
-                .When<TriggerEventA>(e => d => { })
+                .When<TriggerEventA>(e => d => { /* todo: map e to d */ })
                     .Correlate(x => x.TriggerEventAIdM, x => x.IdM)
                     .Correlate(x => x.TriggerEventAIdN, x => x.IdN)
                     .Then(TakeDecisionXHandler.OnA)                                                                    
-                .When<TriggerEventB>(e => d => { })
+                .When<TriggerEventB>(e => d => { /* todo: map e to d */ })
                     .Then(TakeDecisionXHandler.OnB);                     
         }
     }

@@ -8,6 +8,11 @@ namespace EventSourcing
 {
     static class Extensions
     {
+        public static KeyValuePair<string, object> PropertyNameValue<T>(this T instance, Expression<Func<T, object>> property)
+        {
+            return new KeyValuePair<string, object>(property.GetPropertyName(), property.Compile()(instance));
+        }
+
         public static TypeContract Contract(this Type t)
         {
             return new TypeContract(t);

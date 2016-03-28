@@ -3,10 +3,8 @@ using System.Collections.Generic;
 
 namespace EventSourcing
 {
-    public interface IDomainEvent
-    {
-        IEnumerable<KeyValuePair<string, object>> Correlations { get; }
-    }
+    public interface IDomainEvent : ICorrelated
+    {}
 
     public struct SerializedNotification
     {
