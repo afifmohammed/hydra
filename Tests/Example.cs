@@ -80,11 +80,12 @@ namespace EventSourcing
         }
     }
 
-    public class Tests
+    public class PublisherTests
     {
         /*
         new UseCase<MatchNominatedDespositAccount>()
-            .Given<BankLoginReceived>(e => d => {})            
+            .Given<BankLoginReceived>(e => d => {})
+                .Correlates(e => e.ApplicationId, d => d.ApplicationId)            
             .When<BankAccountRetrieved>(e => d => {})
                 .Then((e,d) => MatchNominatedBankAccountHandler.On(e,d))
             .When<BankLoginsNominated>(e => d => {})
