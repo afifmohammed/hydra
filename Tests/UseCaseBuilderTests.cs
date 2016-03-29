@@ -118,6 +118,8 @@ namespace Tests
                     .Correlate(x => x.TriggerEventAIdN, x => x.IdN)
                     .Then(TakeDecisionXHandler.OnA)                                                                    
                 .When<TriggerEventB>(e => d => { /* todo: map e to d */ })
+                    .Correlate(x => x.TriggerEventBIdM, x => x.IdM)
+                    .Correlate(x => x.TriggerEventBIdN, x => x.IdN)
                     .Then(TakeDecisionXHandler.OnB);                     
         }
     }
