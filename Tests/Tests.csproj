@@ -59,8 +59,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Example.cs" />
-    <Compile Include="UseCaseBuilderTests.cs" />
+    <Compile Include="StockExample\Events.cs" />
+    <Compile Include="StockExample\InventoryItemStockData.cs" />
+    <Compile Include="StockExample\Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

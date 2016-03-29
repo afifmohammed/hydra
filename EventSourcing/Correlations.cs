@@ -57,6 +57,19 @@ namespace EventSourcing
             );
         }
 
+        public static KeyValuePair<TypeContract, Func<TSource, JsonContent, TSource>> Maps<TContract>(Func<TContract, TSource, TSource> mapper)
+        {
+            return new KeyValuePair<TypeContract, Func<TSource, JsonContent, TSource>>
+            (
+                typeof(TContract).Contract(),
+                (d, json) =>
+                {
+                    var contract = JsonConvert.DeserializeObject<TContract>(json.Value);
+                    return mapper(contract,d);
+                }
+            );
+        }
+
         public static KeyValuePair<TypeContract, Func<TSource, JsonContent, TSource>> Maps<TContract>(Func<TContract, Action<TSource>> mapper)
         {
             return new KeyValuePair<TypeContract, Func<TSource, JsonContent, TSource>>

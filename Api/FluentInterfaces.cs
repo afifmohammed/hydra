@@ -14,25 +14,20 @@ namespace EventSourcing
     public interface Given<TData>
         where TData : new()
     {
-        CorrelationMap<TData, TNotification> Given<TNotification>(Func<TNotification, Action<TData>> mapper) where TNotification : IDomainEvent;
+        CorrelationMap<TData, TNotification> Given<TNotification>(Func<TNotification, TData, TData> mapper) where TNotification : IDomainEvent;
     }
 
     public interface When<TData> where TData : new()
     {
-        CorrelationMap<TData, TNotification> When<TNotification>(Func<TNotification, Action<TData>> mapper) where TNotification : IDomainEvent;
+        CorrelationMap<TData, TNotification> When<TNotification>(Func<TNotification, TData, TData> mapper) where TNotification : IDomainEvent;
+        CorrelationMap<TData, TNotification> When<TNotification>() where TNotification : IDomainEvent;
+        IEnumerable<KeyValuePair<TypeContract, Func<IDomainEvent, NotificationsByPublisher>>> Publishers { get; }
     }
 
-    public interface Then<TData, TNotification> : When<TData>
+    public interface Then<TData, out TNotification> : When<TData>
         where TData : new()
         where TNotification : IDomainEvent
     {
-        Build<TData, TNotification> Then(Func<TData, TNotification, IEnumerable<IDomainEvent>> handler);
-    }
-
-    public interface Build<TData, in TNotification> : When<TData>
-        where TData : new()
-        where TNotification : IDomainEvent
-    {
-        IEnumerable<Func<TNotification, NotificationsByPublisher>> Build();
+        When<TData> Then(Func<TData, TNotification, IEnumerable<IDomainEvent>> handler);
     }
 }
