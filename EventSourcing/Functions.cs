@@ -112,12 +112,7 @@ namespace EventSourcing
         {
             var handlerData = new THandlerData();
 
-            foreach (var notification in notifications)
-                handlerData = handlerDataMappersByNotificationContract
-                    [notification.Contract]
-                    (handlerData, notification.JsonContent);
-
-            return handlerData;
+            return notifications.Aggregate(handlerData, (current, notification) => handlerDataMappersByNotificationContract[notification.Contract](current, notification.JsonContent));
         }
     }
 
