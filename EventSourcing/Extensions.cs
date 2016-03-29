@@ -6,8 +6,18 @@ using System.Reflection;
 
 namespace EventSourcing
 {
-    static class Extensions
+    public static class Extensions
     {
+        public static IEnumerable<Correlation> Correlations(this IDomainEvent notification)
+        {
+            return notification.Correlations.Select(c => new Correlation
+            {
+                Contract = new TypeContract(notification),
+                PropertyName = c.Key,
+                PropertyValue = new Lazy<string>(() => c.Value.ToString())
+            });
+        } 
+
         public static KeyValuePair<string, object> PropertyNameValue<T>(this T instance, Expression<Func<T, object>> property)
         {
             return new KeyValuePair<string, object>(property.GetPropertyName(), property.Compile()(instance));

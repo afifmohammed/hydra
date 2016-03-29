@@ -221,7 +221,7 @@ namespace EventSourcing
                 (e, d) => MatchNominatedDepositAccountHandler.On(d, e),
                 CorrelationMapsByPublisherDataContract,
                 NotificationsByCorrelations(notifications),
-                CorrelationsByNotificationContract,
+                n => CorrelationsByNotificationContract[new TypeContract(n)](n),
                 PublisherDataMappers,
                 () => time
             );

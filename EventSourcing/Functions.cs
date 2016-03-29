@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace EventSourcing
 {
-    static class Functions
+    public static class Functions
     {
         public static NotificationsByPublisherAndVersion AppendPublisherVersion(
             NotificationsByPublisher notifications,
@@ -23,7 +23,7 @@ namespace EventSourcing
             Func<TPublisherData, TNotification, IEnumerable<IDomainEvent>> publisher,
             IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByPublisherDataContract,
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
-            IDictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>> correlationsByNotificationContract,
+            Func<IDomainEvent, IEnumerable<Correlation>> correlationsByNotification,
             IDictionary<TypeContract, Func<TPublisherData, JsonContent, TPublisherData>> publisherDataMappersByNotificationContract,
             Func<DateTimeOffset> clock)
             where TPublisherData : new()
@@ -49,7 +49,7 @@ namespace EventSourcing
                         CorrelationsOfMatchingNotificationsBy
                         (
                             correlationMapsByPublisherDataContract[typeof(TPublisherData).Contract()],
-                            correlationsByNotificationContract[new TypeContract(n)](n)
+                            correlationsByNotification(n)
                         ).Where(x => x.Contract.Equals(new TypeContract(n)))
                     )
                 ),

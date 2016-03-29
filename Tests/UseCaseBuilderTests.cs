@@ -107,7 +107,7 @@ namespace Tests
         [Fact]
         public void WorksOutofTheBox()
         {
-            new UseCase<TakeDecisionX>()
+            var publisher = new UseCase<TakeDecisionX>()
                 .Given<StateEventA>(e => d => { /* todo: map e to d */ })
                     .Correlate(x => x.StateEventAIdM, x => x.IdM)
                 .Given<StateEventB>(e => d => { /* todo: map e to d */ })
@@ -120,7 +120,8 @@ namespace Tests
                 .When<TriggerEventB>(e => d => { /* todo: map e to d */ })
                     .Correlate(x => x.TriggerEventBIdM, x => x.IdM)
                     .Correlate(x => x.TriggerEventBIdN, x => x.IdN)
-                    .Then(TakeDecisionXHandler.OnB);                     
+                    .Then(TakeDecisionXHandler.OnB)
+                .Build();                     
         }
     }
 }
