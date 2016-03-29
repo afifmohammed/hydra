@@ -22,7 +22,7 @@ namespace EventSourcing
         public static Func<TNotification, NotificationsByPublisher> GroupNotificationsByPublisher<TPublisherData, TNotification>(
             Func<TPublisherData, TNotification, IEnumerable<IDomainEvent>> publisher,
             IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByPublisherDataContract,
-            Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByPublisherDataCorrelations,
+            Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
             IDictionary<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>> correlationsByNotificationContract,
             IDictionary<TypeContract, Func<TPublisherData, JsonContent, TPublisherData>> publisherDataMappersByNotificationContract,
             Func<DateTimeOffset> clock)
@@ -37,7 +37,7 @@ namespace EventSourcing
                     (
                         notification,
                         correlationMapsByPublisherDataContract[typeof(TPublisherData).Contract()],
-                        notificationsByPublisherDataCorrelations,
+                        notificationsByCorrelations,
                         publisherDataMappersByNotificationContract
                     ),
                     notification
@@ -103,7 +103,7 @@ namespace EventSourcing
                     PropertyName = m.HandlerDataPropertyName,
                     Contract = m.HandlerDataContract,
                     PropertyValue = new Lazy<string>(() => (m.NotificationPropertyName.GetPropertySelector<TNotification>().Compile()(notification)).ToString())
-                });
+                }); 
         }
 
         public static THandlerData FoldHandlerData<THandlerData>(
