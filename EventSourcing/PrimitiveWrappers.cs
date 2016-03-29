@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace EventSourcing
 {
-    public interface Unit<TValue>
+    public interface Unit<out TValue>
     {
         TValue Value { get; }
     }
@@ -18,7 +18,7 @@ namespace EventSourcing
         {
             Value = value;
         }
-        public string Value { get; private set; }
+        public string Value { get; }
     }
 
     public struct Version : Unit<int>
@@ -27,7 +27,7 @@ namespace EventSourcing
         {
             Value = value;
         }
-        public int Value { get; private set; }
+        public int Value { get; }
     }
 
     public struct TypeContract : Unit<string>
@@ -42,7 +42,7 @@ namespace EventSourcing
             Value = t.GetType().FriendlyName();
         }
 
-        public string Value { get; private set; }
+        public string Value { get; }
 
         public override bool Equals(object obj)
         {
