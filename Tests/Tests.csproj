@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="StockExample\Events.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="StockExample\InventoryItemStockData.cs" />
     <Compile Include="StockExample\Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
