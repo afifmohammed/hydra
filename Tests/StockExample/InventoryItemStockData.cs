@@ -14,7 +14,7 @@ namespace Tests
 
     public static class InventoryItemStockHandler
     {
-        public static IEnumerable<KeyValuePair<TypeContract, Func<IDomainEvent, NotificationsByPublisher>>> Publishers()
+        public static IEnumerable<KeyValuePair<TypeContract, Func<IDomainEvent, NotificationsByPublisher>>> Subscribers()
         {
             return new UseCase<InventoryItemStockData>()
                 .Given<InventoryItemCreated>(Map)
@@ -95,9 +95,10 @@ namespace Tests
         {
             return new InventoryItemStockData
             {
-                Sku = e.Id,
-                OverStockLimit = d.OverStockLimit,
-                Count = d.Count + e.Count
+                IsActive = d.IsActive,
+                Sku = d.Sku,
+                Count = d.Count + e.Count,
+                OverStockLimit = d.OverStockLimit
             };
         }
 
@@ -105,9 +106,10 @@ namespace Tests
         {
             return new InventoryItemStockData
             {
-                Sku = e.Id,
-                OverStockLimit = d.OverStockLimit,
-                Count = d.Count - e.Count
+                IsActive = d.IsActive,
+                Sku = d.Sku,
+                Count = d.Count - e.Count,
+                OverStockLimit = d.OverStockLimit
             };
         }
 
@@ -115,9 +117,10 @@ namespace Tests
         {
             return new InventoryItemStockData
             {
-                Sku = e.Id,
-                OverStockLimit = d.OverStockLimit,
-                IsActive = false
+                IsActive = false,
+                Sku = d.Sku,
+                Count = d.Count,
+                OverStockLimit = d.OverStockLimit
             };
         }
 
@@ -125,14 +128,20 @@ namespace Tests
         {
             return new InventoryItemStockData
             {
+                IsActive = true,
                 Sku = e.Id
             };
         }
 
         private static InventoryItemStockData Map(InventoryItemStockLimitChanged e, InventoryItemStockData d)
         {
-            d.OverStockLimit = e.Limit;
-            return d;
+            return new InventoryItemStockData
+            {
+                IsActive = d.IsActive,
+                Sku = d.Sku,
+                Count = d.Count,
+                OverStockLimit = e.Limit
+            };
         }
     }
 }
