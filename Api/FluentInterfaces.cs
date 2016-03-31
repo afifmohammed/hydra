@@ -17,11 +17,22 @@ namespace EventSourcing
         CorrelationMap<TData, TNotification> Given<TNotification>(Func<TNotification, TData, TData> mapper) where TNotification : IDomainEvent;
     }
 
-    public interface When<TData> where TData : new()
+    public interface Subsriptions
+    {
+        IDictionary<
+            Tuple<TypeContract, TypeContract>, 
+            Func<
+                IDomainEvent, 
+                Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>>, 
+                Func<DateTimeOffset>, 
+                NotificationsByPublisher>> PublisherByNotificationAndPublisherContract { get; }
+    }
+
+    public interface When<TData> : Subsriptions
+        where TData : new()
     {
         CorrelationMap<TData, TNotification> When<TNotification>(Func<TNotification, TData, TData> mapper) where TNotification : IDomainEvent;
         CorrelationMap<TData, TNotification> When<TNotification>() where TNotification : IDomainEvent;
-        IEnumerable<KeyValuePair<TypeContract, Func<IDomainEvent, NotificationsByPublisher>>> Publishers { get; }
     }
 
     public interface Then<TData, out TNotification> : When<TData>

@@ -8,36 +8,17 @@ namespace Tests
 {
     public class Tests
     {
-        static Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> NotificationsByCorrelations(params IDomainEvent[] notifications)
-        {
-            return correlations => notifications
-                .Select(n => new
-                {
-                    Notification = new SerializedNotification
-                    {
-                        Contract = n.Contract(),
-                        JsonContent = new JsonContent(n)
-                    },
-                    Correlations = n.Correlations()
-                })
-                .Where(n => correlations.Where(c => c.Contract.Equals(n.Contract())).All(c => n.Correlations.Any(nc => nc.Equals(c))))
-                .Select(x => x.Notification);
-        }
-
         public class CanDeactivateAStockedItem
         {
             readonly List<NotificationsByPublisher> _notificationsByPublisher = new List<NotificationsByPublisher>();
              
             public CanDeactivateAStockedItem()
             {
-                GlobalConfiguration.NotificationsByCorrelations = NotificationsByCorrelations
-                (
-                    new InventoryItemCreated { Id = "1" },
-                    new ItemsCheckedInToInventory { Id = "1", Count = 10 }
-                );
-
                 _notificationsByPublisher.AddRange(InventoryItemStockHandler
-                    .Subscribers()
+                    .Subsriptions()
+                    .Given<DeactivateInventoryItemRequested>(
+                        new InventoryItemCreated { Id = "1" },
+                        new ItemsCheckedInToInventory { Id = "1", Count = 10 })
                     .Notify(new DeactivateInventoryItemRequested {Id = "1"}));
             }
 

@@ -14,7 +14,7 @@ namespace Tests
 
     public static class InventoryItemStockHandler
     {
-        public static IEnumerable<KeyValuePair<TypeContract, Func<IDomainEvent, NotificationsByPublisher>>> Subscribers()
+        public static Subsriptions Subsriptions()
         {
             return new UseCase<InventoryItemStockData>()
                 .Given<InventoryItemCreated>(Map)
@@ -41,8 +41,7 @@ namespace Tests
                     .Then(Handle)
                 .When<DeactivateInventoryItemRequested>()
                     .Correlate(x => x.Id, x => x.Sku)
-                    .Then(Handle)
-                .Publishers;
+                    .Then(Handle);
         }
 
         public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, InventoryItemStockLimitChangeRequested e)
