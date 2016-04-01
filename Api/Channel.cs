@@ -6,6 +6,15 @@ namespace EventSourcing
 {
     public static class Channel
     {
+        public static IEnumerable<Message> PrepareMessages(
+            IDomainEvent notification,
+            PublishersBySubscription publishersBySubscription)
+        {
+            return publishersBySubscription
+                .Where(p => p.Key.NotificationContract.Equals(new TypeContract(notification)))
+                .Select(p => new Message {Notification = notification, Subscription = p.Key});
+        }
+
         public static void Push(
             Message message, 
             PublishersBySubscription publishersBySubscription,
@@ -16,17 +25,18 @@ namespace EventSourcing
             Action<IEnumerable<Message>> notify)
         {
             var publisher = publishersBySubscription[message.Subscription];
+
             var notificationsByPublisher = publisher(message.Notification, notificationsByCorrelations, clock);
+
             var notificationsByPublisherAndVersion = Functions.AppendPublisherVersion(
                 notificationsByPublisher,
                 publisherVersionByPublisherDataContractCorrelations);
 
             saveNotificationsByPublisherAndVersion(notificationsByPublisherAndVersion);
+
             notify(notificationsByPublisher
                 .Notifications
-                .SelectMany(n => publishersBySubscription
-                    .Where(p => p.Key.NotificationContract.Equals(new TypeContract(n)))
-                    .Select(p => new Message { Notification = n.Item1, Subscription = p.Key }))
+                .SelectMany(n => PrepareMessages(n.Item1, publishersBySubscription))
                 .ToArray());
         }
     }
