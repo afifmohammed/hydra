@@ -27,18 +27,31 @@ namespace EventSourcing
 
         public override bool Equals(object obj)
         {
+            if (ReferenceEquals(obj, null)) return false;
             if (!(obj is Correlation))
                 return false;
 
-            var other = (Correlation)obj;
+            return Equals((Correlation)obj);
+        }
 
-            return other.Contract.Equals(Contract)
-                && other.PropertyName == PropertyName
-                && other.PropertyValue.Value == PropertyValue.Value;
+        public bool Equals(Correlation other)
+        {
+            return Contract.Equals(other.Contract) && string.Equals(PropertyName, other.PropertyName) && Equals(PropertyValue, other.PropertyValue);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Contract.GetHashCode();
+                hashCode = (hashCode*397) ^ (PropertyName?.GetHashCode() ?? 0);
+                hashCode = (hashCode*397) ^ (PropertyValue?.GetHashCode() ?? 0);
+                return hashCode;
+            }
         }
     }
 
-    public static partial class Type<TSource> where TSource : new()
+    public static class Type<TSource> where TSource : new()
     {
         public static KeyValuePair<TypeContract, CorrelationMap> Correlates<TContract>(
             Expression<Func<TSource, object>> handlerDataProperty,
@@ -87,7 +100,11 @@ namespace EventSourcing
 
         public static KeyValuePair<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>> Correlation(params Expression<Func<TSource, object>>[] properties)
         {
-            return new KeyValuePair<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>>(typeof(TSource).Contract(), e => properties.Select(p => Property(p, (TSource)e)));
+            return new KeyValuePair<TypeContract, Func<IDomainEvent, IEnumerable<Correlation>>>
+            (
+                typeof(TSource).Contract(), 
+                e => properties.Select(p => Property(p, (TSource)e))
+            );
         }
 
         public static Correlation Property(Expression<Func<TSource, object>> property, TSource source)

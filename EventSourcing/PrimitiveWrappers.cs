@@ -18,7 +18,7 @@ namespace EventSourcing
         {
             Value = value;
         }
-        public string Value { get; }
+        public string Value { get; set; }
     }
 
     public struct Version : Unit<int>
@@ -27,7 +27,7 @@ namespace EventSourcing
         {
             Value = value;
         }
-        public int Value { get; }
+        public int Value { get; set; }
     }
 
     public struct TypeContract : Unit<string>
@@ -42,16 +42,24 @@ namespace EventSourcing
             Value = t.GetType().FriendlyName();
         }
 
-        public string Value { get; }
+        public string Value { get; set; }
 
         public override bool Equals(object obj)
         {
-            if (!(obj is TypeContract))
-                return false;
+            if (ReferenceEquals(obj, null)) return false;
+            if ((obj is TypeContract) == false) return false;
 
-            var other = (TypeContract)obj;
+            return Equals((TypeContract)obj);
+        }
 
-            return other.Value.Equals(Value);
+        public bool Equals(TypeContract other)
+        {
+            return string.Equals(Value, other.Value);
+        }
+
+        public override int GetHashCode()
+        {
+            return Value?.GetHashCode() ?? 0;
         }
     }
 }

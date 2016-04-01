@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using EventSourcing;
 using Xunit;
@@ -16,6 +15,7 @@ namespace Tests
             {
                 _notificationsByPublisher.AddRange(InventoryItemStockHandler
                     .Subsriptions()
+                    .PublisherBySubscription
                     .Given<DeactivateInventoryItemRequested>(
                         new InventoryItemCreated { Id = "1" },
                         new ItemsCheckedInToInventory { Id = "1", Count = 10 })
@@ -44,9 +44,9 @@ namespace Tests
             public void PublisherHasPublishedTheRightNotifications()
             {
                 var notifications = _notificationsByPublisher
-                .SelectMany(n => n.Notifications)
-                .Select(n => n.Item1)
-                .ToList();
+                    .SelectMany(n => n.Notifications)
+                    .Select(n => n.Item1)
+                    .ToList();
 
                 Assert.Equal(1, notifications.Count);
                 Assert.Equal(typeof(InventoryItemDeactivated).Contract().Value, notifications.Select(n => n.Contract().Value).Single());

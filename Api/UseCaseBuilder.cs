@@ -14,13 +14,7 @@ namespace EventSourcing
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(), 
                 new List<KeyValuePair<TypeContract, Func<TData, JsonContent, TData>>> { Type<TData>.Maps(mapper) },
-                new Dictionary<
-                    Tuple<TypeContract, TypeContract>,
-                    Func<
-                        IDomainEvent,
-                        Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>>,
-                        Func<DateTimeOffset>,
-                        NotificationsByPublisher>>()
+                new PublishersBySubscription()
             );
         }
     }
@@ -31,48 +25,29 @@ namespace EventSourcing
     {
         readonly List<KeyValuePair<TypeContract, CorrelationMap>> _publisherDataContractMaps;
         readonly List<KeyValuePair<TypeContract, Func<TData, JsonContent, TData>>> _publisherDataMappers;
-        public IDictionary<
-            Tuple<TypeContract, TypeContract>,
-            Func<
-                IDomainEvent,
-                Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>>,
-                Func<DateTimeOffset>,
-                NotificationsByPublisher>> PublisherByNotificationAndPublisherContract { get; }
+        public PublishersBySubscription PublisherBySubscription { get; }
 
         public NotificationHandler(
             List<KeyValuePair<TypeContract, CorrelationMap>> maps, 
             List<KeyValuePair<TypeContract, Func<TData, JsonContent, TData>>> mappers,
-            IDictionary<
-                Tuple<TypeContract, TypeContract>,
-                Func<
-                    IDomainEvent,
-                    Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>>,
-                    Func<DateTimeOffset>,
-                    NotificationsByPublisher>> publisherByNotificationAndPublisherContract)
+            PublishersBySubscription publisherByNotificationAndPublisherContract)
         {
             _publisherDataContractMaps = maps ?? new List<KeyValuePair<TypeContract, CorrelationMap>>();
             _publisherDataMappers = mappers ?? new List<KeyValuePair<TypeContract, Func<TData, JsonContent, TData>>>();
 
-            PublisherByNotificationAndPublisherContract = publisherByNotificationAndPublisherContract 
-                ?? new Dictionary<
-                    Tuple<TypeContract, TypeContract>, 
-                    Func<
-                        IDomainEvent, 
-                        Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>>, 
-                        Func<DateTimeOffset>, 
-                        NotificationsByPublisher>>();
+            PublisherBySubscription = publisherByNotificationAndPublisherContract ?? new PublishersBySubscription();
         }
 
         public CorrelationMap<TData, TNotification1> Given<TNotification1>(Func<TNotification1, TData, TData> mapper) where TNotification1 : IDomainEvent
         {
             _publisherDataMappers.Add(Type<TData>.Maps(mapper));
-            return new NotificationHandler<TData, TNotification1>(_publisherDataContractMaps, _publisherDataMappers, PublisherByNotificationAndPublisherContract);
+            return new NotificationHandler<TData, TNotification1>(_publisherDataContractMaps, _publisherDataMappers, PublisherBySubscription);
         }
 
         public CorrelationMap<TData, TNotification1> When<TNotification1>(Func<TNotification1, TData, TData> mapper) where TNotification1 : IDomainEvent
         {
             _publisherDataMappers.Add(Type<TData>.Maps(mapper));
-            return new NotificationHandler<TData, TNotification1>(_publisherDataContractMaps, _publisherDataMappers, PublisherByNotificationAndPublisherContract);
+            return new NotificationHandler<TData, TNotification1>(_publisherDataContractMaps, _publisherDataMappers, PublisherBySubscription);
         }
 
         public CorrelationMap<TData, TNotification1> When<TNotification1>() where TNotification1 : IDomainEvent
@@ -82,27 +57,18 @@ namespace EventSourcing
 
         public When<TData> Then(Func<TData, TNotification, IEnumerable<IDomainEvent>> handler)
         {
-            PublisherByNotificationAndPublisherContract.Add
+            PublisherBySubscription.Add
             (
-                new KeyValuePair<
-                    Tuple<TypeContract, TypeContract>, 
-                    Func<
-                        IDomainEvent, 
-                        Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>>, 
-                        Func<DateTimeOffset>, 
-                        NotificationsByPublisher>>
-                (
-                    new Tuple<TypeContract, TypeContract>(typeof(TNotification).Contract(), typeof(TData).Contract()),
-                    (e, query, clock) => Functions.GroupNotificationsByPublisher
-                    (
-                        handler,
-                        _publisherDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => x.Select(a => a.Value)),
-                        query,
-                        Extensions.Correlations,
-                        _publisherDataMappers.ToDictionary(x => x.Key, x => x.Value),
-                        clock
-                    )((TNotification)e)
-                )
+                new Subscription(typeof(TNotification).Contract(), typeof(TData).Contract()),
+                (e, query, clock) => Functions.GroupNotificationsByPublisher
+                                    (
+                                        handler,
+                                        _publisherDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => x.Select(a => a.Value)),
+                                        query,
+                                        Extensions.Correlations,
+                                        _publisherDataMappers.ToDictionary(x => x.Key, x => x.Value),
+                                        clock
+                                    )((TNotification)e)
             );
 
             return this;

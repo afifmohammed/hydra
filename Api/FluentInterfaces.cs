@@ -17,18 +17,53 @@ namespace EventSourcing
         CorrelationMap<TData, TNotification> Given<TNotification>(Func<TNotification, TData, TData> mapper) where TNotification : IDomainEvent;
     }
 
-    public interface Subsriptions
+    public struct Subscription
     {
-        IDictionary<
-            Tuple<TypeContract, TypeContract>, 
-            Func<
-                IDomainEvent, 
-                Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>>, 
-                Func<DateTimeOffset>, 
-                NotificationsByPublisher>> PublisherByNotificationAndPublisherContract { get; }
+        public Subscription(TypeContract notificationContract, TypeContract publisherDataContract)
+        {
+            NotificationContract = notificationContract;
+            PublisherDataContract = publisherDataContract;
+        }
+
+        public TypeContract NotificationContract { get; set; }
+        public TypeContract PublisherDataContract { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(obj, null)) return false;
+            if ((obj is Subscription) == false) return false;
+            
+            return Equals((Subscription)obj);
+        }
+
+        public bool Equals(Subscription other)
+        {
+            return NotificationContract.Equals(other.NotificationContract) && PublisherDataContract.Equals(other.PublisherDataContract);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (NotificationContract.GetHashCode()*397) ^ PublisherDataContract.GetHashCode();
+            }
+        }
     }
 
-    public interface When<TData> : Subsriptions
+    public delegate NotificationsByPublisher Publisher(
+        IDomainEvent notification,
+        Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> queryNotificationsByCorrelations,
+        Func<DateTimeOffset> clock);
+
+    public class PublishersBySubscription : Dictionary<Subscription, Publisher>
+    { }
+
+    public interface HasSubscriptions
+    {
+        PublishersBySubscription PublisherBySubscription { get; }
+    }
+
+    public interface When<TData> : HasSubscriptions
         where TData : new()
     {
         CorrelationMap<TData, TNotification> When<TNotification>(Func<TNotification, TData, TData> mapper) where TNotification : IDomainEvent;

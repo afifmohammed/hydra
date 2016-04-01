@@ -14,7 +14,7 @@ namespace Tests
 
     public static class InventoryItemStockHandler
     {
-        public static Subsriptions Subsriptions()
+        public static HasSubscriptions Subsriptions()
         {
             return new UseCase<InventoryItemStockData>()
                 .Given<InventoryItemCreated>(Map)

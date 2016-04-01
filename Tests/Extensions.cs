@@ -8,23 +8,21 @@ namespace Tests
     static class Extensions
     {
         public static IEnumerable<Func<IDomainEvent, NotificationsByPublisher>> Given<TNotification>(
-            this Subsriptions subscriptions,
+            this PublishersBySubscription subscriptions,
             params IDomainEvent[] given)
             where TNotification : IDomainEvent
         {
-            var publishers = subscriptions.PublisherByNotificationAndPublisherContract.Where(p => p.Key.Item1.Equals(typeof(TNotification).Contract())).Select(p => p.Value);
+            var publishers = subscriptions.Where(p => p.Key.NotificationContract.Equals(typeof(TNotification).Contract())).Select(p => p.Value);
 
-            return publishers.Select<
-                    Func<IDomainEvent, Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>>, Func<DateTimeOffset>, NotificationsByPublisher>, 
-                    Func<IDomainEvent, NotificationsByPublisher>>
-                    (
-                        function => 
-                            notification => 
-                                function(
-                                    notification, 
-                                    NotificationsByCorrelations(given), 
-                                    () => DateTimeOffset.Now)
-                    );
+            return publishers.Select<Publisher, Func<IDomainEvent, NotificationsByPublisher>>
+                                (
+                                    function => 
+                                        notification => 
+                                            function(
+                                                notification, 
+                                                NotificationsByCorrelations(given), 
+                                                () => DateTimeOffset.Now)
+                                );
         }
 
         public static IEnumerable<NotificationsByPublisher> Notify<TNotification>(this 
