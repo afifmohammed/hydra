@@ -60,15 +60,15 @@ namespace EventSourcing
             PublisherBySubscription.Add
             (
                 new Subscription(typeof(TNotification).Contract(), typeof(TData).Contract()),
-                (e, query, clock) => Functions.GroupNotificationsByPublisher
+                (notification, queryNotificationsByCorrelations, clock) => Functions.GroupNotificationsByPublisher
                                     (
                                         handler,
                                         _publisherDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => x.Select(a => a.Value)),
-                                        query,
+                                        queryNotificationsByCorrelations,
                                         Extensions.Correlations,
                                         _publisherDataMappers.ToDictionary(x => x.Key, x => x.Value),
                                         clock
-                                    )((TNotification)e)
+                                    )((TNotification)notification)
             );
 
             return this;

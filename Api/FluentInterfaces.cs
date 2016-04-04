@@ -58,12 +58,12 @@ namespace EventSourcing
     public class PublishersBySubscription : Dictionary<Subscription, Publisher>
     { }
 
-    public interface HasSubscriptions
+    public interface PublisherSubscriptions
     {
         PublishersBySubscription PublisherBySubscription { get; }
     }
 
-    public interface When<TData> : HasSubscriptions
+    public interface When<TData> : PublisherSubscriptions
         where TData : new()
     {
         CorrelationMap<TData, TNotification> When<TNotification>(Func<TNotification, TData, TData> mapper) where TNotification : IDomainEvent;

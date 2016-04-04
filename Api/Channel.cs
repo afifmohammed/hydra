@@ -6,27 +6,27 @@ namespace EventSourcing
 {
     public static class Channel
     {
-        public static IEnumerable<Message> PrepareMessages(
+        public static IEnumerable<PublisherNotification> PrepareMessages(
             IDomainEvent notification,
             PublishersBySubscription publishersBySubscription)
         {
             return publishersBySubscription
                 .Where(p => p.Key.NotificationContract.Equals(new TypeContract(notification)))
-                .Select(p => new Message {Notification = notification, Subscription = p.Key});
+                .Select(p => new PublisherNotification {Notification = notification, Subscription = p.Key});
         }
 
         public static void Push(
-            Message message, 
+            PublisherNotification publisherNotification, 
             PublishersBySubscription publishersBySubscription,
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
             Func<IEnumerable<Correlation>, int> publisherVersionByPublisherDataContractCorrelations,
             Func<DateTimeOffset> clock,
             Action<NotificationsByPublisherAndVersion> saveNotificationsByPublisherAndVersion,
-            Action<IEnumerable<Message>> notify)
+            Action<IEnumerable<PublisherNotification>> notify)
         {
-            var publisher = publishersBySubscription[message.Subscription];
+            var publisher = publishersBySubscription[publisherNotification.Subscription];
 
-            var notificationsByPublisher = publisher(message.Notification, notificationsByCorrelations, clock);
+            var notificationsByPublisher = publisher(publisherNotification.Notification, notificationsByCorrelations, clock);
 
             var notificationsByPublisherAndVersion = Functions.AppendPublisherVersion(
                 notificationsByPublisher,
@@ -41,9 +41,11 @@ namespace EventSourcing
         }
     }
 
-    public struct Message
+    public struct PublisherNotification : Message
     {
         public Subscription Subscription { get; set; }
         public IDomainEvent Notification { get; set; }
     }
+
+    public interface Message { }
 }
