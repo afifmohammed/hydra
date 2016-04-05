@@ -5,7 +5,9 @@ using System.Linq.Expressions;
 
 namespace EventSourcing
 {
-    public class Publisher<TData> : Given<TData>
+    public class Publisher<TData> : 
+        Given<TData>, 
+        When<TData> 
         where TData : new()
     {
         public CorrelationMap<TData, TNotification> Given<TNotification>(Func<TNotification, TData, TData> mapper) where TNotification : IDomainEvent
@@ -14,6 +16,26 @@ namespace EventSourcing
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(), 
                 new List<KeyValuePair<TypeContract, Func<TData, JsonContent, TData>>> { Type<TData>.Maps(mapper) },
+                new PublishersBySubscription()
+            );
+        }
+
+        public CorrelationMap<TData, TNotification> When<TNotification>(Func<TNotification, TData, TData> mapper) where TNotification : IDomainEvent
+        {
+            return new NotificationHandler<TData, TNotification>
+            (
+                new List<KeyValuePair<TypeContract, CorrelationMap>>(),
+                new List<KeyValuePair<TypeContract, Func<TData, JsonContent, TData>>> { Type<TData>.Maps(mapper) },
+                new PublishersBySubscription()
+            );
+        }
+
+        public CorrelationMap<TData, TNotification> When<TNotification>() where TNotification : IDomainEvent
+        {
+            return new NotificationHandler<TData, TNotification>
+            (
+                new List<KeyValuePair<TypeContract, CorrelationMap>>(),
+                new List<KeyValuePair<TypeContract, Func<TData, JsonContent, TData>>>(),
                 new PublishersBySubscription()
             );
         }
