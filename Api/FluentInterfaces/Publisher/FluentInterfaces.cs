@@ -19,14 +19,14 @@ namespace EventSourcing
 
     public struct Subscription
     {
-        public Subscription(TypeContract notificationContract, TypeContract publisherDataContract)
+        public Subscription(TypeContract notificationContract, TypeContract subscriberDataContract)
         {
             NotificationContract = notificationContract;
-            PublisherDataContract = publisherDataContract;
+            SubscriberDataContract = subscriberDataContract;
         }
 
         public TypeContract NotificationContract { get; set; }
-        public TypeContract PublisherDataContract { get; set; }
+        public TypeContract SubscriberDataContract { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -38,14 +38,14 @@ namespace EventSourcing
 
         public bool Equals(Subscription other)
         {
-            return NotificationContract.Equals(other.NotificationContract) && PublisherDataContract.Equals(other.PublisherDataContract);
+            return NotificationContract.Equals(other.NotificationContract) && SubscriberDataContract.Equals(other.SubscriberDataContract);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return (NotificationContract.GetHashCode()*397) ^ PublisherDataContract.GetHashCode();
+                return (NotificationContract.GetHashCode()*397) ^ SubscriberDataContract.GetHashCode();
             }
         }
     }
