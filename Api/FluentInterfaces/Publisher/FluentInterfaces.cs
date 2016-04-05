@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace EventSourcing
 {
-    public interface CorrelationMap<TData, TNotification> : Given<TData>, When<TData>, Then<TData, TNotification>
+    public interface CorrelationMap<TData, TNotification> : Given<TData>, PublisherSubscriptions<TData>, Then<TData, TNotification>
         where TData : new()
         where TNotification : IDomainEvent
     {
@@ -58,22 +58,28 @@ namespace EventSourcing
     public class PublishersBySubscription : Dictionary<Subscription, Publisher>
     { }
 
+    public interface PublisherSubscriptions<TData> :
+        When<TData>,
+        PublisherSubscriptions
+        where TData : new()
+    {}
+
     public interface PublisherSubscriptions
     {
         PublishersBySubscription PublisherBySubscription { get; }
     }
 
-    public interface When<TData> : PublisherSubscriptions
+    public interface When<TData>
         where TData : new()
     {
         CorrelationMap<TData, TNotification> When<TNotification>(Func<TNotification, TData, TData> mapper) where TNotification : IDomainEvent;
         CorrelationMap<TData, TNotification> When<TNotification>() where TNotification : IDomainEvent;
     }
 
-    public interface Then<TData, out TNotification> : When<TData>
+    public interface Then<TData, out TNotification>
         where TData : new()
         where TNotification : IDomainEvent
     {
-        When<TData> Then(Func<TData, TNotification, IEnumerable<IDomainEvent>> handler);
+        PublisherSubscriptions<TData> Then(Func<TData, TNotification, IEnumerable<IDomainEvent>> handler);
     }
 }

@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace EventSourcing
 {
-    public class UseCase<TData> : Given<TData>
+    public class Publisher<TData> : Given<TData>
         where TData : new()
     {
         public CorrelationMap<TData, TNotification> Given<TNotification>(Func<TNotification, TData, TData> mapper) where TNotification : IDomainEvent
@@ -55,12 +55,12 @@ namespace EventSourcing
             return When<TNotification1>((e, d) => d);
         }
 
-        public When<TData> Then(Func<TData, TNotification, IEnumerable<IDomainEvent>> handler)
+        public PublisherSubscriptions<TData> Then(Func<TData, TNotification, IEnumerable<IDomainEvent>> handler)
         {
             PublisherBySubscription.Add
             (
                 new Subscription(typeof(TNotification).Contract(), typeof(TData).Contract()),
-                (notification, queryNotificationsByCorrelations, clock) => Functions.GroupNotificationsByPublisher
+                (notification, queryNotificationsByCorrelations, clock) => Functions.BuildPublisher
                                     (
                                         handler,
                                         _publisherDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => x.Select(a => a.Value)),

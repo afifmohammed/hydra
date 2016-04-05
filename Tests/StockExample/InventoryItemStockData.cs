@@ -16,7 +16,7 @@ namespace Tests
     {
         public static PublisherSubscriptions Subsriptions()
         {
-            return new UseCase<InventoryItemStockData>()
+            return new Publisher<InventoryItemStockData>()
                 .Given<InventoryItemCreated>(Map)
                     .Correlate(x => x.Id, x => x.Sku)
                 .Given<InventoryItemDeactivated>(Map)

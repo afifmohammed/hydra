@@ -16,7 +16,7 @@ namespace Client
             {
                 Channel.Push(
                     publisherNotification,
-                    EventStore.Subscriptions(),
+                    EventStore.PublishersBySubscription(),
                     EventStore.NotificationsByCorrelations(t),
                     EventStore.PublisherVersionByPublisherDataContractCorrelations(t),
                     () => DateTimeOffset.Now,
@@ -27,7 +27,13 @@ namespace Client
             }
         }
 
-        public static PublishersBySubscription Subscriptions()
+        public static SubscribersBySubscription<TEndpoint> SubscribersBySubscription<TEndpoint>()
+        {
+            // todo: select many from calling every handler from the domain
+            return new SubscribersBySubscription<TEndpoint>();
+        }
+
+        public static PublishersBySubscription PublishersBySubscription()
         {
             // todo: select many from calling every handler from the domain
             return new PublishersBySubscription();

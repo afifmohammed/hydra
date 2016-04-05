@@ -19,7 +19,31 @@ namespace EventSourcing
             };
         }
 
-        public static Func<TNotification, NotificationsByPublisher> GroupNotificationsByPublisher<TPublisherData, TNotification>(
+        public static Action<TNotification> BuildSubscriber<TSubscriberData, TNotification, TEndpoint>(
+            Action<TSubscriberData, TNotification, TEndpoint> subscriber,
+            IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsBySubscriberDataContract,
+            Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
+            TEndpoint connection,
+            IDictionary<TypeContract, Func<TSubscriberData, JsonContent, TSubscriberData>> subscriberDataMappersByNotificationContract,
+            Func<DateTimeOffset> clock)
+            where TSubscriberData : new()
+            where TNotification : IDomainEvent
+        {
+            return notification => subscriber
+            (
+                FoldHandlerData
+                (
+                    notification,
+                    correlationMapsBySubscriberDataContract[typeof(TSubscriberData).Contract()],
+                    notificationsByCorrelations,
+                    subscriberDataMappersByNotificationContract
+                ),
+                notification,
+                connection
+            );
+        }
+
+        public static Func<TNotification, NotificationsByPublisher> BuildPublisher<TPublisherData, TNotification>(
             Func<TPublisherData, TNotification, IEnumerable<IDomainEvent>> publisher,
             IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByPublisherDataContract,
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
