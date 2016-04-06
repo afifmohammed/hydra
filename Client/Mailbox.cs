@@ -24,14 +24,14 @@ namespace Client
             {
                 foreach (var message in messages)
                 {
-                    Hangfire.BackgroundJob.Enqueue(() => Mailbox.Post(message));
+                    Hangfire.BackgroundJob.Enqueue(() => Mailbox.Route(message));
                 }
 
                 transaction.Complete();
             }
         }
 
-        public static void Post(Message message)
+        static void Route(Message message)
         {
             var routes = new Dictionary<TypeContract, Action<Message>>
             {
