@@ -41,11 +41,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Channel.cs" />
-    <Compile Include="FluentInterfaces\SideEffects\FluentInterface.cs" />
-    <Compile Include="FluentInterfaces\SideEffects\SubscriberBuilder.cs" />
+    <Compile Include="FluentInterfaces\Publishers.cs" />
+    <Compile Include="FluentInterfaces\Subscribers\OneEndpoint.cs" />
+    <Compile Include="FluentInterfaces\Subscribers\TwoEndpoints.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FluentInterfaces\Publisher\PublisherBuilder.cs" />
-    <Compile Include="FluentInterfaces\Publisher\FluentInterfaces.cs" />
+    <Compile Include="Queries.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EventSourcing\Core.csproj">

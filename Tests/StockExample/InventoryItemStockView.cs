@@ -3,7 +3,7 @@ using EventSourcing;
 
 namespace Tests
 {
-    public class Denormalizer<TView> : SideEffects<TView, Dictionary<string, TView>> where TView : new()
+    public class Denormalizer<TView> : SubscriberBuilder<TView, Dictionary<string, TView>> where TView : new()
     { }
 
     public class InventoryItemStockView
@@ -16,7 +16,7 @@ namespace Tests
 
     public static class InventoryItemStockViewBuilder
     {
-        public static SubscriberSubscriptions<InventoryItemStockView, Dictionary<string, InventoryItemStockView>> Subscriptions()
+        public static SubscriberContractSubscriptions<InventoryItemStockView, Dictionary<string, InventoryItemStockView>> Subscriptions()
         {
             return new Denormalizer<InventoryItemStockView>()
                 .When<InventoryItemCreated>()

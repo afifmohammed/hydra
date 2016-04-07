@@ -7,21 +7,21 @@ namespace Tests
 {
     static class Extensions
     {
-        public static SubscriberSubscriptions<TData, TEndpoint> Notify<TData, TEndpoint>(
-            this SubscriberSubscriptions<TData, TEndpoint> subscriberSubscriptions,
+        public static SubscriberContractSubscriptions<THandlerContract, TEndpoint> Notify<THandlerContract, TEndpoint>(
+            this SubscriberContractSubscriptions<THandlerContract, TEndpoint> subscriberContractSubscriptions,
             IDomainEvent notification,
             TEndpoint endpoint) 
-            where TData : new()
+            where THandlerContract : new()
         {
-            subscriberSubscriptions
-                .SubscriberBySubscription[new Subscription(notificationContract: new TypeContract(notification), subscriberDataContract: new TypeContract(typeof (TData)))]
+            subscriberContractSubscriptions
+                .SubscriberBySubscription[new Subscription(notificationContract: new TypeContract(notification), subscriberDataContract: new TypeContract(typeof (THandlerContract)))]
                 (
                     notification, 
                     NotificationsByCorrelations(), 
                     () => DateTimeOffset.Now, 
                     endpoint
                 );
-            return subscriberSubscriptions;
+            return subscriberContractSubscriptions;
         }
 
         public static IEnumerable<Func<IDomainEvent, NotificationsByPublisher>> Given<TNotification>(

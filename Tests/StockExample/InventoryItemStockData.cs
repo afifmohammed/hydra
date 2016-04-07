@@ -16,7 +16,7 @@ namespace Tests
     {
         public static PublisherSubscriptions Subsriptions()
         {
-            return new Publisher<InventoryItemStockData>()
+            return new PublisherBuilder<InventoryItemStockData>()
                 .Given<InventoryItemCreated>(Map)
                     .Correlate(x => x.Id, x => x.Sku)
                 .Given<InventoryItemDeactivated>(Map)

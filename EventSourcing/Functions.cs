@@ -23,7 +23,7 @@ namespace EventSourcing
             Action<TSubscriberData, TNotification, TEndpoint> subscriber,
             IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsBySubscriberDataContract,
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
-            TEndpoint connection,
+            TEndpoint endpoint,
             IDictionary<TypeContract, Func<TSubscriberData, JsonContent, TSubscriberData>> subscriberDataMappersByNotificationContract,
             Func<DateTimeOffset> clock)
             where TSubscriberData : new()
@@ -39,7 +39,33 @@ namespace EventSourcing
                     subscriberDataMappersByNotificationContract
                 ),
                 notification,
-                connection
+                endpoint
+            );
+        }
+
+        public static Action<TNotification> BuildSubscriber<TSubscriberData, TNotification, TEndpoint1, TEndpoint2>(
+            Action<TSubscriberData, TNotification, TEndpoint1, TEndpoint2> subscriber,
+            IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsBySubscriberDataContract,
+            Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
+            TEndpoint1 endpoint1,
+            TEndpoint2 endpoint2,
+            IDictionary<TypeContract, Func<TSubscriberData, JsonContent, TSubscriberData>> subscriberDataMappersByNotificationContract,
+            Func<DateTimeOffset> clock)
+            where TSubscriberData : new()
+            where TNotification : IDomainEvent
+        {
+            return notification => subscriber
+            (
+                FoldHandlerData
+                (
+                    notification,
+                    correlationMapsBySubscriberDataContract[typeof(TSubscriberData).Contract()],
+                    notificationsByCorrelations,
+                    subscriberDataMappersByNotificationContract
+                ),
+                notification,
+                endpoint1,
+                endpoint2
             );
         }
 
