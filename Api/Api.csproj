@@ -45,6 +45,8 @@
     <Compile Include="FluentInterfaces\Subscribers\OneEndpoint.cs" />
     <Compile Include="FluentInterfaces\Subscribers\TwoEndpoints.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Subscribers.cs" />
+    <Compile Include="Subscriptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EventSourcing\Core.csproj">

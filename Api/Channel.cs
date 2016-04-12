@@ -6,48 +6,48 @@ namespace EventSourcing
 {
     public static class Channel
     {
-        public static IEnumerable<SubscriberNotification<TEndpoint>> PrepareMessages<TEndpoint>(
+        public static IEnumerable<MessageToConsumer<TEndpoint>> PrepareMessages<TEndpoint>(
             IDomainEvent notification,
-            SubscribersBySubscription<TEndpoint> subscribersBySubscription)
+            ConsumersBySubscription<TEndpoint> consumersBySubscription)
         {
-            return subscribersBySubscription
+            return consumersBySubscription
                 .Where(p => p.Key.NotificationContract.Equals(new TypeContract(notification)))
-                .Select(p => new SubscriberNotification<TEndpoint> { Notification = notification, Subscription = p.Key });
+                .Select(p => new MessageToConsumer<TEndpoint> { Notification = notification, Subscription = p.Key });
         }
 
         public static void Push<TEndpoint>(
-            SubscriberNotification<TEndpoint> subscriberNotification,
-            SubscribersBySubscription<TEndpoint> subscribersBySubscription,
+            MessageToConsumer<TEndpoint> messageToConsumer,
+            ConsumersBySubscription<TEndpoint> consumersBySubscription,
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
             Func<DateTimeOffset> clock,
             TEndpoint endpoint)
         {
-            var subscriber = subscribersBySubscription[subscriberNotification.Subscription];
+            var consumer = consumersBySubscription[messageToConsumer.Subscription];
 
-            subscriber(subscriberNotification.Notification, notificationsByCorrelations, clock, endpoint);
+            consumer(messageToConsumer.Notification, notificationsByCorrelations, clock, endpoint);
         }
 
-        public static IEnumerable<PublisherNotification> PrepareMessages(
+        public static IEnumerable<MessageToPublisher> PrepareMessages(
             IDomainEvent notification,
             PublishersBySubscription publishersBySubscription)
         {
             return publishersBySubscription
                 .Where(p => p.Key.NotificationContract.Equals(new TypeContract(notification)))
-                .Select(p => new PublisherNotification {Notification = notification, Subscription = p.Key});
+                .Select(p => new MessageToPublisher {Notification = notification, Subscription = p.Key});
         }
 
         public static void Push(
-            PublisherNotification publisherNotification, 
+            MessageToPublisher messageToPublisher, 
             PublishersBySubscription publishersBySubscription,
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
             Func<IEnumerable<Correlation>, int> publisherVersionByPublisherDataContractCorrelations,
             Func<DateTimeOffset> clock,
             Action<NotificationsByPublisherAndVersion> saveNotificationsByPublisherAndVersion,
-            Action<IEnumerable<PublisherNotification>> notify)
+            Action<IEnumerable<MessageToPublisher>> notify)
         {
-            var publisher = publishersBySubscription[publisherNotification.Subscription];
+            var publisher = publishersBySubscription[messageToPublisher.Subscription];
 
-            var notificationsByPublisher = publisher(publisherNotification.Notification, notificationsByCorrelations, clock);
+            var notificationsByPublisher = publisher(messageToPublisher.Notification, notificationsByCorrelations, clock);
 
             var notificationsByPublisherAndVersion = Functions.AppendPublisherVersion(
                 notificationsByPublisher,
@@ -62,13 +62,13 @@ namespace EventSourcing
         }
     }
 
-    public struct PublisherNotification : Message
+    public struct MessageToPublisher : Message
     {
         public Subscription Subscription { get; set; }
         public IDomainEvent Notification { get; set; }
     }
 
-    public struct SubscriberNotification<TEndpoint> : Message
+    public struct MessageToConsumer<TEndpoint> : Message
     {
         public Subscription Subscription { get; set; }
         public IDomainEvent Notification { get; set; }

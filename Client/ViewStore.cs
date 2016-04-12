@@ -16,13 +16,13 @@ namespace Client
 
     public static class ViewStore
     {
-        public static void Post(SubscriberNotification<ViewStoreConnection> subscriberNotification)
+        public static void Post(MessageToConsumer<ViewStoreConnection> messageToConsumer)
         {
             using (var c = new SqlConnection("ViewStore").With(x => x.Open()))
             using (var t = c.BeginTransaction())
             {
                 Channel.Push(
-                    subscriberNotification,
+                    messageToConsumer,
                     EventStore.SubscribersBySubscription<ViewStoreConnection>(),
                     EventStore.NotificationsByCorrelations(t),
                     () => DateTimeOffset.Now,

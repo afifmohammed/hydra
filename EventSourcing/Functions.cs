@@ -19,49 +19,49 @@ namespace EventSourcing
             };
         }
 
-        public static Action<TNotification> BuildSubscriber<TSubscriberData, TNotification, TEndpoint>(
-            Action<TSubscriberData, TNotification, TEndpoint> subscriber,
-            IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsBySubscriberDataContract,
+        public static Action<TNotification> BuildConsumer<TConsumerData, TNotification, TEndpoint>(
+            Action<TConsumerData, TNotification, TEndpoint> consumer,
+            IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByConsumerDataContract,
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
             TEndpoint endpoint,
-            IDictionary<TypeContract, Func<TSubscriberData, JsonContent, TSubscriberData>> subscriberDataMappersByNotificationContract,
+            IDictionary<TypeContract, Func<TConsumerData, JsonContent, TConsumerData>> consumerDataMappersByNotificationContract,
             Func<DateTimeOffset> clock)
-            where TSubscriberData : new()
+            where TConsumerData : new()
             where TNotification : IDomainEvent
         {
-            return notification => subscriber
+            return notification => consumer
             (
                 FoldHandlerData
                 (
                     notification,
-                    correlationMapsBySubscriberDataContract[typeof(TSubscriberData).Contract()],
+                    correlationMapsByConsumerDataContract[typeof(TConsumerData).Contract()],
                     notificationsByCorrelations,
-                    subscriberDataMappersByNotificationContract
+                    consumerDataMappersByNotificationContract
                 ),
                 notification,
                 endpoint
             );
         }
 
-        public static Action<TNotification> BuildSubscriber<TSubscriberData, TNotification, TEndpoint1, TEndpoint2>(
-            Action<TSubscriberData, TNotification, TEndpoint1, TEndpoint2> subscriber,
-            IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsBySubscriberDataContract,
+        public static Action<TNotification> BuildConsumer<TConsumerData, TNotification, TEndpoint1, TEndpoint2>(
+            Action<TConsumerData, TNotification, TEndpoint1, TEndpoint2> consumer,
+            IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByConsumerDataContract,
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
             TEndpoint1 endpoint1,
             TEndpoint2 endpoint2,
-            IDictionary<TypeContract, Func<TSubscriberData, JsonContent, TSubscriberData>> subscriberDataMappersByNotificationContract,
+            IDictionary<TypeContract, Func<TConsumerData, JsonContent, TConsumerData>> consumerDataMappersByNotificationContract,
             Func<DateTimeOffset> clock)
-            where TSubscriberData : new()
+            where TConsumerData : new()
             where TNotification : IDomainEvent
         {
-            return notification => subscriber
+            return notification => consumer
             (
                 FoldHandlerData
                 (
                     notification,
-                    correlationMapsBySubscriberDataContract[typeof(TSubscriberData).Contract()],
+                    correlationMapsByConsumerDataContract[typeof(TConsumerData).Contract()],
                     notificationsByCorrelations,
-                    subscriberDataMappersByNotificationContract
+                    consumerDataMappersByNotificationContract
                 ),
                 notification,
                 endpoint1,

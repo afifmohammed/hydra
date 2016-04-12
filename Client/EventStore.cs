@@ -9,13 +9,13 @@ namespace Client
 {
     public static class EventStore
     {
-        public static void Post(PublisherNotification publisherNotification)
+        public static void Post(MessageToPublisher messageToPublisher)
         {
             using (var c = new SqlConnection("EventStore").With(x => x.Open()))
             using (var t = c.BeginTransaction())
             {
                 Channel.Push(
-                    publisherNotification,
+                    messageToPublisher,
                     EventStore.PublishersBySubscription(),
                     EventStore.NotificationsByCorrelations(t),
                     EventStore.PublisherVersionByPublisherDataContractCorrelations(t),
@@ -27,10 +27,10 @@ namespace Client
             }
         }
 
-        public static SubscribersBySubscription<TEndpoint> SubscribersBySubscription<TEndpoint>()
+        public static ConsumersBySubscription<TEndpoint> SubscribersBySubscription<TEndpoint>()
         {
             // todo: select many from calling every handler from the domain
-            return new SubscribersBySubscription<TEndpoint>();
+            return new ConsumersBySubscription<TEndpoint>();
         }
 
         public static PublishersBySubscription PublishersBySubscription()

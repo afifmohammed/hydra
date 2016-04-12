@@ -5,64 +5,23 @@ using System.Linq.Expressions;
 
 namespace EventSourcing
 {
-    public delegate NotificationsByPublisher Publisher(
-        IDomainEvent notification,
-        Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> queryNotificationsByCorrelations,
-        Func<DateTimeOffset> clock);
-
-    public class PublishersBySubscription : Dictionary<Subscription, Publisher>
-    { }
-
-    public interface CorrelationMap<THandlerContract, TNotification> : Given<THandlerContract>, PublisherContractSubscriptions<THandlerContract>, Then<THandlerContract, TNotification>
-        where THandlerContract : new()
+    public interface CorrelationMap<TSubscriberDataContract, TNotification> : Given<TSubscriberDataContract>, PublisherContractSubscriptions<TSubscriberDataContract>, Then<TSubscriberDataContract, TNotification>
+        where TSubscriberDataContract : new()
         where TNotification : IDomainEvent
     {
-        CorrelationMap<THandlerContract, TNotification> Correlate(Expression<Func<TNotification, object>> left, Expression<Func<THandlerContract, object>> right);
+        CorrelationMap<TSubscriberDataContract, TNotification> Correlate(Expression<Func<TNotification, object>> left, Expression<Func<TSubscriberDataContract, object>> right);
     }
 
-    public interface Given<THandlerContract>
-        where THandlerContract : new()
+    public interface Given<TSubscriberDataContract>
+        where TSubscriberDataContract : new()
     {
-        CorrelationMap<THandlerContract, TNotification> Given<TNotification>(Func<TNotification, THandlerContract, THandlerContract> mapper) where TNotification : IDomainEvent;
+        CorrelationMap<TSubscriberDataContract, TNotification> Given<TNotification>(Func<TNotification, TSubscriberDataContract, TSubscriberDataContract> mapper) where TNotification : IDomainEvent;
     }
 
-    public struct Subscription
-    {
-        public Subscription(TypeContract notificationContract, TypeContract subscriberDataContract)
-        {
-            NotificationContract = notificationContract;
-            SubscriberDataContract = subscriberDataContract;
-        }
-
-        public TypeContract NotificationContract { get; set; }
-        public TypeContract SubscriberDataContract { get; set; }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(obj, null)) return false;
-            if ((obj is Subscription) == false) return false;
-
-            return Equals((Subscription)obj);
-        }
-
-        public bool Equals(Subscription other)
-        {
-            return NotificationContract.Equals(other.NotificationContract) && SubscriberDataContract.Equals(other.SubscriberDataContract);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (NotificationContract.GetHashCode() * 397) ^ SubscriberDataContract.GetHashCode();
-            }
-        }
-    }
-
-    public interface PublisherContractSubscriptions<THandlerContract> :
-        When<THandlerContract>,
+    public interface PublisherContractSubscriptions<TSubscriberDataContract> :
+        When<TSubscriberDataContract>,
         PublisherSubscriptions
-        where THandlerContract : new()
+        where TSubscriberDataContract : new()
     { }
 
     public interface PublisherSubscriptions
@@ -70,97 +29,97 @@ namespace EventSourcing
         PublishersBySubscription PublisherBySubscription { get; }
     }
 
-    public interface When<THandlerContract>
-        where THandlerContract : new()
+    public interface When<TSubscriberDataContract>
+        where TSubscriberDataContract : new()
     {
-        CorrelationMap<THandlerContract, TNotification> When<TNotification>(Func<TNotification, THandlerContract, THandlerContract> mapper) where TNotification : IDomainEvent;
-        CorrelationMap<THandlerContract, TNotification> When<TNotification>() where TNotification : IDomainEvent;
+        CorrelationMap<TSubscriberDataContract, TNotification> When<TNotification>(Func<TNotification, TSubscriberDataContract, TSubscriberDataContract> mapper) where TNotification : IDomainEvent;
+        CorrelationMap<TSubscriberDataContract, TNotification> When<TNotification>() where TNotification : IDomainEvent;
     }
 
-    public interface Then<THandlerContract, out TNotification>
-        where THandlerContract : new()
+    public interface Then<TSubscriberDataContract, out TNotification>
+        where TSubscriberDataContract : new()
         where TNotification : IDomainEvent
     {
-        PublisherContractSubscriptions<THandlerContract> Then(Func<THandlerContract, TNotification, IEnumerable<IDomainEvent>> handler);
+        PublisherContractSubscriptions<TSubscriberDataContract> Then(Func<TSubscriberDataContract, TNotification, IEnumerable<IDomainEvent>> handler);
     }
 
-    public class PublisherBuilder<THandlerContract> :
-        Given<THandlerContract>,
-        When<THandlerContract>
-        where THandlerContract : new()
+    public class PublisherBuilder<TSubscriberDataContract> :
+        Given<TSubscriberDataContract>,
+        When<TSubscriberDataContract>
+        where TSubscriberDataContract : new()
     {
-        public CorrelationMap<THandlerContract, TNotification> Given<TNotification>(Func<TNotification, THandlerContract, THandlerContract> mapper) where TNotification : IDomainEvent
+        public CorrelationMap<TSubscriberDataContract, TNotification> Given<TNotification>(Func<TNotification, TSubscriberDataContract, TSubscriberDataContract> mapper) where TNotification : IDomainEvent
         {
-            return new NotificationHandler<THandlerContract, TNotification>
+            return new NotificationHandler<TSubscriberDataContract, TNotification>
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
-                new List<KeyValuePair<TypeContract, Func<THandlerContract, JsonContent, THandlerContract>>> { Type<THandlerContract>.Maps(mapper) },
+                new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> { Type<TSubscriberDataContract>.Maps(mapper) },
                 new PublishersBySubscription()
             );
         }
 
-        public CorrelationMap<THandlerContract, TNotification> When<TNotification>(Func<TNotification, THandlerContract, THandlerContract> mapper) where TNotification : IDomainEvent
+        public CorrelationMap<TSubscriberDataContract, TNotification> When<TNotification>(Func<TNotification, TSubscriberDataContract, TSubscriberDataContract> mapper) where TNotification : IDomainEvent
         {
-            return new NotificationHandler<THandlerContract, TNotification>
+            return new NotificationHandler<TSubscriberDataContract, TNotification>
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
-                new List<KeyValuePair<TypeContract, Func<THandlerContract, JsonContent, THandlerContract>>> { Type<THandlerContract>.Maps(mapper) },
+                new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> { Type<TSubscriberDataContract>.Maps(mapper) },
                 new PublishersBySubscription()
             );
         }
 
-        public CorrelationMap<THandlerContract, TNotification> When<TNotification>() where TNotification : IDomainEvent
+        public CorrelationMap<TSubscriberDataContract, TNotification> When<TNotification>() where TNotification : IDomainEvent
         {
-            return new NotificationHandler<THandlerContract, TNotification>
+            return new NotificationHandler<TSubscriberDataContract, TNotification>
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
-                new List<KeyValuePair<TypeContract, Func<THandlerContract, JsonContent, THandlerContract>>>(),
+                new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>>(),
                 new PublishersBySubscription()
             );
         }
     }
 
-    class NotificationHandler<THandlerContract, TNotification> : CorrelationMap<THandlerContract, TNotification>
-        where THandlerContract : new()
+    class NotificationHandler<TSubscriberDataContract, TNotification> : CorrelationMap<TSubscriberDataContract, TNotification>
+        where TSubscriberDataContract : new()
         where TNotification : IDomainEvent
     {
         readonly List<KeyValuePair<TypeContract, CorrelationMap>> _publisherDataContractMaps;
-        readonly List<KeyValuePair<TypeContract, Func<THandlerContract, JsonContent, THandlerContract>>> _publisherDataMappers;
+        readonly List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> _publisherDataMappers;
         public PublishersBySubscription PublisherBySubscription { get; }
 
         public NotificationHandler(
             List<KeyValuePair<TypeContract, CorrelationMap>> maps,
-            List<KeyValuePair<TypeContract, Func<THandlerContract, JsonContent, THandlerContract>>> mappers,
+            List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> mappers,
             PublishersBySubscription publisherByNotificationAndPublisherContract)
         {
             _publisherDataContractMaps = maps ?? new List<KeyValuePair<TypeContract, CorrelationMap>>();
-            _publisherDataMappers = mappers ?? new List<KeyValuePair<TypeContract, Func<THandlerContract, JsonContent, THandlerContract>>>();
+            _publisherDataMappers = mappers ?? new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>>();
 
             PublisherBySubscription = publisherByNotificationAndPublisherContract ?? new PublishersBySubscription();
         }
 
-        public CorrelationMap<THandlerContract, TNotification1> Given<TNotification1>(Func<TNotification1, THandlerContract, THandlerContract> mapper) where TNotification1 : IDomainEvent
+        public CorrelationMap<TSubscriberDataContract, TNotification1> Given<TNotification1>(Func<TNotification1, TSubscriberDataContract, TSubscriberDataContract> mapper) where TNotification1 : IDomainEvent
         {
-            _publisherDataMappers.Add(Type<THandlerContract>.Maps(mapper));
-            return new NotificationHandler<THandlerContract, TNotification1>(_publisherDataContractMaps, _publisherDataMappers, PublisherBySubscription);
+            _publisherDataMappers.Add(Type<TSubscriberDataContract>.Maps(mapper));
+            return new NotificationHandler<TSubscriberDataContract, TNotification1>(_publisherDataContractMaps, _publisherDataMappers, PublisherBySubscription);
         }
 
-        public CorrelationMap<THandlerContract, TNotification1> When<TNotification1>(Func<TNotification1, THandlerContract, THandlerContract> mapper) where TNotification1 : IDomainEvent
+        public CorrelationMap<TSubscriberDataContract, TNotification1> When<TNotification1>(Func<TNotification1, TSubscriberDataContract, TSubscriberDataContract> mapper) where TNotification1 : IDomainEvent
         {
-            _publisherDataMappers.Add(Type<THandlerContract>.Maps(mapper));
-            return new NotificationHandler<THandlerContract, TNotification1>(_publisherDataContractMaps, _publisherDataMappers, PublisherBySubscription);
+            _publisherDataMappers.Add(Type<TSubscriberDataContract>.Maps(mapper));
+            return new NotificationHandler<TSubscriberDataContract, TNotification1>(_publisherDataContractMaps, _publisherDataMappers, PublisherBySubscription);
         }
 
-        public CorrelationMap<THandlerContract, TNotification1> When<TNotification1>() where TNotification1 : IDomainEvent
+        public CorrelationMap<TSubscriberDataContract, TNotification1> When<TNotification1>() where TNotification1 : IDomainEvent
         {
             return When<TNotification1>((e, d) => d);
         }
 
-        public PublisherContractSubscriptions<THandlerContract> Then(Func<THandlerContract, TNotification, IEnumerable<IDomainEvent>> handler)
+        public PublisherContractSubscriptions<TSubscriberDataContract> Then(Func<TSubscriberDataContract, TNotification, IEnumerable<IDomainEvent>> handler)
         {
             PublisherBySubscription.Add
             (
-                new Subscription(typeof(TNotification).Contract(), typeof(THandlerContract).Contract()),
+                new Subscription(typeof(TNotification).Contract(), typeof(TSubscriberDataContract).Contract()),
                 (notification, queryNotificationsByCorrelations, clock) => Functions.BuildPublisher
                                     (
                                         handler,
@@ -175,9 +134,9 @@ namespace EventSourcing
             return this;
         }
 
-        public CorrelationMap<THandlerContract, TNotification> Correlate(Expression<Func<TNotification, object>> left, Expression<Func<THandlerContract, object>> right)
+        public CorrelationMap<TSubscriberDataContract, TNotification> Correlate(Expression<Func<TNotification, object>> left, Expression<Func<TSubscriberDataContract, object>> right)
         {
-            _publisherDataContractMaps.Add(Type<THandlerContract>.Correlates(right, left));
+            _publisherDataContractMaps.Add(Type<TSubscriberDataContract>.Correlates(right, left));
             return this;
         }
     }

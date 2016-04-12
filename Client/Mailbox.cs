@@ -35,8 +35,8 @@ namespace Client
         {
             var routes = new Dictionary<TypeContract, Action<Message>>
             {
-                { typeof(PublisherNotification).Contract(), m => EventStore.Post((PublisherNotification)m) },
-                { typeof(SubscriberNotification<ViewStoreConnection>).Contract(), m => ViewStore.Post((SubscriberNotification<ViewStoreConnection>)m) }
+                { typeof(MessageToPublisher).Contract(), m => EventStore.Post((MessageToPublisher)m) },
+                { typeof(MessageToConsumer<ViewStoreConnection>).Contract(), m => ViewStore.Post((MessageToConsumer<ViewStoreConnection>)m) }
             };
 
             routes[message.Contract()](message);
