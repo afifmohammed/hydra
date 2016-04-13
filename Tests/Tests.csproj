@@ -59,6 +59,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="StockExample\Commands.cs" />
     <Compile Include="StockExample\Events.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="StockExample\InventoryItemStockData.cs" />
@@ -70,6 +71,10 @@
     <ProjectReference Include="..\Api\Api.csproj">
       <Project>{A0E76561-ABD7-4739-8D82-BEE6F2AD8EBC}</Project>
       <Name>Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Commands\Commands.csproj">
+      <Project>{900B7A11-306E-46ED-9267-552BB7840BC1}</Project>
+      <Name>Commands</Name>
     </ProjectReference>
     <ProjectReference Include="..\EventSourcing\Core.csproj">
       <Project>{e6e5141e-a6ac-434a-9697-784811570ecb}</Project>

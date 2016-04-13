@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Commands;
 using EventSourcing;
 
 namespace Tests
@@ -27,67 +28,67 @@ namespace Tests
                     .Correlate(x => x.Id, x => x.Sku)
                 .Given<InventoryItemStockLimitChanged>(Map)
                     .Correlate(x =>x.Id, x => x.Sku)
-                .When<InventoryItemStockLimitChangeRequested>()
-                    .Correlate(x => x.Id, x => x.Sku)
+                .When<Received<ChangeInventoryItemStockLimit>>()
+                    .Correlate(x => x.Command.Id, x => x.Sku)
                     .Then(Handle)
-                .When<CheckInItemsRequested>()
-                    .Correlate(x => x.Id, x => x.Sku)
+                .When<Received<CheckInItems>>()
+                    .Correlate(x => x.Command.Id, x => x.Sku)
                     .Then(Handle)
-                .When<RemoveInventoryItemsRequested>()
-                    .Correlate(x => x.Id, x => x.Sku)
+                .When<Received<RemoveInventoryItems>>()
+                    .Correlate(x => x.Command.Id, x => x.Sku)
                     .Then(Handle)
-                .When<CreateInventoryItemRequested>()
-                    .Correlate(x => x.Id, x => x.Sku)
+                .When<Received<CreateInventoryItem>>()
+                    .Correlate(x => x.Command.Id, x => x.Sku)
                     .Then(Handle)
-                .When<DeactivateInventoryItemRequested>()
-                    .Correlate(x => x.Id, x => x.Sku)
+                .When<Received<DeactivateInventoryItem>>()
+                    .Correlate(x => x.Command.Id, x => x.Sku)
                     .Then(Handle);
         }
 
-        public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, InventoryItemStockLimitChangeRequested e)
+        public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, Received<ChangeInventoryItemStockLimit> e)
         {
             if (!d.IsActive)
-                return new[] { new InventoryItemActionInvalid { Action = "CheckIn", Id = e.Id, Reason = "ItemInActive" } };
+                return new[] { new InventoryItemActionInvalid { Action = "CheckIn", Id = e.Command.Id, Reason = "ItemInActive" } };
 
-            return new[] { new InventoryItemStockLimitChanged { Id = e.Id, Limit = e.Limit } };
+            return new[] { new InventoryItemStockLimitChanged { Id = e.Command.Id, Limit = e.Command.Limit } };
         }
 
-        public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, CheckInItemsRequested e)
+        public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, Received<CheckInItems> e)
         {
             if (!d.IsActive)
-                return new [] {new InventoryItemActionInvalid {Action = "CheckIn", Id = e.Id, Reason = "ItemInActive"}};
+                return new [] {new InventoryItemActionInvalid {Action = "CheckIn", Id = e.Command.Id, Reason = "ItemInActive"}};
 
             if (d.Count > d.OverStockLimit)
-                return new[] { new InventoryItemActionInvalid { Action = "CheckIn", Id = e.Id, Reason = "OverStocked" } };
+                return new[] { new InventoryItemActionInvalid { Action = "CheckIn", Id = e.Command.Id, Reason = "OverStocked" } };
             
-            return new[] { new ItemsCheckedInToInventory {Id = e.Id, Count = e.Count} };
+            return new[] { new ItemsCheckedInToInventory {Id = e.Command.Id, Count = e.Command.Count} };
         }
 
-        public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, RemoveInventoryItemsRequested e)
+        public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, Received<RemoveInventoryItems> e)
         {
             if (!d.IsActive)
-                return new[] { new InventoryItemActionInvalid { Action = "CheckOut", Id = e.Id, Reason = "ItemInActive" } };
+                return new[] { new InventoryItemActionInvalid { Action = "CheckOut", Id = e.Command.Id, Reason = "ItemInActive" } };
 
-            if (d.Count < e.Count)
-                return new[] { new InventoryItemActionInvalid { Action = "CheckOut", Id = e.Id, Reason = "BelowZeroStock" } };
+            if (d.Count < e.Command.Count)
+                return new[] { new InventoryItemActionInvalid { Action = "CheckOut", Id = e.Command.Id, Reason = "BelowZeroStock" } };
 
-            return new[] { new ItemsRemovedFromInventory { Id = e.Id, Count = e.Count } };
+            return new[] { new ItemsRemovedFromInventory { Id = e.Command.Id, Count = e.Command.Count } };
         }
 
-        public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, DeactivateInventoryItemRequested e)
+        public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, Received<DeactivateInventoryItem> e)
         {
             if (!d.IsActive)
                 return new[] { new JustSpinningMyWheels() };
 
-            return new[] { new InventoryItemDeactivated  { Id = e.Id } };
+            return new[] { new InventoryItemDeactivated  { Id = e.Command.Id } };
         }
 
-        public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, CreateInventoryItemRequested e)
+        public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, Received<CreateInventoryItem> e)
         {
-            if (d.Sku.Equals(e.Id))
+            if (d.Sku.Equals(e.Command.Id))
                 return new[] { new JustSpinningMyWheels() };
 
-            return new[] { new InventoryItemCreated { Id = e.Id } };
+            return new[] { new InventoryItemCreated { Id = e.Command.Id } };
         }
 
         public static InventoryItemStockData Map(ItemsCheckedInToInventory e, InventoryItemStockData d)

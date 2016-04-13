@@ -38,6 +38,16 @@ namespace EventSourcing
             return (TValue)dictionary[typeof(TKey).FriendlyName()];
         }
 
+        public static object GetPropertyValue<T>(this string propertyName, T instance)
+        {
+            var properties = propertyName.Split('.');
+            var result = properties.First().GetPropertySelector<T>().Compile()(instance);
+            return !properties.Skip(1).Any()
+                ? result
+                : typeof(Extensions).GetMethod("GetPropertyValue").MakeGenericMethod(result.GetType())
+                    .Invoke(null, new[] { properties.Skip(1).Aggregate((x, xs) => string.Join(".", x, xs)), result });
+        }
+
         public static string GetPropertyName<T>(this Expression<Func<T, object>> property)
         {
             LambdaExpression lambda = property;
@@ -52,16 +62,26 @@ namespace EventSourcing
             {
                 memberExpression = (MemberExpression)(lambda.Body);
             }
+            var names = new List<string> {((PropertyInfo) memberExpression.Member).Name};
 
-            return ((PropertyInfo)memberExpression.Member).Name;
+            var nested = memberExpression.Expression as MemberExpression;
+
+            while (nested != null)
+            {
+                names.Add(((PropertyInfo)nested.Member).Name);
+                nested = nested.Expression as MemberExpression;
+            }
+
+            names.Reverse();
+            return names.Aggregate((x, xs) => x + "." + xs);
         }
 
-        public static Expression<Func<T, object>> GetPropertySelector<T>(this string propertyName)
+        static Expression<Func<T, object>> GetPropertySelector<T>(this string propertyName)
         {
             var arg = Expression.Parameter(typeof(T), "x");
             var property = Expression.Property(arg, propertyName);
             var conv = Expression.Convert(property, typeof(object));
-            var exp = Expression.Lambda<Func<T, object>>(conv, new ParameterExpression[] { arg });
+            var exp = Expression.Lambda<Func<T, object>>(conv, arg);
             return exp;
         }
 
@@ -74,7 +94,7 @@ namespace EventSourcing
             var genericArguments = type.GetGenericArguments();
             var typeDefeninition = type.Name;
             var unmangledName = typeDefeninition.Substring(0, typeDefeninition.IndexOf("`"));
-            return unmangledName + "(of " + String.Join(",", genericArguments.Select(FriendlyName)) + ")";
+            return unmangledName + "(of " + string.Join(",", genericArguments.Select(FriendlyName)) + ")";
         }
 
         public static T With<T>(this T instance, Action<T> operation)

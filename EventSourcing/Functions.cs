@@ -113,8 +113,8 @@ namespace EventSourcing
             IEnumerable<CorrelationMap> handlerDataCorrelationMaps,
             Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
             IDictionary<TypeContract, Func<THandlerData, JsonContent, THandlerData>> handlerDataMappersByNotificationContract)
-                where THandlerData : new()
-                where TNotification : IDomainEvent
+            where THandlerData : new()
+            where TNotification : IDomainEvent
         {
             return FoldHandlerData
             (
@@ -144,7 +144,8 @@ namespace EventSourcing
 
         public static IEnumerable<Correlation> HandlerDataCorrelationsBy<TNotification>(
             IEnumerable<CorrelationMap> handlerDataCorrelationMaps,
-            TNotification notification)
+            TNotification notification) 
+            where TNotification : IDomainEvent
         {
             return handlerDataCorrelationMaps
                 .Where(m => m.NotificationContract.Equals(typeof(TNotification).Contract()))
@@ -152,13 +153,14 @@ namespace EventSourcing
                 {
                     PropertyName = m.HandlerDataPropertyName,
                     Contract = m.HandlerDataContract,
-                    PropertyValue = new Lazy<string>(() => (m.NotificationPropertyName.GetPropertySelector<TNotification>().Compile()(notification)).ToString())
+                    PropertyValue = new Lazy<string>(() => (m.NotificationPropertyName.GetPropertyValue(notification)).ToString())
                 }); 
         }
 
         public static THandlerData FoldHandlerData<THandlerData>(
             IDictionary<TypeContract, Func<THandlerData, JsonContent, THandlerData>> handlerDataMappersByNotificationContract,
-            IEnumerable<SerializedNotification> notifications) where THandlerData : new()
+            IEnumerable<SerializedNotification> notifications) 
+            where THandlerData : new()
         {
             var handlerData = new THandlerData();
 

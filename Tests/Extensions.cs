@@ -24,30 +24,30 @@ namespace Tests
             return consumerContractSubscriptions;
         }
 
-        public static IEnumerable<Func<IDomainEvent, NotificationsByPublisher>> Given<TNotification>(
+        public static Func<IDomainEvent, IEnumerable<Func<IDomainEvent, NotificationsByPublisher>>> Given(
             this PublishersBySubscription subscriptions,
             params IDomainEvent[] given)
-            where TNotification : IDomainEvent
         {
-            var publishers = subscriptions.Where(p => p.Key.NotificationContract.Equals(typeof(TNotification).Contract())).Select(p => p.Value);
+            return n => subscriptions
+                .Where(p => p.Key.NotificationContract.Equals(n.Contract())).Select(p => p.Value)
+                .Select<Publisher, Func<IDomainEvent, NotificationsByPublisher>>
+                (
+                    function =>
+                        notification =>
+                            function(
+                                notification,
+                                NotificationsByCorrelations(given),
+                                () => DateTimeOffset.Now)
+                );
 
-            return publishers.Select<Publisher, Func<IDomainEvent, NotificationsByPublisher>>
-                                (
-                                    function => 
-                                        notification => 
-                                            function(
-                                                notification, 
-                                                NotificationsByCorrelations(given), 
-                                                () => DateTimeOffset.Now)
-                                );
         }
 
-        public static IEnumerable<NotificationsByPublisher> Notify<TNotification>(this 
-            IEnumerable<Func<IDomainEvent, NotificationsByPublisher>> publishers,
+        public static IEnumerable<NotificationsByPublisher> Notify<TNotification>(this
+            Func<IDomainEvent, IEnumerable<Func<IDomainEvent, NotificationsByPublisher>>> publishers,
             TNotification notification)
             where TNotification : IDomainEvent
         {
-            return publishers
+            return publishers(notification)
                 .Select(x => x(notification));
         }
 

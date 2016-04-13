@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Commands;
 using EventSourcing;
 using Xunit;
 
@@ -29,10 +30,10 @@ namespace Tests
             _notificationsByPublisher.AddRange(InventoryItemStockHandler
                 .Subsriptions()
                 .PublisherBySubscription
-                .Given<DeactivateInventoryItemRequested>(
+                .Given(
                     new InventoryItemCreated { Id = "1" },
                     new ItemsCheckedInToInventory { Id = "1", Count = 10 })
-                .Notify(new DeactivateInventoryItemRequested { Id = "1" }));
+                .Notify(new Received<DeactivateInventoryItem> { Command = new DeactivateInventoryItem { Id = "1" } }));
         }
 
         [Fact]
