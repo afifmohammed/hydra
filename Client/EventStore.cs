@@ -7,9 +7,18 @@ using EventSourcing;
 
 namespace Client
 {
+    public delegate void Commit(MessageToPublisher messageToPublisher);
+    public delegate Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> NotificationsByCorrelations<in TConnection>(TConnection connection);
+    
+    public static class EventStore<TConnection>
+    {
+        public static NotificationsByCorrelations<TConnection> NotificationsByCorrelations { get; set; }
+        public static ConsumersBySubscription<TConnection> ConsumersBySubscription { get; set; }
+    }
+
     public static class EventStore
     {
-        public static void Post(MessageToPublisher messageToPublisher)
+        public static Commit Commit = messageToPublisher =>
         {
             using (var c = new SqlConnection("EventStore").With(x => x.Open()))
             using (var t = c.BeginTransaction())
@@ -21,17 +30,11 @@ namespace Client
                     EventStore.PublisherVersionByPublisherDataContractCorrelations(t),
                     () => DateTimeOffset.Now,
                     EventStore.SaveNotificationsByPublisherAndVersion(t),
-                    publisherNotifications => Mailbox.Post(publisherNotifications.Cast<Message>()));
+                    publisherNotifications => Mailbox.Post(publisherNotifications.Cast<SubscriberMessage>()));
 
                 t.Commit();
             }
-        }
-
-        public static ConsumersBySubscription<TEndpoint> SubscribersBySubscription<TEndpoint>()
-        {
-            // todo: select many from calling every handler from the domain
-            return new ConsumersBySubscription<TEndpoint>();
-        }
+        };
 
         public static PublishersBySubscription PublishersBySubscription()
         {

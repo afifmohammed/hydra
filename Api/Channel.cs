@@ -4,75 +4,109 @@ using System.Linq;
 
 namespace EventSourcing
 {
-    public static class Channel
+    public interface SubscriberMessage { }
+
+    public struct MessageToPublisher : SubscriberMessage
     {
-        public static IEnumerable<MessageToConsumer<TEndpoint>> PrepareMessages<TEndpoint>(
-            IDomainEvent notification,
-            ConsumersBySubscription<TEndpoint> consumersBySubscription)
-        {
-            return consumersBySubscription
+        public Subscription Subscription { get; set; }
+        public IDomainEvent Notification { get; set; }
+    }
+
+    public struct MessageToConsumer<TEndpoint> : SubscriberMessage
+    {
+        public Subscription Subscription { get; set; }
+        public IDomainEvent Notification { get; set; }
+    }
+
+    public delegate IEnumerable<MessageToPublisher> PrepareMessages(
+        IDomainEvent notification,
+        PublishersBySubscription publishersBySubscription);
+
+    public delegate IEnumerable<MessageToConsumer<TEndpoint>> PrepareMessages<TEndpoint>(
+        IDomainEvent notification,
+        ConsumersBySubscription<TEndpoint> consumersBySubscription);
+
+    public delegate void Push(
+        MessageToPublisher messageToPublisher,
+        PublishersBySubscription publishersBySubscription,
+        Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
+        Func<IEnumerable<Correlation>, int> publisherVersionByPublisherDataContractCorrelations,
+        Func<DateTimeOffset> clock,
+        Action<NotificationsByPublisherAndVersion> saveNotificationsByPublisherAndVersion,
+        Action<IEnumerable<MessageToPublisher>> notify);
+
+    public delegate void Push<TEndpoint>(
+        MessageToConsumer<TEndpoint> messageToConsumer,
+        ConsumersBySubscription<TEndpoint> consumersBySubscription,
+        Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
+        Func<DateTimeOffset> clock,
+        TEndpoint endpoint);
+
+    public static class Channel<TEndpoint>
+    {
+        public static PrepareMessages<TEndpoint> PrepareMessages = 
+        (
+            notification, 
+            consumersBySubscription
+        ) => 
+            consumersBySubscription
                 .Where(p => p.Key.NotificationContract.Equals(new TypeContract(notification)))
                 .Select(p => new MessageToConsumer<TEndpoint> { Notification = notification, Subscription = p.Key });
-        }
 
-        public static void Push<TEndpoint>(
-            MessageToConsumer<TEndpoint> messageToConsumer,
-            ConsumersBySubscription<TEndpoint> consumersBySubscription,
-            Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
-            Func<DateTimeOffset> clock,
-            TEndpoint endpoint)
-        {
-            var consumer = consumersBySubscription[messageToConsumer.Subscription];
+        public static Push<TEndpoint> Push => 
+        (
+            messageToConsumer, 
+            consumersBySubscription, 
+            notificationsByCorrelations, 
+            clock, 
+            endpoint
+        ) => 
+            consumersBySubscription[messageToConsumer.Subscription]
+            (
+                messageToConsumer.Notification, 
+                notificationsByCorrelations, 
+                clock, 
+                endpoint
+            );
+    }
 
-            consumer(messageToConsumer.Notification, notificationsByCorrelations, clock, endpoint);
-        }
-
-        public static IEnumerable<MessageToPublisher> PrepareMessages(
-            IDomainEvent notification,
-            PublishersBySubscription publishersBySubscription)
-        {
-            return publishersBySubscription
+    public static class Channel
+    {
+        public static PrepareMessages PrepareMessages = 
+        (
+            notification,
+            publishersBySubscription
+        ) =>  publishersBySubscription
                 .Where(p => p.Key.NotificationContract.Equals(new TypeContract(notification)))
                 .Select(p => new MessageToPublisher {Notification = notification, Subscription = p.Key});
-        }
 
-        public static void Push(
-            MessageToPublisher messageToPublisher, 
-            PublishersBySubscription publishersBySubscription,
-            Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
-            Func<IEnumerable<Correlation>, int> publisherVersionByPublisherDataContractCorrelations,
-            Func<DateTimeOffset> clock,
-            Action<NotificationsByPublisherAndVersion> saveNotificationsByPublisherAndVersion,
-            Action<IEnumerable<MessageToPublisher>> notify)
-        {
-            var publisher = publishersBySubscription[messageToPublisher.Subscription];
 
-            var notificationsByPublisher = publisher(messageToPublisher.Notification, notificationsByCorrelations, clock);
+        public static Push Push =
+        (
+            messageToPublisher, 
+            publishersBySubscription, 
+            notificationsByCorrelations, 
+            publisherVersionByPublisherDataContractCorrelations, 
+            clock, 
+            saveNotificationsByPublisherAndVersion, 
+            notify
+        ) =>
+            {
+                var publisher = publishersBySubscription[messageToPublisher.Subscription];
 
-            var notificationsByPublisherAndVersion = Functions.AppendPublisherVersion(
-                notificationsByPublisher,
-                publisherVersionByPublisherDataContractCorrelations);
+                var notificationsByPublisher = publisher(messageToPublisher.Notification, notificationsByCorrelations,
+                    clock);
 
-            saveNotificationsByPublisherAndVersion(notificationsByPublisherAndVersion);
+                var notificationsByPublisherAndVersion = Functions.AppendPublisherVersion(
+                    notificationsByPublisher,
+                    publisherVersionByPublisherDataContractCorrelations);
 
-            notify(notificationsByPublisher
-                .Notifications
-                .SelectMany(n => PrepareMessages(n.Item1, publishersBySubscription))
-                .ToArray());
-        }
+                saveNotificationsByPublisherAndVersion(notificationsByPublisherAndVersion);
+
+                notify(notificationsByPublisher
+                    .Notifications
+                    .SelectMany(n => PrepareMessages(n.Item1, publishersBySubscription))
+                    .ToArray());
+            };
     }
-
-    public struct MessageToPublisher : Message
-    {
-        public Subscription Subscription { get; set; }
-        public IDomainEvent Notification { get; set; }
-    }
-
-    public struct MessageToConsumer<TEndpoint> : Message
-    {
-        public Subscription Subscription { get; set; }
-        public IDomainEvent Notification { get; set; }
-    }
-
-    public interface Message { }
 }

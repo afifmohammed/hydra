@@ -5,31 +5,59 @@ using EventSourcing;
 
 namespace Client
 {
-    public class ViewStoreConnection : Unit<IDbTransaction>
+    public delegate void PostAndCommit<TConnection>(
+        MessageToConsumer<TConnection> messageToConsumer,
+        ConsumersBySubscription<TConnection> consumersBySubscription,
+        NotificationsByCorrelations<TConnection> notificationsByCorrelations,
+        Action<Action<TConnection>> commit);
+
+    public static class ViewStore<TConnection>
     {
-        public ViewStoreConnection(IDbTransaction transaction)
+        public static PostAndCommit<TConnection> PostAndCommit = 
+        (
+            messageToConsumer,
+            consumersBySubscription,
+            notificationsByCorrelations,
+            commit
+        ) => 
+            commit(
+                connection => 
+                    Channel<TConnection>.Push(
+                        messageToConsumer,
+                        consumersBySubscription,
+                        notificationsByCorrelations(connection),
+                        () => DateTimeOffset.Now,
+                        connection));
+    }
+
+    public static class AdoNetViewStore
+    {
+        public static void Post(MessageToConsumer<AdoNetViewStoreConnection> message)
+        {
+            ViewStore<AdoNetViewStoreConnection>.PostAndCommit
+            (
+                message,
+                EventStore<AdoNetViewStoreConnection>.ConsumersBySubscription,
+                EventStore<AdoNetViewStoreConnection>.NotificationsByCorrelations,
+                doWork =>
+                {
+                    using (var c = new SqlConnection("ViewStore").With(x => x.Open()))
+                    using (var t = c.BeginTransaction())
+                    {
+                        doWork(new AdoNetViewStoreConnection(t));
+                        t.Commit();
+                    }
+                }
+            );
+        }
+    }
+
+    public class AdoNetViewStoreConnection : Unit<IDbTransaction>
+    {
+        public AdoNetViewStoreConnection(IDbTransaction transaction)
         {
             Value = transaction;
         }
         public IDbTransaction Value { get; }
-    }
-
-    public static class ViewStore
-    {
-        public static void Post(MessageToConsumer<ViewStoreConnection> messageToConsumer)
-        {
-            using (var c = new SqlConnection("ViewStore").With(x => x.Open()))
-            using (var t = c.BeginTransaction())
-            {
-                Channel.Push(
-                    messageToConsumer,
-                    EventStore.SubscribersBySubscription<ViewStoreConnection>(),
-                    EventStore.NotificationsByCorrelations(t),
-                    () => DateTimeOffset.Now,
-                    new ViewStoreConnection(t));
-
-                t.Commit();
-            }
-        }
     }
 }

@@ -6,40 +6,70 @@ using EventSourcing;
 
 namespace Client
 {
+    public delegate void Notify(IDomainEvent notification);
+
+    public delegate void NotifyViaPost(
+        IDomainEvent notification,
+        SubscriberMessagesByNotification subscriberMessagesByNotification,
+        Post post);
+
+    public delegate IEnumerable<SubscriberMessage> SubscriberMessagesByNotification(IDomainEvent notification);
+
+    public delegate void Post(IEnumerable<SubscriberMessage> messages);
+
+    delegate void Route(SubscriberMessage message);
+
     public static class Mailbox
     {
-        public static void Post(IDomainEvent notification)
-        {
-            Post
+        public static SubscriberMessagesByNotification SubscriberMessagesByNotification = notification =>
+            new List<SubscriberMessage>()
+                    .With(x => x.AddRange(Channel.PrepareMessages(notification, EventStore.PublishersBySubscription()).Cast<SubscriberMessage>()))
+                    .With(x => x.AddRange(Channel<AdoNetViewStoreConnection>.PrepareMessages(notification, EventStore<AdoNetViewStoreConnection>.ConsumersBySubscription).Cast<SubscriberMessage>()));
+
+        public static Notify Notify = notification => 
+            NotifyViaPost
             (
-                new List<Message>()
-                    .With(x => x.AddRange(Channel.PrepareMessages(notification, EventStore.PublishersBySubscription()).Cast<Message>()))
-                    .With(x => x.AddRange(Channel.PrepareMessages(notification, EventStore.SubscribersBySubscription<ViewStoreConnection>()).Cast<Message>()))
+                notification, 
+                SubscriberMessagesByNotification, 
+                Post
             );
-        }
 
-        public static void Post(IEnumerable<Message> messages)
-        {
-            using (var transaction = new TransactionScope())
+        public static NotifyViaPost NotifyViaPost = 
+        (
+            notification, 
+            subscriberMessagesByNotification, 
+            post
+        ) =>
+            post(subscriberMessagesByNotification(notification));
+
+        public static Post Post = messages =>
             {
-                foreach (var message in messages)
+                using (var transaction = new TransactionScope())
                 {
-                    Hangfire.BackgroundJob.Enqueue(() => Mailbox.Route(message));
+                    foreach (var message in messages)
+                    {
+                        Hangfire.BackgroundJob.Enqueue(() => Route(message));
+                    }
+
+                    transaction.Complete();
                 }
-
-                transaction.Complete();
-            }
-        }
-
-        static void Route(Message message)
-        {
-            var routes = new Dictionary<TypeContract, Action<Message>>
-            {
-                { typeof(MessageToPublisher).Contract(), m => EventStore.Post((MessageToPublisher)m) },
-                { typeof(MessageToConsumer<ViewStoreConnection>).Contract(), m => ViewStore.Post((MessageToConsumer<ViewStoreConnection>)m) }
             };
 
-            routes[message.Contract()](message);
-        }
+        static Route Route = message =>
+            {
+                var routes = new Dictionary<TypeContract, Action<SubscriberMessage>>
+                {
+                    {
+                        typeof (MessageToPublisher).Contract(),
+                        m => EventStore.Commit((MessageToPublisher) m)
+                    },
+                    {
+                        typeof (MessageToConsumer<AdoNetViewStoreConnection>).Contract(),
+                        m => AdoNetViewStore.Post((MessageToConsumer<AdoNetViewStoreConnection>) m)
+                    }
+                };
+
+                routes[message.Contract()](message);
+            };
     }
 }
