@@ -4,7 +4,11 @@ using System.Linq;
 
 namespace EventSourcing
 {
-    public interface SubscriberMessage { }
+    public interface SubscriberMessage
+    {
+        Subscription Subscription { get; set; }
+        IDomainEvent Notification { get; set; }
+    }
 
     public struct MessageToPublisher : SubscriberMessage
     {
@@ -29,7 +33,7 @@ namespace EventSourcing
     public delegate void Push(
         MessageToPublisher messageToPublisher,
         PublishersBySubscription publishersBySubscription,
-        Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
+        NotificationsByCorrelations notificationsByCorrelations,
         Func<IEnumerable<Correlation>, int> publisherVersionByPublisherDataContractCorrelations,
         Func<DateTimeOffset> clock,
         Action<NotificationsByPublisherAndVersion> saveNotificationsByPublisherAndVersion,
@@ -38,29 +42,23 @@ namespace EventSourcing
     public delegate void Push<TEndpoint>(
         MessageToConsumer<TEndpoint> messageToConsumer,
         ConsumersBySubscription<TEndpoint> consumersBySubscription,
-        Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
+        NotificationsByCorrelations notificationsByCorrelations,
         Func<DateTimeOffset> clock,
         TEndpoint endpoint);
 
     public static class Channel<TEndpoint>
     {
-        public static PrepareMessages<TEndpoint> PrepareMessages = 
-        (
-            notification, 
-            consumersBySubscription
-        ) => 
+        public static PrepareMessages<TEndpoint> PrepareMessages = (notification, consumersBySubscription) => 
             consumersBySubscription
                 .Where(p => p.Key.NotificationContract.Equals(new TypeContract(notification)))
                 .Select(p => new MessageToConsumer<TEndpoint> { Notification = notification, Subscription = p.Key });
 
-        public static Push<TEndpoint> Push => 
-        (
+        public static Push<TEndpoint> Push => (
             messageToConsumer, 
             consumersBySubscription, 
             notificationsByCorrelations, 
             clock, 
-            endpoint
-        ) => 
+            endpoint) => 
             consumersBySubscription[messageToConsumer.Subscription]
             (
                 messageToConsumer.Notification, 
@@ -72,25 +70,19 @@ namespace EventSourcing
 
     public static class Channel
     {
-        public static PrepareMessages PrepareMessages = 
-        (
-            notification,
+        public static PrepareMessages PrepareMessages = (notification, publishersBySubscription) =>  
             publishersBySubscription
-        ) =>  publishersBySubscription
                 .Where(p => p.Key.NotificationContract.Equals(new TypeContract(notification)))
                 .Select(p => new MessageToPublisher {Notification = notification, Subscription = p.Key});
 
-
-        public static Push Push =
-        (
+        public static Push Push = (
             messageToPublisher, 
             publishersBySubscription, 
             notificationsByCorrelations, 
             publisherVersionByPublisherDataContractCorrelations, 
             clock, 
             saveNotificationsByPublisherAndVersion, 
-            notify
-        ) =>
+            notify) =>
             {
                 var publisher = publishersBySubscription[messageToPublisher.Subscription];
 

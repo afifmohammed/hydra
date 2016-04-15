@@ -51,10 +51,6 @@
       <Project>{a0e76561-abd7-4739-8d82-bee6f2ad8ebc}</Project>
       <Name>Api</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Client\Client.csproj">
-      <Project>{05BE8BB5-D396-438C-9DF7-D13C32D1FA69}</Project>
-      <Name>Client</Name>
-    </ProjectReference>
     <ProjectReference Include="..\EventSourcing\Core.csproj">
       <Project>{E6E5141E-A6AC-434A-9697-784811570ECB}</Project>
       <Name>Core</Name>

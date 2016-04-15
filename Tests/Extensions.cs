@@ -51,7 +51,7 @@ namespace Tests
                 .Select(x => x(notification));
         }
 
-        static Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> NotificationsByCorrelations(params IDomainEvent[] notifications)
+        static NotificationsByCorrelations NotificationsByCorrelations(params IDomainEvent[] notifications)
         {
             return correlations => notifications
                 .Select(n => new

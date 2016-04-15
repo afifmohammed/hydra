@@ -22,7 +22,7 @@ namespace EventSourcing
         public static Action<TNotification> BuildConsumer<TConsumerData, TNotification, TEndpoint>(
             Action<TConsumerData, TNotification, TEndpoint> consumer,
             IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByConsumerDataContract,
-            Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
+            NotificationsByCorrelations notificationsByCorrelations,
             TEndpoint endpoint,
             IDictionary<TypeContract, Func<TConsumerData, JsonContent, TConsumerData>> consumerDataMappersByNotificationContract,
             Func<DateTimeOffset> clock)
@@ -46,7 +46,7 @@ namespace EventSourcing
         public static Action<TNotification> BuildConsumer<TConsumerData, TNotification, TEndpoint1, TEndpoint2>(
             Action<TConsumerData, TNotification, TEndpoint1, TEndpoint2> consumer,
             IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByConsumerDataContract,
-            Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
+            NotificationsByCorrelations notificationsByCorrelations,
             TEndpoint1 endpoint1,
             TEndpoint2 endpoint2,
             IDictionary<TypeContract, Func<TConsumerData, JsonContent, TConsumerData>> consumerDataMappersByNotificationContract,
@@ -72,7 +72,7 @@ namespace EventSourcing
         public static Func<TNotification, NotificationsByPublisher> BuildPublisher<TPublisherData, TNotification>(
             Func<TPublisherData, TNotification, IEnumerable<IDomainEvent>> publisher,
             IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByPublisherDataContract,
-            Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
+            NotificationsByCorrelations notificationsByCorrelations,
             Func<IDomainEvent, IEnumerable<Correlation>> correlationsByNotification,
             IDictionary<TypeContract, Func<TPublisherData, JsonContent, TPublisherData>> publisherDataMappersByNotificationContract,
             Func<DateTimeOffset> clock)
@@ -111,7 +111,7 @@ namespace EventSourcing
         public static THandlerData FoldHandlerData<THandlerData, TNotification>(
             TNotification notification,
             IEnumerable<CorrelationMap> handlerDataCorrelationMaps,
-            Func<IEnumerable<Correlation>, IEnumerable<SerializedNotification>> notificationsByCorrelations,
+            NotificationsByCorrelations notificationsByCorrelations,
             IDictionary<TypeContract, Func<THandlerData, JsonContent, THandlerData>> handlerDataMappersByNotificationContract)
             where THandlerData : new()
             where TNotification : IDomainEvent
