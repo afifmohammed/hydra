@@ -2,7 +2,7 @@
 using Commands;
 using EventSourcing;
 
-namespace Tests
+namespace InventoryStockManager.Domain
 {
     public class ChangeInventoryItemStockLimit : ICommand
     {

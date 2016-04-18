@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Commands;
 using EventSourcing;
 
-namespace Tests
+namespace InventoryStockManager.Domain
 {
     public struct InventoryItemStockData
     {
@@ -27,7 +26,7 @@ namespace Tests
                 .Given<ItemsCheckedInToInventory>(Map)
                     .Correlate(x => x.Id, x => x.Sku)
                 .Given<InventoryItemStockLimitChanged>(Map)
-                    .Correlate(x =>x.Id, x => x.Sku)
+                    .Correlate(x => x.Id, x => x.Sku)
                 .When<Received<ChangeInventoryItemStockLimit>>()
                     .Correlate(x => x.Command.Id, x => x.Sku)
                     .Then(Handle)
@@ -56,12 +55,12 @@ namespace Tests
         public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, Received<CheckInItems> e)
         {
             if (!d.IsActive)
-                return new [] {new InventoryItemActionInvalid {Action = "CheckIn", Id = e.Command.Id, Reason = "ItemInActive"}};
+                return new[] { new InventoryItemActionInvalid { Action = "CheckIn", Id = e.Command.Id, Reason = "ItemInActive" } };
 
             if (d.Count > d.OverStockLimit)
                 return new[] { new InventoryItemActionInvalid { Action = "CheckIn", Id = e.Command.Id, Reason = "OverStocked" } };
-            
-            return new[] { new ItemsCheckedInToInventory {Id = e.Command.Id, Count = e.Command.Count} };
+
+            return new[] { new ItemsCheckedInToInventory { Id = e.Command.Id, Count = e.Command.Count } };
         }
 
         public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, Received<RemoveInventoryItems> e)
@@ -80,7 +79,7 @@ namespace Tests
             if (!d.IsActive)
                 return new[] { new JustSpinningMyWheels() };
 
-            return new[] { new InventoryItemDeactivated  { Id = e.Command.Id } };
+            return new[] { new InventoryItemDeactivated { Id = e.Command.Id } };
         }
 
         public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, Received<CreateInventoryItem> e)

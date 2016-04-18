@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using EventSourcing;
 
-namespace Tests
+namespace InventoryStockManager.Domain
 {
     public class InventoryItemStockLimitChanged : IDomainEvent
     {

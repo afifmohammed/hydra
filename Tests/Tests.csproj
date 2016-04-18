@@ -59,12 +59,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="StockExample\Commands.cs" />
-    <Compile Include="StockExample\Events.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="StockExample\InventoryItemStockData.cs" />
-    <Compile Include="StockExample\InventoryItemStockView.cs" />
-    <Compile Include="StockExample\Tests.cs" />
+    <Compile Include="StockSample\InventoryItemStockView.cs" />
+    <Compile Include="StockSample\Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +76,10 @@
     <ProjectReference Include="..\EventSourcing\Core.csproj">
       <Project>{e6e5141e-a6ac-434a-9697-784811570ecb}</Project>
       <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sample\InventoryStockManager\InventoryStockManager.csproj">
+      <Project>{f8a5a9ad-f680-46f4-806f-653e7e51a030}</Project>
+      <Name>InventoryStockManager</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
