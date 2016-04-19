@@ -46,7 +46,7 @@ namespace EventSourcing
         Func<DateTimeOffset> clock,
         TEndpoint endpoint);
 
-    public static class Channel<TEndpoint>
+    public static class ConsumerChannel<TEndpoint>
     {
         public static PrepareMessages<TEndpoint> PrepareMessages = (notification, consumersBySubscription) => 
             consumersBySubscription
@@ -68,7 +68,7 @@ namespace EventSourcing
             );
     }
 
-    public static class Channel
+    public static class PublisherChannel
     {
         public static PrepareMessages PrepareMessages = (notification, publishersBySubscription) =>  
             publishersBySubscription

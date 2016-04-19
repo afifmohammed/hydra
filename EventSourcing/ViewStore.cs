@@ -18,7 +18,7 @@ namespace EventSourcing
             commit) => 
                 commit(
                     connection => 
-                        Channel<TEndpoint>.Push(
+                        ConsumerChannel<TEndpoint>.Push(
                             messageToConsumer,
                             consumersBySubscription,
                             notificationsByCorrelations,

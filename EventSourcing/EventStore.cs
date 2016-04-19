@@ -10,28 +10,28 @@ namespace EventSourcing
     public delegate NotificationsByCorrelations NotificationsByCorrelations<in TEndpoint>(TEndpoint connection) where TEndpoint : class;
     public delegate Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion<in TEndpoint>(TEndpoint connection) where TEndpoint : class;
 
-    public static class EventStore<TEndpoint> where TEndpoint : class
+    public static class EventStore<TPersistence> where TPersistence : class
     {
-        public static NotificationsByCorrelations<TEndpoint> NotificationsByCorrelations { get; set; }
-        public static PublisherVersionByPublisherDataContractCorrelations<TEndpoint> PublisherVersionByPublisherDataContractCorrelations { get; set; }
-        public static SaveNotificationsByPublisherAndVersion<TEndpoint> SaveNotificationsByPublisherAndVersion { get; set; }
+        public static NotificationsByCorrelations<TPersistence> NotificationsByCorrelations { get; set; }
+        public static PublisherVersionByPublisherDataContractCorrelations<TPersistence> PublisherVersionByPublisherDataContractCorrelations { get; set; }
+        public static SaveNotificationsByPublisherAndVersion<TPersistence> SaveNotificationsByPublisherAndVersion { get; set; }
     }
 
-    public static class EventStore<TEndpoint, TTransport>
-        where TEndpoint : class
+    public static class EventStore<TPersistence, TTransport>
+        where TPersistence : class
         where TTransport : class
     {
-        public static NotifyPublisher<TEndpoint> NotifyPublisher = (messageToPublisher, commitWork) =>
+        public static NotifyPublisher<TPersistence> NotifyPublisher = (messageToPublisher, commitWork) =>
             commitWork(connection =>
             {
-                Channel.Push(
+                PublisherChannel.Push(
                     messageToPublisher,
                     EventStore.PublishersBySubscription,
-                    EventStore<TEndpoint>.NotificationsByCorrelations(connection),
-                    EventStore<TEndpoint>.PublisherVersionByPublisherDataContractCorrelations(connection),
+                    EventStore<TPersistence>.NotificationsByCorrelations(connection),
+                    EventStore<TPersistence>.PublisherVersionByPublisherDataContractCorrelations(connection),
                     () => DateTimeOffset.Now,
-                    EventStore<TEndpoint>.SaveNotificationsByPublisherAndVersion(connection),
-                    publisherNotifications => Mailbox<TEndpoint, TTransport>.Post(publisherNotifications.Cast<SubscriberMessage>()));
+                    EventStore<TPersistence>.SaveNotificationsByPublisherAndVersion(connection),
+                    publisherNotifications => Mailbox<TPersistence, TTransport>.Post(publisherNotifications.Cast<SubscriberMessage>()));
             });
     }
 

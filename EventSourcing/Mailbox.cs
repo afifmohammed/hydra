@@ -28,7 +28,7 @@ namespace EventSourcing
 
         public static readonly List<SubscriberMessagesByNotification> SubscriberMessagesByNotification = 
             new List<SubscriberMessagesByNotification>()
-                .With(x => x.Add(e => Channel.PrepareMessages(e, EventStore.PublishersBySubscription).Cast<SubscriberMessage>()));
+                .With(x => x.Add(e => PublisherChannel.PrepareMessages(e, EventStore.PublishersBySubscription).Cast<SubscriberMessage>()));
 
         public static Notify Notify = notification => 
             NotifyViaPost
