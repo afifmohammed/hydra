@@ -53,9 +53,9 @@
       <Project>{E6E5141E-A6AC-434A-9697-784811570ECB}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Queries\Queries.csproj">
-      <Project>{EB7A999C-A296-4051-854A-41E5FFABA4D5}</Project>
-      <Name>Queries</Name>
+    <ProjectReference Include="..\Requests\Requests.csproj">
+      <Project>{eb7a999c-a296-4051-854a-41e5ffaba4d5}</Project>
+      <Name>Requests</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

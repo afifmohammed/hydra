@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using EventSourcing;
-using Queries;
+using Requests;
 
 namespace Commands
 {
@@ -17,9 +17,9 @@ namespace Commands
         public static Dispatch<TCommand> Dispatch = input => 
             DispatchToPipeline(
                 input,
-                cmd => Query<Unit<bool>>.By(new Authenticate { Command = cmd }).All(x => x.Value),
-                cmd => Query<Unit<bool>>.By(new Authorise { Command = cmd }).All(x => x.Value),
-                cmd => Query<IEnumerable<KeyValuePair<string, string>>>.By(new Validate { Command = cmd }).SelectMany(x => x),
+                cmd => Request<Unit<bool>>.By(new Authenticate { Command = cmd }).All(x => x.Value),
+                cmd => Request<Unit<bool>>.By(new Authorise { Command = cmd }).All(x => x.Value),
+                cmd => Request<IEnumerable<KeyValuePair<string, string>>>.By(new Validate { Command = cmd }).SelectMany(x => x),
                 cmd => Mailbox<TEventStoreEndpoint, TTransportEndpoint>.Notify(new Received<TCommand> {Command = cmd}));
 
         public static Response DispatchToPipeline(

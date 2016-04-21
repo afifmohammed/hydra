@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Queries
+namespace Requests
 {
     struct TypeContract
     {

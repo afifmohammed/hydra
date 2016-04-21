@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Queries
+namespace Requests
 {
     public static class Return
     {

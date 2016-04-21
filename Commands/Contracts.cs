@@ -1,21 +1,21 @@
 ﻿using EventSourcing;
 using System.Collections.Generic;
 using System.Net;
-using Queries;
+using Requests;
 
 namespace Commands
 {
-    public class Authenticate : Request<Unit<bool>>
+    public class Authenticate : IRequest<Unit<bool>>
     {
         public ICommand Command { get; set; }
     }
 
-    public class Authorise : Request<Unit<bool>>
+    public class Authorise : IRequest<Unit<bool>>
     {
         public ICommand Command { get; set; }
     }
 
-    public class Validate : Request<IEnumerable<KeyValuePair<string, string>>>
+    public class Validate : IRequest<IEnumerable<KeyValuePair<string, string>>>
     {
         public ICommand Command { get; set; }
     }

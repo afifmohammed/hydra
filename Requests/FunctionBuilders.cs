@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Queries
+namespace Requests
 {
     static class Function
     {
