@@ -28,17 +28,25 @@ namespace InventoryStockManager
 
             EventStore<AdoNetTransaction<ApplicationStore>>.NotificationsByCorrelations = connection => 
                 correlations => connection.Value.Connection.Query<SerializedNotification>(
-                    sql:new NotificationsByCorrelationQuery(correlations).ToString(), 
+                    sql:"", // todo:
                     transaction:connection.Value, 
-                    param: new NotificationsByCorrelationQuery(correlations).Parameters);
+                    param: new { }); // todo:
 
             EventStore<AdoNetTransaction<ApplicationStore>>.PublisherVersionByPublisherDataContractCorrelations = connection =>
-                correlations => connection.Value.Connection.Query<int>(sql:"", transaction:connection.Value, param:new {}).FirstOrDefault();
+                correlations => connection.Value.Connection.Query<int>(
+                    sql:"", // todo:
+                    transaction:connection.Value, 
+                    param:new {} // todo:
+                    ).FirstOrDefault();
 
             EventStore<AdoNetTransaction<ApplicationStore>>.SaveNotificationsByPublisherAndVersion = connection =>
                 notificationsByPublisherAndVersion =>
                 {
-                    if(connection.Value.Connection.Query<int>(sql: "", transaction: connection.Value, param: new { }).FirstOrDefault() != 1)
+                    if(connection.Value.Connection.Query<int>(
+                            sql: "", // todo:
+                            transaction: connection.Value, 
+                            param: new { } // todo:
+                        ).FirstOrDefault() != 1)
                         throw new DBConcurrencyException();
                 };
 
@@ -71,40 +79,5 @@ namespace InventoryStockManager
         }
     }
 
-    class ApplicationStore { }
-
-    class NotificationsByCorrelationQuery
-    {
-        private readonly StringBuilder _query;
-        public NotificationsByCorrelationQuery(IEnumerable<Correlation> correlations)
-        {
-            var kvps = new Dictionary<string, object>();
-            var counter = 1;
-            foreach (var correlation in correlations)
-            {
-                kvps.Add("correlationContract" + counter, correlation.Contract);
-                kvps.Add("correlationPropertyName" + counter, correlation.PropertyName);
-                kvps.Add("correlationPropertyValue" + counter, correlation.PropertyValue.Value);
-                counter++;
-            }
-
-            var eo = new ExpandoObject();
-
-            foreach (var kvp in kvps)
-            {
-                ((ICollection<KeyValuePair<string, object>>)eo).Add(kvp);
-            }
-
-            Parameters = (dynamic) eo;
-
-
-        }
-
-        public override string ToString()
-        {
-            return _query.ToString();
-        }
-
-        public readonly object Parameters;
-    }
+    class ApplicationStore { }    
 }
