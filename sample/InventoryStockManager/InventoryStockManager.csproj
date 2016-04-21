@@ -83,6 +83,10 @@
     <Content Include="icon.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\AdoNet\AdoNet.csproj">
+      <Project>{223A1668-8FC2-4399-9047-287B9DBF2636}</Project>
+      <Name>AdoNet</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Api\Api.csproj">
       <Project>{a0e76561-abd7-4739-8d82-bee6f2ad8ebc}</Project>
       <Name>Api</Name>

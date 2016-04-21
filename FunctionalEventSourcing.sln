@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{81BD1E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryStockManager", "sample\InventoryStockManager\InventoryStockManager.csproj", "{F8A5A9AD-F680-46F4-806F-653E7E51A030}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdoNet", "AdoNet\AdoNet.csproj", "{223A1668-8FC2-4399-9047-287B9DBF2636}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{F8A5A9AD-F680-46F4-806F-653E7E51A030}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8A5A9AD-F680-46F4-806F-653E7E51A030}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8A5A9AD-F680-46F4-806F-653E7E51A030}.Release|Any CPU.Build.0 = Release|Any CPU
+		{223A1668-8FC2-4399-9047-287B9DBF2636}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{223A1668-8FC2-4399-9047-287B9DBF2636}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{223A1668-8FC2-4399-9047-287B9DBF2636}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{223A1668-8FC2-4399-9047-287B9DBF2636}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
