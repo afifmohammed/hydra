@@ -75,12 +75,14 @@
     <Compile Include="Modules\InventoryModule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlQueries.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.png" />
+    <Content Include="Schema.sql" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\AdoNet\AdoNet.csproj">

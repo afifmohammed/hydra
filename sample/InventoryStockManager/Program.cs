@@ -23,11 +23,7 @@ namespace InventoryStockManager
                 EventStore.PublishersBySubscription.Add(element.Key, element.Value);
             }
 
-            EventStore<AdoNetTransaction<ApplicationStore>>.NotificationsByCorrelations = connection => 
-                correlations => connection.Value.Connection.Query<SerializedNotification>(
-                    sql:"", // todo:
-                    transaction:connection.Value, 
-                    param: new { }); // todo:
+            EventStore<AdoNetTransaction<ApplicationStore>>.NotificationsByCorrelations = SqlQueries.NotificationsByCorrelations;
 
             EventStore<AdoNetTransaction<ApplicationStore>>.PublisherVersionByPublisherDataContractCorrelations = connection =>
                 correlations => connection.Value.Connection.Query<int>(
