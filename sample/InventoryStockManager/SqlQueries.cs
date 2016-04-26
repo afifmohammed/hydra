@@ -9,12 +9,12 @@ namespace InventoryStockManager
 {
     static class SqlQueries
     {
-        public static NotificationsByCorrelations NotificationsByCorrelations(AdoNetTransaction<ApplicationStore> connection)
+        public static NotificationsByCorrelations NotificationsByCorrelations(AdoNetTransaction<ApplicationStore> transaction)
         {
-            return correlations => connection.Value.Connection
+            return correlations => transaction.Value.Connection
                 .Query<dynamic>(
                     sql: NotificationsByCorrelationsSql,
-                    transaction: connection.Value,
+                    transaction: transaction.Value,
                     param: correlations.AsTvp())
                 .Select(x => new SerializedNotification
                 {
