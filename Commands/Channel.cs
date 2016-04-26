@@ -43,14 +43,19 @@ namespace Commands
                     Status = HttpStatusCode.Forbidden
                 };
 
-            return new Response
+            var response = new Response
             {
                 Correlations = command.Correlations,
                 ValidationMessages = validator(command)
-            }.With(x => 
-                x.Status = x.ValidationMessages.Any() 
-                    ? HttpStatusCode.BadRequest 
+            }.With(x =>
+                x.Status = x.ValidationMessages.Any()
+                    ? HttpStatusCode.BadRequest
                     : HttpStatusCode.Accepted);
+
+            if (response.Status == HttpStatusCode.Accepted)
+                dispatch(command);
+
+            return response;
         }
     }
 }
