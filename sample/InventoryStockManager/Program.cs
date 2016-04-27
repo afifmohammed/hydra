@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
@@ -9,6 +11,7 @@ using Hangfire;
 using Hangfire.SqlServer;
 using InventoryStockManager.Domain;
 using Nancy.Hosting.Self;
+using Newtonsoft.Json;
 using Owin;
 
 namespace InventoryStockManager
@@ -24,15 +27,6 @@ namespace InventoryStockManager
             {
                 EventStore.PublishersBySubscription.Add(element.Key, element.Value);
             }
-
-            EventStore<AdoNetTransaction<ApplicationStore>>.NotificationsByCorrelations =
-                t => SqlQueries.NotificationsByCorrelations(t.Value);
-
-            EventStore<AdoNetTransaction<ApplicationStore>>.PublisherVersionByPublisherDataContractCorrelations =
-                t => SqlQueries.PublisherVersionByContractAndCorrelations(t.Value);
-
-            EventStore<AdoNetTransaction<ApplicationStore>>.SaveNotificationsByPublisherAndVersion =
-                t => SqlQueries.SaveNotificationsByPublisherAndVersion(t.Value);
 
             Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.CommitEventStoreConnection =
                 AdoNetTransaction<ApplicationStore>.CommitWork(ConnectionString.ByName);
@@ -53,9 +47,18 @@ namespace InventoryStockManager
             {
                 foreach (var subscriberMessage in messages)
                 {
-                    Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Route(subscriberMessage);
+                    //Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Route(subscriberMessage);
 
-                    //BackgroundJob.Enqueue(() => Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Route(subscriberMessage));
+                    MappersByContract.Mappers[new TypeContract(subscriberMessage.Notification)] = content => (IDomainEvent)JsonConvert.DeserializeObject(content.Value, subscriberMessage.Notification.GetType());
+
+                    var message = new AdoNetMailboxMessage
+                    {
+                        NotificationContent = new JsonContent(subscriberMessage.Notification),
+                        NotificationContract = subscriberMessage.Notification.Contract(),
+                        Subscription = subscriberMessage.Subscription
+                    };
+
+                    BackgroundJob.Enqueue(() => new AdoNetMailbox().Route(message));
                 }
             };
 
@@ -72,10 +75,27 @@ namespace InventoryStockManager
             }
         }
     }
-    
-    class ApplicationStore
-    {}
 
+    public static class MappersByContract
+    {
+        public static IDictionary<TypeContract, Func<JsonContent, IDomainEvent>> Mappers = new Dictionary<TypeContract, Func<JsonContent, IDomainEvent>>();
+    }
+
+    public class AdoNetMailboxMessage
+    {
+        public Subscription Subscription { get; set; }
+        public JsonContent NotificationContent { get; set; }
+        public TypeContract NotificationContract { get; set; }
+    }
+
+    public class AdoNetMailbox
+    {
+        public void Route(AdoNetMailboxMessage message)
+        {
+            var subscriberMessage = new SubscriberMessage {Subscription = message.Subscription, Notification = MappersByContract.Mappers[message.NotificationContract](message.NotificationContent)};
+            Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Route(subscriberMessage);
+        }
+    }
     static class ConnectionString
     {
         public static string ByName(string connectionStringName)

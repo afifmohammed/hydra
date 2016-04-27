@@ -1,15 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using EventSourcing;
-using static Dapper.SqlMapper;
 using System.Linq;
+using AdoNet;
+using Dapper;
+using EventSourcing;
 using Newtonsoft.Json;
 
 namespace InventoryStockManager
 {
+    public class ApplicationStore
+    { }
+
     static class SqlQueries
     {
+        static SqlQueries()
+        {
+            EventStore<AdoNetTransaction<ApplicationStore>>.NotificationsByCorrelations =
+    t => SqlQueries.NotificationsByCorrelations(t.Value);
+
+            EventStore<AdoNetTransaction<ApplicationStore>>.PublisherVersionByPublisherDataContractCorrelations =
+                t => SqlQueries.PublisherVersionByContractAndCorrelations(t.Value);
+
+            EventStore<AdoNetTransaction<ApplicationStore>>.SaveNotificationsByPublisherAndVersion =
+                t => SqlQueries.SaveNotificationsByPublisherAndVersion(t.Value);
+        }
+
         public static Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion(IDbTransaction transaction)
         {
             return notificationsByPublisherAndVersion =>
@@ -99,7 +115,7 @@ namespace InventoryStockManager
                 });                
         }
 
-        public static ICustomQueryParameter AsTvp(this IEnumerable<Correlation> correlations)
+        public static SqlMapper.ICustomQueryParameter AsTvp(this IEnumerable<Correlation> correlations)
         {
             var eventsDataTable = CreateEventTable();
             foreach (var item in correlations)
