@@ -6,7 +6,6 @@ using Hangfire;
 using Hangfire.SqlServer;
 using InventoryStockManager.Domain;
 using Nancy.Hosting.Self;
-using Newtonsoft.Json;
 
 namespace InventoryStockManager
 {
@@ -37,13 +36,13 @@ namespace InventoryStockManager
                 });
 
             EventStore<AdoNetTransaction<ApplicationStore>>.NotificationsByCorrelations =
-                t => SqlQueries.NotificationsByCorrelations(t.Value);
+                t => SqlEventStore.NotificationsByCorrelations(t.Value);
 
             EventStore<AdoNetTransaction<ApplicationStore>>.PublisherVersionByPublisherDataContractCorrelations =
-                t => SqlQueries.PublisherVersionByContractAndCorrelations(t.Value);
+                t => SqlEventStore.PublisherVersionByContractAndCorrelations(t.Value);
 
             EventStore<AdoNetTransaction<ApplicationStore>>.SaveNotificationsByPublisherAndVersion =
-                t => SqlQueries.SaveNotificationsByPublisherAndVersion(t.Value);
+                t => SqlEventStore.SaveNotificationsByPublisherAndVersion(t.Value);
 
             Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Enqueue = (endpoint, messages) =>
             {
@@ -73,30 +72,4 @@ namespace InventoryStockManager
             }
         }
     }
-
-    public class MailboxJsonMessage
-    {
-        public Subscription Subscription { get; set; }
-        public JsonContent NotificationContent { get; set; }
-        public string NotificationType { get; set; }
-    }
-
-    public class JsonMessageMailbox
-    {
-        public void Route(MailboxJsonMessage message)
-        {
-            var subscriberMessage = new SubscriberMessage
-            {
-                Subscription = message.Subscription,
-                Notification = (IDomainEvent) JsonConvert.DeserializeObject(message.NotificationContent.Value, Type.GetType(message.NotificationType))
-            };
-
-            Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Route(subscriberMessage);
-        }
-    }
-
-    static class ConnectionString
-    {
-        public static Func<string, string> ByName = connectionStringName => ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString;
-    }   
 }

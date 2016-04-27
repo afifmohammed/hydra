@@ -70,7 +70,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SqlQueries.cs" />
+    <Compile Include="JsonMailbox.cs" />
+    <Compile Include="SqlServer.cs" />
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>

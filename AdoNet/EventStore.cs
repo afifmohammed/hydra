@@ -2,17 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using AdoNet;
 using Dapper;
 using EventSourcing;
 using Newtonsoft.Json;
 
-namespace InventoryStockManager
+namespace AdoNet
 {
-    public class ApplicationStore
-    { }
-
-    static class SqlQueries
+    public static class SqlEventStore
     {
         public static Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion(IDbTransaction transaction)
         {
@@ -40,28 +36,35 @@ namespace InventoryStockManager
                         commandType: CommandType.StoredProcedure);
                 }
 
-                var publisher = notificationsByPublisherAndVersion.NotificationsByPublisher.PublisherDataCorrelations.AsPublisherNameAndCorrelation();
+                var publisher = notificationsByPublisherAndVersion
+                    .NotificationsByPublisher
+                    .PublisherDataCorrelations
+                    .AsPublisherNameAndCorrelation();
 
                 var rowCount = transaction.Connection.Execute(
-                    sql: notificationsByPublisherAndVersion.ExpectedVersion.Value == 0 
+                    sql: notificationsByPublisherAndVersion.ExpectedVersion.Value == 0
                         ? @"INSERT INTO Publishers (Name, Correlation, Version)
-                            VALUES (@Name, @Correlation, @Version)" 
+                            VALUES (@Name, @Correlation, @Version)"
                         : @"UPDATE Publisher SET Version = @Version 
                             WHERE Name = @Name 
                             AND Correlation = @Correlation 
                             AND Version = @ExpectedVersion",
                     transaction: transaction,
-                    param: new { Name = publisher.Item1, Correlation = publisher.Item2, Version = notificationsByPublisherAndVersion.Version.Value, ExpectedVersion = notificationsByPublisherAndVersion.ExpectedVersion.Value });
+                    param: new
+                    {
+                        Name = publisher.Item1,
+                        Correlation = publisher.Item2,
+                        Version = notificationsByPublisherAndVersion.Version.Value,
+                        ExpectedVersion = notificationsByPublisherAndVersion.ExpectedVersion.Value
+                    });
 
                 if (rowCount == 0)
-                    throw new DBConcurrencyException($@"
-                    Not match found for Publisher with Data contract '{publisher.Item1}' Version '{notificationsByPublisherAndVersion.ExpectedVersion}' and Correlation '{publisher.Item2}'");
-            }; 
+                    throw new DBConcurrencyException($@"Not match found for Publisher 
+                        with Data contract '{publisher.Item1}' 
+                        Version '{notificationsByPublisherAndVersion.ExpectedVersion}' 
+                        and Correlation '{publisher.Item2}'");
+            };
 
-        }
-        static object As<T>(this T instance, Func<T, object> map)
-        {
-            return map(instance);
         }
 
         public static Func<IEnumerable<Correlation>, int> PublisherVersionByContractAndCorrelations(IDbTransaction transaction)
@@ -74,20 +77,10 @@ namespace InventoryStockManager
                         WHERE Name = @Name
                             AND Correlation = @Correlation;",
                     transaction: transaction,
-                    param: correlations.AsPublisherNameAndCorrelation().As(x => new {Name = x.Item1, Correlation = x.Item2}))
+                    param: correlations.AsPublisherNameAndCorrelation().As(x => new { Name = x.Item1, Correlation = x.Item2 }))
                 .FirstOrDefault();
         }
-
-        static Tuple<string, string> AsPublisherNameAndCorrelation(this IEnumerable<Correlation> correlations)
-        {
-            return new Tuple<string, string>(
-                correlations.GroupBy(c => c.Contract.Value).Single().Key,
-                JsonConvert.SerializeObject(correlations
-                    .Select(x => new { x.PropertyName, x.PropertyValue })
-                    .OrderBy(x => x.PropertyName)
-                    .ToDictionary(x => x.PropertyName, x => x.PropertyValue))
-            );
-        } 
+        
 
         public static NotificationsByCorrelations NotificationsByCorrelations(IDbTransaction transaction)
         {
@@ -100,7 +93,7 @@ namespace InventoryStockManager
                 {
                     Contract = new TypeContract { Value = x.EventName },
                     JsonContent = new JsonContent { Value = x.Content }
-                });                
+                });
         }
 
         public static SqlMapper.ICustomQueryParameter AsTvp(this IEnumerable<Correlation> correlations)
@@ -117,7 +110,7 @@ namespace InventoryStockManager
         static DataTable CreateEventTable()
         {
             var eventTable = new DataTable("Event");
-            
+
             var colEventName = new DataColumn("EventName", typeof(string));
             eventTable.Columns.Add(colEventName);
             var colPropertyName = new DataColumn("PropertyName", typeof(string));
@@ -125,6 +118,22 @@ namespace InventoryStockManager
             var colPropertyValue = new DataColumn("PropertyValue", typeof(string));
             eventTable.Columns.Add(colPropertyValue);
             return eventTable;
+        }
+
+        static Tuple<string, string> AsPublisherNameAndCorrelation(this IEnumerable<Correlation> correlations)
+        {
+            return new Tuple<string, string>(
+                correlations.GroupBy(c => c.Contract.Value).Single().Key,
+                JsonConvert.SerializeObject(correlations
+                    .Select(x => new { x.PropertyName, x.PropertyValue })
+                    .OrderBy(x => x.PropertyName)
+                    .ToDictionary(x => x.PropertyName, x => x.PropertyValue))
+            );
+        }
+
+        static object As<T>(this T instance, Func<T, object> map)
+        {
+            return map(instance);
         }
     }
 }
