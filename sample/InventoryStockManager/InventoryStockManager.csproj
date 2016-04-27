@@ -69,6 +69,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <Compile Include="Domain\Commands.cs" />
     <Compile Include="Domain\Events.cs" />
     <Compile Include="Domain\ManageStock.cs" />

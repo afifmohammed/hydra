@@ -47,6 +47,7 @@ ON DELETE CASCADE
 ALTER TABLE [dbo].[EventCorrelations] CHECK CONSTRAINT [FK_EventCorrelations_Events]
 
 GO
+
 CREATE PROCEDURE proc_AddPublisherEvents(@EventName varchar(50), @Content varchar(max), @When DateTimeOffset, @EventCorrelations dbo.EventTableType READONLY)
 AS
 BEGIN
@@ -61,4 +62,17 @@ BEGIN
 	INSERT INTO EventCorrelations (EventId, PropertyName, PropertyValue)
 	SELECT @Id, PropertyName, PropertyValue
 	FROM @eventCorrelations
+END
+
+GO
+
+CREATE PROCEDURE proc_GetEventsWithCorrelations (@tvpEvents dbo.EventTableType READONLY)
+AS
+BEGIN
+	SET NOCOUNT ON
+	SELECT e.EventName, e.Content
+	FROM [Events] as e INNER JOIN EventCorrelations AS ec ON e.Id = ec.EventId 
+	INNER JOIN @tvpEvents as t 	ON e.EventName = t.EventName AND ec.PropertyName = t.PropertyName AND ec.PropertyValue = t.PropertyValue 
+	Group by e.Id, e.EventName, e.Content
+	ORDER BY e.Id
 END

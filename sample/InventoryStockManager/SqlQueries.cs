@@ -89,7 +89,7 @@ namespace InventoryStockManager
         {
             return correlations => transaction.Connection
                 .Query<dynamic>(
-                    sql: NotificationsByCorrelationsSql,
+                    sql: "proc_GetEventsWithCorrelations",
                     transaction: transaction,
                     param: correlations.AsTvp())
                 .Select(x => new SerializedNotification
@@ -98,18 +98,6 @@ namespace InventoryStockManager
                     JsonContent = new JsonContent { Value = x.Content }
                 });                
         }
-
-        private const string NotificationsByCorrelationsSql = @"
-			SELECT e.EventName, e.Content
-			FROM [Events] as e 
-			INNER JOIN EventCorrelations AS ec 
-				ON e.EventId = ec.EventId 
-			INNER JOIN @tvpEvents as t 
-				ON e.EventName = t.EventName 
-				AND ec.PropertyName = t.PropertyName 
-				AND ec.PropertyValue = t.PropertyValue 
-			Group by e.EventId, e.EventName, e.Content
-			ORDER BY e.EventId";
 
         public static ICustomQueryParameter AsTvp(this IEnumerable<Correlation> correlations)
         {
