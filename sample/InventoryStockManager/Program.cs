@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Transactions;
 using AdoNet;
 using EventSourcing;
 using Hangfire;
@@ -12,7 +8,6 @@ using Hangfire.SqlServer;
 using InventoryStockManager.Domain;
 using Nancy.Hosting.Self;
 using Newtonsoft.Json;
-using Owin;
 
 namespace InventoryStockManager
 {
@@ -47,9 +42,8 @@ namespace InventoryStockManager
             {
                 foreach (var subscriberMessage in messages)
                 {
-                    //Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Route(subscriberMessage);
-
-                    MappersByContract.Mappers[new TypeContract(subscriberMessage.Notification)] = content => (IDomainEvent)JsonConvert.DeserializeObject(content.Value, subscriberMessage.Notification.GetType());
+                    MappersByContract.Mappers[new TypeContract(subscriberMessage.Notification)] = content => 
+                        (IDomainEvent)JsonConvert.DeserializeObject(content.Value, subscriberMessage.Notification.GetType());
 
                     var message = new AdoNetMailboxMessage
                     {
@@ -96,11 +90,9 @@ namespace InventoryStockManager
             Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Route(subscriberMessage);
         }
     }
+
     static class ConnectionString
     {
-        public static string ByName(string connectionStringName)
-        {
-            return ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString;
-        }
+        public static Func<string, string> ByName = connectionStringName => ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString;
     }   
 }
