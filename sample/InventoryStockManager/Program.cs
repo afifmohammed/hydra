@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Transactions;
@@ -33,17 +34,11 @@ namespace InventoryStockManager
             EventStore<AdoNetTransaction<ApplicationStore>>.SaveNotificationsByPublisherAndVersion = 
                 t => SqlQueries.SaveNotificationsByPublisherAndVersion(t.Value);
 
-            Mailbox<AdoNetTransaction<ApplicationStore>, TransactionScope>.CommitEventStoreConnection = 
-                AdoNetTransaction<ApplicationStore>.CommitWork();
+            Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.CommitEventStoreConnection = 
+                AdoNetTransaction<ApplicationStore>.CommitWork(ConnectionString.ByName);
 
-            Mailbox<AdoNetTransaction<ApplicationStore>, TransactionScope>.CommitTransportConnection = work =>
-            {
-                using (var scope = new TransactionScope())
-                {
-                    work(scope);
-                    scope.Complete();
-                }
-            };
+            Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.CommitTransportConnection =
+                AdoNetTransactionScope.Commit();
 
             GlobalConfiguration.Configuration.UseSqlServerStorage(
                 nameOrConnectionString: "EventStoreTransport", 
@@ -52,11 +47,11 @@ namespace InventoryStockManager
                     PrepareSchemaIfNecessary = false
                 });
 
-            Mailbox<AdoNetTransaction<ApplicationStore>, TransactionScope>.Enqueue = (endpoint, messages) =>
+            Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Enqueue = (endpoint, messages) =>
             {
                 foreach (var subscriberMessage in messages)
                     BackgroundJob.Enqueue(
-                        () => Mailbox<AdoNetTransaction<ApplicationStore>, TransactionScope>.Route(subscriberMessage));
+                        () => Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Route(subscriberMessage));
             };
 
             using (var host = new NancyHost(uri))
@@ -78,5 +73,14 @@ namespace InventoryStockManager
         }
     }
 
-    class ApplicationStore { }    
+    class ApplicationStore
+    {}
+
+    static class ConnectionString
+    {
+        public static string ByName(string connectionStringName)
+        {
+            return ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString;
+        }
+    }   
 }

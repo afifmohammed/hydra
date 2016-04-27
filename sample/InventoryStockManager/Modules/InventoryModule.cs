@@ -11,7 +11,7 @@ namespace InventoryStockManager.Modules
         {
             Get["/inventory/{id}"] = _ => "not available";
 
-            Put["/inventory/{id}/deactivate"] = id => Commands.Channel<DeactivateInventoryItem, AdoNetTransaction<ApplicationStore>, TransactionScope>
+            Put["/inventory/{id}/deactivate"] = id => Commands.Channel<DeactivateInventoryItem, AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>
                     .Dispatch(new DeactivateInventoryItem {Id = id});
         }
     }

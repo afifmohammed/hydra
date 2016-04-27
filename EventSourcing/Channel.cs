@@ -4,23 +4,17 @@ using System.Linq;
 
 namespace EventSourcing
 {
-    public interface SubscriberMessage
-    {
-        Subscription Subscription { get; set; }
-        IDomainEvent Notification { get; set; }
-    }
-
-    public struct MessageToPublisher : SubscriberMessage
+    public class SubscriberMessage
     {
         public Subscription Subscription { get; set; }
         public IDomainEvent Notification { get; set; }
     }
 
-    public struct MessageToConsumer<TEndpoint> : SubscriberMessage
-    {
-        public Subscription Subscription { get; set; }
-        public IDomainEvent Notification { get; set; }
-    }
+    public class MessageToPublisher : SubscriberMessage
+    {}
+
+    public class MessageToConsumer<TEndpoint> : SubscriberMessage
+    {}
 
     public delegate IEnumerable<MessageToPublisher> PrepareMessages(
         IDomainEvent notification,
