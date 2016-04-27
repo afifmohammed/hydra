@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
 using AdoNet;
 using EventSourcing;
@@ -50,17 +49,14 @@ namespace InventoryStockManager
             {
                 foreach (var subscriberMessage in messages)
                 {
-                    MappersByContract.Mappers[new TypeContract(subscriberMessage.Notification)] = content => 
-                        (IDomainEvent)JsonConvert.DeserializeObject(content.Value, subscriberMessage.Notification.GetType());
-
-                    var message = new AdoNetMailboxMessage
+                    var message = new MailboxJsonMessage
                     {
                         NotificationContent = new JsonContent(subscriberMessage.Notification),
-                        NotificationContract = subscriberMessage.Notification.Contract(),
+                        NotificationType = subscriberMessage.Notification.GetType().FullName,
                         Subscription = subscriberMessage.Subscription
                     };
 
-                    BackgroundJob.Enqueue(() => new AdoNetMailbox().Route(message));
+                    BackgroundJob.Enqueue(() => new JsonMessageMailbox().Route(message));
                 }
             };
 
@@ -78,23 +74,23 @@ namespace InventoryStockManager
         }
     }
 
-    public static class MappersByContract
-    {
-        public static IDictionary<TypeContract, Func<JsonContent, IDomainEvent>> Mappers = new Dictionary<TypeContract, Func<JsonContent, IDomainEvent>>();
-    }
-
-    public class AdoNetMailboxMessage
+    public class MailboxJsonMessage
     {
         public Subscription Subscription { get; set; }
         public JsonContent NotificationContent { get; set; }
-        public TypeContract NotificationContract { get; set; }
+        public string NotificationType { get; set; }
     }
 
-    public class AdoNetMailbox
+    public class JsonMessageMailbox
     {
-        public void Route(AdoNetMailboxMessage message)
+        public void Route(MailboxJsonMessage message)
         {
-            var subscriberMessage = new SubscriberMessage {Subscription = message.Subscription, Notification = MappersByContract.Mappers[message.NotificationContract](message.NotificationContent)};
+            var subscriberMessage = new SubscriberMessage
+            {
+                Subscription = message.Subscription,
+                Notification = (IDomainEvent) JsonConvert.DeserializeObject(message.NotificationContent.Value, Type.GetType(message.NotificationType))
+            };
+
             Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Route(subscriberMessage);
         }
     }
