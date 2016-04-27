@@ -28,9 +28,37 @@ CREATE TABLE [dbo].[Events](
 	) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
+CREATE TABLE [dbo].[Publishers](
+	[Name] [varchar](50) NOT NULL,
+	[Correlation] [varchar](850) NOT NULL,
+	[Version] [int] NOT NULL,
+ CONSTRAINT [PK_Publishers] PRIMARY KEY CLUSTERED 
+(
+	[Name] ASC,
+	[Correlation] ASC
+)
+) ON [PRIMARY]
+
 ALTER TABLE [dbo].[EventCorrelations]  WITH CHECK ADD  CONSTRAINT [FK_EventCorrelations_Events] FOREIGN KEY([EventId])
 REFERENCES [dbo].[Events] ([Id])
 ON UPDATE CASCADE
 ON DELETE CASCADE
 
 ALTER TABLE [dbo].[EventCorrelations] CHECK CONSTRAINT [FK_EventCorrelations_Events]
+
+GO
+CREATE PROCEDURE proc_AddPublisherEvents(@EventName varchar(50), @Content varchar(max), @When DateTimeOffset, @EventCorrelations dbo.EventTableType READONLY)
+AS
+BEGIN
+	SET NOCOUNT ON
+	DECLARE @Id bigint
+
+	INSERT INTO [Events] (EventName, Content, [When])
+	VALUES (@EventName, @Content, @When)
+
+	SET @id = @@IDENTITY
+
+	INSERT INTO EventCorrelations (EventId, PropertyName, PropertyValue)
+	SELECT @Id, PropertyName, PropertyValue
+	FROM @eventCorrelations
+END

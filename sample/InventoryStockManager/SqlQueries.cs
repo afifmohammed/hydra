@@ -12,18 +12,34 @@ namespace InventoryStockManager
     {
         public static Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion(IDbTransaction transaction)
         {
-            return x =>
+            return notificationsByPublisherAndVersion =>
             {
-                foreach (var tuple in x.NotificationsByPublisher.Notifications)
+                var when = notificationsByPublisherAndVersion.NotificationsByPublisher.When;
+                foreach (var tuple in notificationsByPublisherAndVersion.NotificationsByPublisher.Notifications)
                 {
-                    IDomainEvent notification = tuple.Item1; // todo: save the notification, get the id back
-                    IEnumerable<Correlation> correlations = tuple.Item2; // todo: save the correlations using the id from above
+                    var notification = tuple.Item1;
+
+                    var content = JsonConvert.SerializeObject(notification);
+                    var correlations = tuple.Item2.ToList();
+                    var name = correlations.GroupBy(x => x.Contract).Single().Key.Value;
+
+                    transaction.Connection.ExecuteScalar(
+                        sql: "proc_AddPublisherEvents",
+                        param: new
+                        {
+                            EventName = name,
+                            Content = content,
+                            When = when,
+                            EventCorrelations = correlations.AsTvp()
+                        },
+                        transaction: transaction,
+                        commandType: CommandType.StoredProcedure);
                 }
 
-                var publisher = x.NotificationsByPublisher.PublisherDataCorrelations.AsPublisherNameAndCorrelation();
+                var publisher = notificationsByPublisherAndVersion.NotificationsByPublisher.PublisherDataCorrelations.AsPublisherNameAndCorrelation();
 
                 var rowCount = transaction.Connection.ExecuteScalar<int>(
-                    sql: x.ExpectedVersion.Value == 0 
+                    sql: notificationsByPublisherAndVersion.ExpectedVersion.Value == 0 
                         ? @"INSERT INTO Publishers (Name, Correlation, Version)
                             VALUES (@Name, @Correlation, @Version)" 
                         : @"UPDATE Publisher SET Version = @Version 
@@ -31,11 +47,11 @@ namespace InventoryStockManager
                             AND Correlation = @Correlation 
                             AND Version = @ExpectedVersion",
                     transaction: transaction,
-                    param: new { Name = publisher.Item1, Correlation = publisher.Item2, x.Version, x.ExpectedVersion });
+                    param: new { Name = publisher.Item1, Correlation = publisher.Item2, notificationsByPublisherAndVersion.Version, notificationsByPublisherAndVersion.ExpectedVersion });
 
                 if (rowCount == 0)
                     throw new DBConcurrencyException($@"
-                    Not match found for Publisher with Data contract '{publisher.Item1}' Version '{x.ExpectedVersion}' and Correlation '{publisher.Item2}'");
+                    Not match found for Publisher with Data contract '{publisher.Item1}' Version '{notificationsByPublisherAndVersion.ExpectedVersion}' and Correlation '{publisher.Item2}'");
             }; 
 
         }
