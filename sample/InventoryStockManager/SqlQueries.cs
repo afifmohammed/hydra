@@ -38,7 +38,7 @@ namespace InventoryStockManager
 
                 var publisher = notificationsByPublisherAndVersion.NotificationsByPublisher.PublisherDataCorrelations.AsPublisherNameAndCorrelation();
 
-                var rowCount = transaction.Connection.ExecuteScalar<int>(
+                var rowCount = transaction.Connection.Execute(
                     sql: notificationsByPublisherAndVersion.ExpectedVersion.Value == 0 
                         ? @"INSERT INTO Publishers (Name, Correlation, Version)
                             VALUES (@Name, @Correlation, @Version)" 
@@ -47,7 +47,7 @@ namespace InventoryStockManager
                             AND Correlation = @Correlation 
                             AND Version = @ExpectedVersion",
                     transaction: transaction,
-                    param: new { Name = publisher.Item1, Correlation = publisher.Item2, notificationsByPublisherAndVersion.Version, notificationsByPublisherAndVersion.ExpectedVersion });
+                    param: new { Name = publisher.Item1, Correlation = publisher.Item2, Version = notificationsByPublisherAndVersion.Version.Value, ExpectedVersion = notificationsByPublisherAndVersion.ExpectedVersion.Value });
 
                 if (rowCount == 0)
                     throw new DBConcurrencyException($@"

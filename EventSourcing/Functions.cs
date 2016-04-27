@@ -96,11 +96,7 @@ namespace EventSourcing
                     n => new Tuple<IDomainEvent, IEnumerable<Correlation>>
                     (
                         n,
-                        CorrelationsOfMatchingNotificationsBy
-                        (
-                            correlationMapsByPublisherDataContract[typeof(TPublisherData).Contract()],
-                            correlationsByNotification(n)
-                        ).Where(x => x.Contract.Equals(new TypeContract(n)))
+                        n.Correlations()
                     )
                 ),
                 PublisherDataCorrelations = HandlerDataCorrelationsBy(correlationMapsByPublisherDataContract[typeof(TPublisherData).Contract()], notification),
@@ -123,8 +119,8 @@ namespace EventSourcing
                 (
                     CorrelationsOfMatchingNotificationsBy
                     (
-                        handlerDataCorrelationMaps,
-                        HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification)
+                        handlerDataCorrelationMaps: handlerDataCorrelationMaps,
+                        handlerDataCorrelations: HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification)
                     )
                 )
             );

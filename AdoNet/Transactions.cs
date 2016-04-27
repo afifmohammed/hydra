@@ -52,8 +52,9 @@ namespace AdoNet
 
         public void Dispose()
         {
+            Value.Connection?.Dispose();
+
             Value.Dispose();
-            Value.Connection.Dispose();
         }
 
         public static CommitWork<AdoNetTransaction<TStore>> CommitWork(Func<string, string> getConnectionString)
