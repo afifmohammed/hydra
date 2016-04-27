@@ -42,13 +42,19 @@ namespace InventoryStockManager
                     QueuePollInterval = TimeSpan.FromSeconds(1)
                 });
 
+            EventStore<AdoNetTransaction<ApplicationStore>>.NotificationsByCorrelations =
+                t => SqlQueries.NotificationsByCorrelations(t.Value);
+
+            EventStore<AdoNetTransaction<ApplicationStore>>.PublisherVersionByPublisherDataContractCorrelations =
+                t => SqlQueries.PublisherVersionByContractAndCorrelations(t.Value);
+
+            EventStore<AdoNetTransaction<ApplicationStore>>.SaveNotificationsByPublisherAndVersion =
+                t => SqlQueries.SaveNotificationsByPublisherAndVersion(t.Value);
 
             Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Enqueue = (endpoint, messages) =>
             {
                 foreach (var subscriberMessage in messages)
                 {
-                    //Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Route(subscriberMessage);
-
                     MappersByContract.Mappers[new TypeContract(subscriberMessage.Notification)] = content => (IDomainEvent)JsonConvert.DeserializeObject(content.Value, subscriberMessage.Notification.GetType());
 
                     var message = new AdoNetMailboxMessage

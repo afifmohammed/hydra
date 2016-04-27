@@ -14,18 +14,6 @@ namespace InventoryStockManager
 
     static class SqlQueries
     {
-        static SqlQueries()
-        {
-            EventStore<AdoNetTransaction<ApplicationStore>>.NotificationsByCorrelations =
-    t => SqlQueries.NotificationsByCorrelations(t.Value);
-
-            EventStore<AdoNetTransaction<ApplicationStore>>.PublisherVersionByPublisherDataContractCorrelations =
-                t => SqlQueries.PublisherVersionByContractAndCorrelations(t.Value);
-
-            EventStore<AdoNetTransaction<ApplicationStore>>.SaveNotificationsByPublisherAndVersion =
-                t => SqlQueries.SaveNotificationsByPublisherAndVersion(t.Value);
-        }
-
         public static Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion(IDbTransaction transaction)
         {
             return notificationsByPublisherAndVersion =>
