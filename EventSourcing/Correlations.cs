@@ -8,6 +8,7 @@ namespace EventSourcing
 {
     public interface ICorrelated
     {
+        [JsonIgnore]
         IEnumerable<KeyValuePair<string, object>> Correlations { get; }
     }
 
