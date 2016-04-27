@@ -47,7 +47,7 @@ ON DELETE CASCADE
 ALTER TABLE [dbo].[EventCorrelations] CHECK CONSTRAINT [FK_EventCorrelations_Events]
 
 GO
-CREATE PROCEDURE proc_AddPublisherEvents(@EventName varchar(50), @Content varchar(max), @When DateTimeOffset, @EventCorrelations dbo.EventTableType READONLY)
+CREATE PROCEDURE AddPublisherEvents(@EventName varchar(50), @Content varchar(max), @When DateTimeOffset, @EventCorrelations dbo.EventTableType READONLY)
 AS
 BEGIN
 	SET NOCOUNT ON

@@ -24,7 +24,7 @@ namespace InventoryStockManager
                     var name = correlations.GroupBy(x => x.Contract).Single().Key.Value;
 
                     transaction.Connection.ExecuteScalar(
-                        sql: "proc_AddPublisherEvents",
+                        sql: "AddPublisherEvents",
                         param: new
                         {
                             EventName = name,
