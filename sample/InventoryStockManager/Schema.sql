@@ -62,3 +62,16 @@ BEGIN
 	SELECT @Id, PropertyName, PropertyValue
 	FROM @eventCorrelations
 END
+
+GO
+
+CREATE PROCEDURE GetEventsWithCorrelations (@tvpEvents dbo.EventTableType READONLY)
+AS
+BEGIN
+	SET NOCOUNT ON
+	SELECT e.EventName, e.Content
+	FROM [Events] as e INNER JOIN EventCorrelations AS ec ON e.Id = ec.EventId 
+	INNER JOIN @tvpEvents as t 	ON e.EventName = t.EventName AND ec.PropertyName = t.PropertyName AND ec.PropertyValue = t.PropertyValue 
+	Group by e.Id, e.EventName, e.Content
+	ORDER BY e.Id
+END

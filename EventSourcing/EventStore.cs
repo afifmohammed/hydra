@@ -37,6 +37,11 @@ namespace EventSourcing
 
     public static class EventStore
     {
+        static EventStore()
+        {
+            PublishersBySubscription = new PublishersBySubscription();
+        }
+
         public static PublishersBySubscription PublishersBySubscription { get; set; }
     }
 }
