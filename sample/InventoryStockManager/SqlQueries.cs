@@ -1,20 +1,80 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using EventSourcing;
 using static Dapper.SqlMapper;
 using System.Linq;
-using AdoNet;
+using Newtonsoft.Json;
 
 namespace InventoryStockManager
 {
     static class SqlQueries
     {
-        public static NotificationsByCorrelations NotificationsByCorrelations(AdoNetTransaction<ApplicationStore> transaction)
+        public static Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion(IDbTransaction transaction)
         {
-            return correlations => transaction.Value.Connection
+            return x =>
+            {
+                foreach (var tuple in x.NotificationsByPublisher.Notifications)
+                {
+                    IDomainEvent notification = tuple.Item1; // todo: save the notification, get the id back
+                    IEnumerable<Correlation> correlations = tuple.Item2; // todo: save the correlations using the id from above
+                }
+
+                var publisher = x.NotificationsByPublisher.PublisherDataCorrelations.AsPublisherNameAndCorrelation();
+
+                var rowCount = transaction.Connection.ExecuteScalar<int>(
+                    sql: x.ExpectedVersion.Value == 0 
+                        ? @"INSERT INTO Publishers (Name, Correlation, Version)
+                            VALUES (@Name, @Correlation, @Version)" 
+                        : @"UPDATE Publisher SET Version = @Version 
+                            WHERE Name = @Name 
+                            AND Correlation = @Correlation 
+                            AND Version = @ExpectedVersion",
+                    transaction: transaction,
+                    param: new { Name = publisher.Item1, Correlation = publisher.Item2, x.Version, x.ExpectedVersion });
+
+                if (rowCount == 0)
+                    throw new DBConcurrencyException($@"
+                    Not match found for Publisher with Data contract '{publisher.Item1}' Version '{x.ExpectedVersion}' and Correlation '{publisher.Item2}'");
+            }; 
+
+        }
+        static object As<T>(this T instance, Func<T, object> map)
+        {
+            return map(instance);
+        }
+
+        public static Func<IEnumerable<Correlation>, int> PublisherVersionByContractAndCorrelations(IDbTransaction transaction)
+        {
+            return correlations => transaction.Connection
+                .Query<int>(
+                    sql: @"
+                        SELECT Version
+                        FROM Publishers
+                        WHERE Name = @Name
+                            AND Correlation = @Correlation;",
+                    transaction: transaction,
+                    param: correlations.AsPublisherNameAndCorrelation().As(x => new {Name = x.Item1, Correlation = x.Item2}))
+                .FirstOrDefault();
+        }
+
+        static Tuple<string, string> AsPublisherNameAndCorrelation(this IEnumerable<Correlation> correlations)
+        {
+            return new Tuple<string, string>(
+                correlations.GroupBy(c => c.Contract.Value).Single().Key,
+                JsonConvert.SerializeObject(correlations
+                    .Select(x => new { x.PropertyName, x.PropertyValue })
+                    .OrderBy(x => x.PropertyName)
+                    .ToDictionary(x => x.PropertyName, x => x.PropertyValue))
+            );
+        } 
+
+        public static NotificationsByCorrelations NotificationsByCorrelations(IDbTransaction transaction)
+        {
+            return correlations => transaction.Connection
                 .Query<dynamic>(
                     sql: NotificationsByCorrelationsSql,
-                    transaction: transaction.Value,
+                    transaction: transaction,
                     param: correlations.AsTvp())
                 .Select(x => new SerializedNotification
                 {
@@ -23,7 +83,7 @@ namespace InventoryStockManager
                 });                
         }
 
-        static readonly string NotificationsByCorrelationsSql = @"
+        private const string NotificationsByCorrelationsSql = @"
 			SELECT e.EventName, e.Content
 			FROM [Events] as e 
 			INNER JOIN EventCorrelations AS ec 

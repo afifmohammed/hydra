@@ -3,11 +3,12 @@ using System.Data;
 using System.Linq;
 using System.Transactions;
 using AdoNet;
-using Dapper;
 using EventSourcing;
 using Hangfire;
+using Hangfire.SqlServer;
 using InventoryStockManager.Domain;
 using Nancy.Hosting.Self;
+using Owin;
 
 namespace InventoryStockManager
 {
@@ -23,27 +24,17 @@ namespace InventoryStockManager
                 EventStore.PublishersBySubscription.Add(element.Key, element.Value);
             }
 
-            EventStore<AdoNetTransaction<ApplicationStore>>.NotificationsByCorrelations = SqlQueries.NotificationsByCorrelations;
+            EventStore<AdoNetTransaction<ApplicationStore>>.NotificationsByCorrelations = 
+                t => SqlQueries.NotificationsByCorrelations(t.Value);
 
-            EventStore<AdoNetTransaction<ApplicationStore>>.PublisherVersionByPublisherDataContractCorrelations = connection =>
-                correlations => connection.Value.Connection.Query<int>(
-                    sql:"", // todo:
-                    transaction:connection.Value, 
-                    param:new {} // todo:
-                    ).FirstOrDefault();
+            EventStore<AdoNetTransaction<ApplicationStore>>.PublisherVersionByPublisherDataContractCorrelations =
+                t => SqlQueries.PublisherVersionByContractAndCorrelations(t.Value);
 
-            EventStore<AdoNetTransaction<ApplicationStore>>.SaveNotificationsByPublisherAndVersion = connection =>
-                notificationsByPublisherAndVersion =>
-                {
-                    if(connection.Value.Connection.Query<int>(
-                            sql: "", // todo:
-                            transaction: connection.Value, 
-                            param: new { } // todo:
-                        ).FirstOrDefault() != 1)
-                        throw new DBConcurrencyException();
-                };
+            EventStore<AdoNetTransaction<ApplicationStore>>.SaveNotificationsByPublisherAndVersion = 
+                t => SqlQueries.SaveNotificationsByPublisherAndVersion(t.Value);
 
-            Mailbox<AdoNetTransaction<ApplicationStore>, TransactionScope>.CommitEventStoreConnection = AdoNetTransaction<ApplicationStore>.CommitWork();
+            Mailbox<AdoNetTransaction<ApplicationStore>, TransactionScope>.CommitEventStoreConnection = 
+                AdoNetTransaction<ApplicationStore>.CommitWork();
 
             Mailbox<AdoNetTransaction<ApplicationStore>, TransactionScope>.CommitTransportConnection = work =>
             {
@@ -53,6 +44,13 @@ namespace InventoryStockManager
                     scope.Complete();
                 }
             };
+
+            GlobalConfiguration.Configuration.UseSqlServerStorage(
+                nameOrConnectionString: "EventStoreTransport", 
+                options: new SqlServerStorageOptions
+                {
+                    PrepareSchemaIfNecessary = false
+                });
 
             Mailbox<AdoNetTransaction<ApplicationStore>, TransactionScope>.Enqueue = (endpoint, messages) =>
             {
@@ -69,6 +67,14 @@ namespace InventoryStockManager
                 Console.WriteLine("Press any [Enter] to close the host.");
                 Console.ReadLine();
             }
+        }
+    }
+
+    public class Startup
+    {
+        public void Configuration(IAppBuilder app)
+        {
+            //app.UseHangfireDashboard();
         }
     }
 
