@@ -65,7 +65,7 @@ END
 
 GO
 
-CREATE PROCEDURE proc_GetEventsWithCorrelations (@tvpEvents dbo.EventTableType READONLY)
+CREATE PROCEDURE GetEventsWithCorrelations (@tvpEvents dbo.EventTableType READONLY)
 AS
 BEGIN
 	SET NOCOUNT ON

@@ -89,7 +89,7 @@ namespace InventoryStockManager
         {
             return correlations => transaction.Connection
                 .Query<dynamic>(
-                    sql: "proc_GetEventsWithCorrelations",
+                    sql: "GetEventsWithCorrelations",
                     transaction: transaction,
                     param: correlations.AsTvp())
                 .Select(x => new SerializedNotification
