@@ -10,7 +10,19 @@ namespace AdoNet
 {
     public static class SqlEventStore
     {
-        public static Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion(IDbTransaction transaction)
+        public static void Initialize<TStore>() where TStore : class
+        {
+            EventStore<AdoNetTransaction<TStore>>.NotificationsByCorrelations =
+                t => NotificationsByCorrelations(t.Value);
+
+            EventStore<AdoNetTransaction<TStore>>.PublisherVersionByPublisherDataContractCorrelations =
+                t => PublisherVersionByContractAndCorrelations(t.Value);
+
+            EventStore<AdoNetTransaction<TStore>>.SaveNotificationsByPublisherAndVersion =
+                t => SaveNotificationsByPublisherAndVersion(t.Value);
+        }
+
+       public static Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion(IDbTransaction transaction)
         {
             return notificationsByPublisherAndVersion =>
             {
@@ -45,7 +57,7 @@ namespace AdoNet
                     sql: notificationsByPublisherAndVersion.ExpectedVersion.Value == 0
                         ? @"INSERT INTO Publishers (Name, Correlation, Version)
                             VALUES (@Name, @Correlation, @Version)"
-                        : @"UPDATE Publisher SET Version = @Version 
+                        : @"UPDATE Publishers SET Version = @Version 
                             WHERE Name = @Name 
                             AND Correlation = @Correlation 
                             AND Version = @ExpectedVersion",
@@ -80,7 +92,6 @@ namespace AdoNet
                     param: correlations.AsPublisherNameAndCorrelation().As(x => new { Name = x.Item1, Correlation = x.Item2 }))
                 .FirstOrDefault();
         }
-        
 
         public static NotificationsByCorrelations NotificationsByCorrelations(IDbTransaction transaction)
         {
