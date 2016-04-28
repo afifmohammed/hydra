@@ -21,6 +21,8 @@ namespace InventoryStockManager
                 EventStore.PublishersBySubscription.Add(element.Key, element.Value);
             }
 
+            SqlEventStore.Initialize<ApplicationStore>();
+
             Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.CommitEventStoreConnection =
                 AdoNetTransaction<ApplicationStore>.CommitWork(ConnectionString.ByName);
 
@@ -34,15 +36,6 @@ namespace InventoryStockManager
                     PrepareSchemaIfNecessary = true,
                     QueuePollInterval = TimeSpan.FromSeconds(1)
                 });
-
-            EventStore<AdoNetTransaction<ApplicationStore>>.NotificationsByCorrelations =
-                t => SqlEventStore.NotificationsByCorrelations(t.Value);
-
-            EventStore<AdoNetTransaction<ApplicationStore>>.PublisherVersionByPublisherDataContractCorrelations =
-                t => SqlEventStore.PublisherVersionByContractAndCorrelations(t.Value);
-
-            EventStore<AdoNetTransaction<ApplicationStore>>.SaveNotificationsByPublisherAndVersion =
-                t => SqlEventStore.SaveNotificationsByPublisherAndVersion(t.Value);
 
             Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Enqueue = (endpoint, messages) =>
             {
@@ -60,15 +53,13 @@ namespace InventoryStockManager
             };
 
             using (var host = new NancyHost(uri))
+            using (new BackgroundJobServer())
             {
-                var svr = new BackgroundJobServer();
                 host.Start();
 
                 Console.WriteLine("Your application is running on " + uri);
                 Console.WriteLine("Press any [Enter] to close the host.");
                 Console.ReadLine();
-
-                svr.Dispose();
             }
         }
     }
