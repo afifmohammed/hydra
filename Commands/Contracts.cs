@@ -22,7 +22,7 @@ namespace Commands
 
     public interface ICommand : ICorrelated { }
 
-    public class Received<TCommand> : IDomainEvent where TCommand : ICommand
+    public class Placed<TCommand> : IDomainEvent where TCommand : ICommand
     {
         public TCommand Command { get; set; }
         public IEnumerable<KeyValuePair<string, object>> Correlations => Command.Correlations;

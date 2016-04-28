@@ -20,7 +20,7 @@ namespace Commands
                 cmd => Request<Unit<bool>>.By(new Authenticate { Command = cmd }).All(x => x.Value),
                 cmd => Request<Unit<bool>>.By(new Authorise { Command = cmd }).All(x => x.Value),
                 cmd => Request<IEnumerable<KeyValuePair<string, string>>>.By(new Validate { Command = cmd }).SelectMany(x => x),
-                cmd => Mailbox<TEventStoreEndpoint, TTransportEndpoint>.Notify(new Received<TCommand> {Command = cmd}));
+                cmd => Mailbox<TEventStoreEndpoint, TTransportEndpoint>.Notify(new Placed<TCommand> {Command = cmd}));
 
         public static Response DispatchToPipeline(
             TCommand command, 
