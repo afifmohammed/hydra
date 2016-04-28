@@ -44,8 +44,9 @@ namespace InventoryStockManager
                     var message = new JsonMailboxMessage
                     {
                         NotificationContent = new JsonContent(subscriberMessage.Notification),
-                        NotificationType = subscriberMessage.Notification.GetType().FullName,
-                        Subscription = subscriberMessage.Subscription
+                        NotificationType = subscriberMessage.Notification.GetType(),
+                        Subscription = new JsonContent(subscriberMessage.Subscription),
+                        SubscriptionType = subscriberMessage.Subscription.GetType(),
                     };
 
                     BackgroundJob.Enqueue(() => new JsonMessageMailbox().Route(message));
