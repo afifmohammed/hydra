@@ -28,7 +28,7 @@ namespace EventSourcing
 
         public static readonly List<SubscriberMessagesByNotification> SubscriberMessagesByNotification = 
             new List<SubscriberMessagesByNotification>()
-                .With(x => x.Add(e => PublisherChannel.PrepareMessages(e, EventStore.PublishersBySubscription).Cast<SubscriberMessage>()));
+                .With(x => x.Add(e => PublisherChannel.PrepareMessages(e, EventStore.PublishersBySubscription)));
 
         public static Notify Notify = notification => 
             NotifyViaPost
@@ -43,15 +43,15 @@ namespace EventSourcing
         
         public static Post Post = messages => CommitTransportConnection(endpoint => Enqueue(endpoint, messages));
 
-        public static readonly IDictionary<TypeContract, Action<SubscriberMessage>> SubscriberRoutes = 
-            new Dictionary<TypeContract, Action<SubscriberMessage>>
+        public static Route Route = message =>
+        {
+            var m = new MessageToPublisher
             {
-                {
-                    typeof (MessageToPublisher).Contract(),
-                    m => EventStore<TEventStoreEndpoint, TTransportEndpoint>.NotifyPublisher((MessageToPublisher) m, CommitEventStoreConnection)
-                }
+                Notification = message.Notification,
+                Subscription = message.Subscription
             };
 
-        public static Route Route = message => SubscriberRoutes[message.Contract()](message);
+            EventStore<TEventStoreEndpoint, TTransportEndpoint>.NotifyPublisher(m, CommitEventStoreConnection);
+        };
     }
 }

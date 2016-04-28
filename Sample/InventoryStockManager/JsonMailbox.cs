@@ -7,9 +7,10 @@ namespace InventoryStockManager
 {
     public class JsonMailboxMessage
     {
-        public Subscription Subscription { get; set; }
+        public JsonContent Subscription { get; set; }
         public JsonContent NotificationContent { get; set; }
-        public string NotificationType { get; set; }
+        public Type NotificationType { get; set; }
+        public Type SubscriptionType { get; set; }
     }
 
     public class JsonMessageMailbox
@@ -18,8 +19,8 @@ namespace InventoryStockManager
         {
             var subscriberMessage = new SubscriberMessage
             {
-                Subscription = message.Subscription,
-                Notification = (IDomainEvent)JsonConvert.DeserializeObject(message.NotificationContent.Value, Type.GetType(message.NotificationType))
+                Subscription = (Subscription)JsonConvert.DeserializeObject(message.Subscription.Value, message.SubscriptionType),
+                Notification = (IDomainEvent)JsonConvert.DeserializeObject(message.NotificationContent.Value, message.NotificationType)
             };
 
             Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Route(subscriberMessage);

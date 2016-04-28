@@ -47,6 +47,6 @@ namespace InventoryStockManager.Domain
     public class JustSpinningMyWheels : IDomainEvent
     {
         public string Id { get; set; }
-        public IEnumerable<KeyValuePair<string, object>> Correlations => new[] { new KeyValuePair<string, object>() };
+        public IEnumerable<KeyValuePair<string, object>> Correlations => new[] { this.PropertyNameValue(x => x.Id) };
     }
 }
