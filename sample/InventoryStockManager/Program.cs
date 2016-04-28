@@ -48,7 +48,7 @@ namespace InventoryStockManager
             {
                 foreach (var subscriberMessage in messages)
                 {
-                    var message = new MailboxJsonMessage
+                    var message = new JsonMailboxMessage
                     {
                         NotificationContent = new JsonContent(subscriberMessage.Notification),
                         NotificationType = subscriberMessage.Notification.GetType().FullName,
