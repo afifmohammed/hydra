@@ -1,9 +1,8 @@
 ﻿using System;
-using AdoNet;
 using EventSourcing;
 using Newtonsoft.Json;
 
-namespace InventoryStockManager
+namespace AdoNet
 {
     public class JsonMailboxMessage
     {
@@ -13,9 +12,9 @@ namespace InventoryStockManager
         public Type SubscriptionType { get; set; }
     }
 
-    public class JsonMessageMailbox
+    public static class JsonMessageMailbox<TStore> where TStore : class
     {
-        public void Route(JsonMailboxMessage message)
+        public static void Route(JsonMailboxMessage message)
         {
             var subscriberMessage = new SubscriberMessage
             {
@@ -23,7 +22,7 @@ namespace InventoryStockManager
                 Notification = (IDomainEvent)JsonConvert.DeserializeObject(message.NotificationContent.Value, message.NotificationType)
             };
 
-            Mailbox<AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Route(subscriberMessage);
+            Mailbox<AdoNetTransaction<TStore>, AdoNetTransactionScope>.Route(subscriberMessage);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace EventSourcing
 {
@@ -31,7 +30,7 @@ namespace EventSourcing
                     EventStore<TPersistence>.PublisherVersionByPublisherDataContractCorrelations(connection),
                     () => DateTimeOffset.Now,
                     EventStore<TPersistence>.SaveNotificationsByPublisherAndVersion(connection),
-                    publisherNotifications => Mailbox<TPersistence, TTransport>.Post(publisherNotifications.Cast<SubscriberMessage>()));
+                    publisherNotifications => Mailbox<TPersistence, TTransport>.Post(publisherNotifications));
             });
     }
 

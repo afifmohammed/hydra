@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="https://ws.valex.com.au/soap/lixi/1.3/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="https://ws.valex.com.au/soap/lixi/1.3/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="https://ws.valex.com.au/soap/lixi/1.3/">
+      <xsd:complexType name="vAuthHeader">
+        <xsd:all>
+          <xsd:element name="userName" type="xsd:string" />
+          <xsd:element name="password" type="xsd:string" />
+        </xsd:all>
+      </xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="AuthHeaderMessage">
+    <wsdl:part name="AuthHeader" type="tns:vAuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="acceptQuote">
+    <wsdl:part name="valex_id" type="xsd:string" />
+    <wsdl:part name="valfirm_quote_id" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="acceptQuoteResponse">
+    <wsdl:part name="result" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="cancellationRequest">
+    <wsdl:part name="valuationMessage" type="xsd:string" />
+    <wsdl:part name="reason_id" type="xsd:int" />
+    <wsdl:part name="comments" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="cancellationRequestResponse">
+    <wsdl:part name="result" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="determineService">
+    <wsdl:part name="valuationMessage" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="determineServiceResponse">
+    <wsdl:part name="responseXml" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="fetchSettings">
+    <wsdl:part name="valexId" type="xsd:string" />
+    <wsdl:part name="loanRef" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="fetchSettingsResponse">
+    <wsdl:part name="responseMessage" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="find">
+    <wsdl:part name="valuationMessage" type="xsd:string" />
+    <wsdl:part name="searchType" type="xsd:string" />
+    <wsdl:part name="noOlderThan" type="xsd:string" />
+    <wsdl:part name="completedOnly" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="findResponse">
+    <wsdl:part name="responseXml" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="findOnWatchlist">
+    <wsdl:part name="valuationMessage" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="findOnWatchlistResponse">
+    <wsdl:part name="responseCode" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="requestValuationQuery">
+    <wsdl:part name="valuationMessage" type="xsd:string" />
+    <wsdl:part name="reasonId" type="xsd:int" />
+    <wsdl:part name="comment" type="xsd:string" />
+    <wsdl:part name="useErrorCodes" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="requestValuationQueryResponse">
+    <wsdl:part name="responseCode" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="subscribe">
+    <wsdl:part name="valuationMessage" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="subscribeResponse">
+    <wsdl:part name="result" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="update">
+    <wsdl:part name="valuationMessage" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="updateResponse">
+    <wsdl:part name="responseCode" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:message name="valuationRequest">
+    <wsdl:part name="valuationMessage" type="xsd:string" />
+    <wsdl:part name="useErrorCodes" type="xsd:boolean" />
+  </wsdl:message>
+  <wsdl:message name="valuationRequestResponse">
+    <wsdl:part name="responseCode" type="xsd:int" />
+  </wsdl:message>
+  <wsdl:portType name="VXWS_ClientPortType">
+    <wsdl:operation name="acceptQuote">
+      <wsdl:input message="tns:acceptQuote" />
+      <wsdl:output message="tns:acceptQuoteResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="cancellationRequest">
+      <wsdl:input message="tns:cancellationRequest" />
+      <wsdl:output message="tns:cancellationRequestResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="determineService">
+      <wsdl:input message="tns:determineService" />
+      <wsdl:output message="tns:determineServiceResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="fetchSettings">
+      <wsdl:input message="tns:fetchSettings" />
+      <wsdl:output message="tns:fetchSettingsResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="find">
+      <wsdl:input message="tns:find" />
+      <wsdl:output message="tns:findResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="findOnWatchlist">
+      <wsdl:input message="tns:findOnWatchlist" />
+      <wsdl:output message="tns:findOnWatchlistResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="requestValuationQuery">
+      <wsdl:input message="tns:requestValuationQuery" />
+      <wsdl:output message="tns:requestValuationQueryResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="subscribe">
+      <wsdl:input message="tns:subscribe" />
+      <wsdl:output message="tns:subscribeResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="update">
+      <wsdl:input message="tns:update" />
+      <wsdl:output message="tns:updateResponse" />
+    </wsdl:operation>
+    <wsdl:operation name="valuationRequest">
+      <wsdl:input message="tns:valuationRequest" />
+      <wsdl:output message="tns:valuationRequestResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="VXWS_ClientBinding" type="tns:VXWS_ClientPortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="rpc" />
+    <wsdl:operation name="acceptQuote">
+      <soap:operation soapAction="https://ws.valex.com.au/soap/lixi/1.3.1/index.php?n=client&amp;method=acceptQuote" style="rpc" />
+      <wsdl:input>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="cancellationRequest">
+      <soap:operation soapAction="https://ws.valex.com.au/soap/lixi/1.3.1/index.php?n=client&amp;method=cancellationRequest" style="rpc" />
+      <wsdl:input>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="determineService">
+      <soap:operation soapAction="https://ws.valex.com.au/soap/lixi/1.3.1/index.php?n=client&amp;method=determineService" style="rpc" />
+      <wsdl:input>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchSettings">
+      <soap:operation soapAction="https://ws.valex.com.au/soap/lixi/1.3.1/index.php?n=client&amp;method=fetchSettings" style="rpc" />
+      <wsdl:input>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="find">
+      <soap:operation soapAction="https://ws.valex.com.au/soap/lixi/1.3.1/index.php?n=client&amp;method=find" style="rpc" />
+      <wsdl:input>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="findOnWatchlist">
+      <soap:operation soapAction="https://ws.valex.com.au/soap/lixi/1.3.1/index.php?n=client&amp;method=findOnWatchlist" style="rpc" />
+      <wsdl:input>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="requestValuationQuery">
+      <soap:operation soapAction="https://ws.valex.com.au/soap/lixi/1.3.1/index.php?n=client&amp;method=requestValuationQuery" style="rpc" />
+      <wsdl:input>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="subscribe">
+      <soap:operation soapAction="https://ws.valex.com.au/soap/lixi/1.3.1/index.php?n=client&amp;method=subscribe" style="rpc" />
+      <wsdl:input>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="update">
+      <soap:operation soapAction="https://ws.valex.com.au/soap/lixi/1.3.1/index.php?n=client&amp;method=update" style="rpc" />
+      <wsdl:input>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="valuationRequest">
+      <soap:operation soapAction="https://ws.valex.com.au/soap/lixi/1.3.1/index.php?n=client&amp;method=valuationRequest" style="rpc" />
+      <wsdl:input>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:AuthHeaderMessage" part="AuthHeader" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://ws.valex.com.au/soap/lixi/1.3/" />
+        <soap:body use="encoded" namespace="https://ws.valex.com.au/soap/lixi/1.3/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="VXWS_Client">
+    <wsdl:port name="VXWS_ClientPort" binding="tns:VXWS_ClientBinding">
+      <soap:address location="https://ws.valex.com.au/soap/lixi/1.3.1/index.php?n=client&amp;handle" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

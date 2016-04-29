@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using Dapper;
 using EventSourcing;
 using Newtonsoft.Json;
@@ -10,7 +11,7 @@ namespace AdoNet
 {
     public static class SqlEventStore
     {
-        public static void Initialize<TStore>() where TStore : class
+        public static void Initialize<TStore>(Func<string, string> connectionString, Action<Expression<Action>> enqueue) where TStore : class
         {
             EventStore<AdoNetTransaction<TStore>>.NotificationsByCorrelations =
                 t => NotificationsByCorrelations(t.Value);
@@ -20,9 +21,31 @@ namespace AdoNet
 
             EventStore<AdoNetTransaction<TStore>>.SaveNotificationsByPublisherAndVersion =
                 t => SaveNotificationsByPublisherAndVersion(t.Value);
+
+            Mailbox<AdoNetTransaction<TStore>, AdoNetTransactionScope>.CommitEventStoreConnection =
+                AdoNetTransaction<TStore>.CommitWork(connectionString);
+
+            Mailbox<AdoNetTransaction<TStore>, AdoNetTransactionScope>.CommitTransportConnection =
+                AdoNetTransactionScope.Commit();
+
+            Mailbox<AdoNetTransaction<TStore>, AdoNetTransactionScope>.Enqueue = (endpoint, messages) =>
+            {
+                foreach (var subscriberMessage in messages)
+                {
+                    var message = new JsonMailboxMessage
+                    {
+                        NotificationContent = new JsonContent(subscriberMessage.Notification),
+                        NotificationType = subscriberMessage.Notification.GetType(),
+                        Subscription = new JsonContent(subscriberMessage.Subscription),
+                        SubscriptionType = subscriberMessage.Subscription.GetType(),
+                    };
+
+                   enqueue(() => JsonMessageMailbox<TStore>.Route(message));
+                }
+            };
         }
 
-       public static Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion(IDbTransaction transaction)
+        static Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion(IDbTransaction transaction)
         {
             return notificationsByPublisherAndVersion =>
             {
@@ -79,7 +102,7 @@ namespace AdoNet
 
         }
 
-        public static Func<IEnumerable<Correlation>, int> PublisherVersionByContractAndCorrelations(IDbTransaction transaction)
+        static Func<IEnumerable<Correlation>, int> PublisherVersionByContractAndCorrelations(IDbTransaction transaction)
         {
             return correlations => transaction.Connection
                 .Query<int>(
@@ -89,11 +112,11 @@ namespace AdoNet
                         WHERE Name = @Name
                             AND Correlation = @Correlation;",
                     transaction: transaction,
-                    param: correlations.AsPublisherNameAndCorrelation().As(x => new { Name = x.Item1, Correlation = x.Item2 }))
+                    param: correlations.AsPublisherNameAndCorrelation().As(x => new {Name = x.Item1, Correlation = x.Item2}))
                 .FirstOrDefault();
         }
 
-        public static NotificationsByCorrelations NotificationsByCorrelations(IDbTransaction transaction)
+        static NotificationsByCorrelations NotificationsByCorrelations(IDbTransaction transaction)
         {
             return correlations => transaction.Connection
                 .Query<dynamic>(
@@ -102,12 +125,12 @@ namespace AdoNet
                     param: correlations.AsTvp())
                 .Select(x => new SerializedNotification
                 {
-                    Contract = new TypeContract { Value = x.EventName },
-                    JsonContent = new JsonContent { Value = x.Content }
+                    Contract = new TypeContract {Value = x.EventName},
+                    JsonContent = new JsonContent {Value = x.Content}
                 });
         }
 
-        public static SqlMapper.ICustomQueryParameter AsTvp(this IEnumerable<Correlation> correlations)
+        static SqlMapper.ICustomQueryParameter AsTvp(this IEnumerable<Correlation> correlations)
         {
             var eventsDataTable = CreateEventTable();
             foreach (var item in correlations)
@@ -133,13 +156,15 @@ namespace AdoNet
 
         static Tuple<string, string> AsPublisherNameAndCorrelation(this IEnumerable<Correlation> correlations)
         {
+            var correlatedItems = correlations.ToList();
+
             return new Tuple<string, string>(
-                correlations.GroupBy(c => c.Contract.Value).Single().Key,
-                JsonConvert.SerializeObject(correlations
-                    .Select(x => new { x.PropertyName, x.PropertyValue })
+                correlatedItems.GroupBy(c => c.Contract.Value).Single().Key,
+                JsonConvert.SerializeObject(correlatedItems
+                    .Select(x => new {x.PropertyName, x.PropertyValue})
                     .OrderBy(x => x.PropertyName)
                     .ToDictionary(x => x.PropertyName, x => x.PropertyValue))
-            );
+                );
         }
 
         static object As<T>(this T instance, Func<T, object> map)

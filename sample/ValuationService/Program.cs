@@ -1,20 +1,28 @@
 ﻿using System;
+using System.Linq;
 using AdoNet;
 using EventSourcing;
 using Hangfire;
 using Hangfire.SqlServer;
-using InventoryStockManager.Domain;
 using Nancy.Hosting.Self;
+using ValuationService.Domain;
 
-namespace InventoryStockManager
+namespace ValuationService
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var uri = new Uri("http://localhost:3579");
+            var uri = new Uri("http://localhost:3578");
 
-            foreach (var element in InventoryItemStockHandler.Subsriptions().PublisherBySubscription)
+            var subscruptions = new[]
+            {
+                UpdateCustomerHandler.Subscriptions(),
+                RequestValuationHandler.Subscriptions(),
+                ProcessValuationHandler.Subscriptions()
+            };
+            
+            foreach (var element in subscruptions.SelectMany(s=>s.PublisherBySubscription))
             {
                 EventStore.PublishersBySubscription.Add(element.Key, element.Value);
             }
