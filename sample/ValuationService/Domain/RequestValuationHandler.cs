@@ -9,13 +9,13 @@ namespace ValuationService.Domain
         public static PublisherSubscriptions Subscriptions()
         {
             return new PublisherBuilder<Valuation>()
-                .When<Received<RequestValuationCommand>>()
-                //.Correlate(x => x.Command.LoanId, x => x.LoanId)
-                //.Correlate(x=>x.Command.CustomerId, x=>x.CustomerId)
+                .When<Placed<RequestValuationCommand>>()
+                .Correlate(x => x.Command.LoanId, x => x.LoanId)
+                .Correlate(x=>x.Command.CustomerId, x=>x.CustomerId)
                 .Then(Handle);
         }
 
-        public static IEnumerable<IDomainEvent> Handle(Valuation d, Received<RequestValuationCommand> e)
+        public static IEnumerable<IDomainEvent> Handle(Valuation d, Placed<RequestValuationCommand> e)
         {
             return new[]
             {

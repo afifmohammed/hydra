@@ -9,12 +9,12 @@ namespace ValuationService.Domain
         public static PublisherSubscriptions Subscriptions()
         {
             return new PublisherBuilder<Customer>()
-                .When<Received<UpdateCustomerCommand>>()
-                //.Correlate(x => x.Command.CustomerId, x => x.Id)
+                .When<Placed<UpdateCustomerCommand>>()
+                .Correlate(x => x.Command.CustomerId, x => x.Id)
                 .Then(Handle);
         }
 
-        public static IEnumerable<IDomainEvent> Handle(Customer d, Received<UpdateCustomerCommand> e)
+        public static IEnumerable<IDomainEvent> Handle(Customer d, Placed<UpdateCustomerCommand> e)
         {
             return new[]
             {

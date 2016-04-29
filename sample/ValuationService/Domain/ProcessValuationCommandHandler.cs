@@ -15,9 +15,9 @@ namespace ValuationService.Domain
         {
             return new PublisherBuilder<Valuation>()
                 .Given<CustomerChangedEvent>(Map)
-                //.Correlate(x => x.CustomerId, y => y.CustomerId)
+                .Correlate(x => x.CustomerId, y => y.CustomerId)
                 .When<ValuationRequestedEvent>()
-                //.Correlate(x => x.LoanId, x => x.LoanId)
+                .Correlate(x => x.LoanId, x => x.LoanId)
                 .Then(Handle);
         }
 
