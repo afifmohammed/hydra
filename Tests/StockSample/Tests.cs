@@ -34,7 +34,7 @@ namespace Tests
                 .Given(
                     new InventoryItemCreated { Id = "1" },
                     new ItemsCheckedInToInventory { Id = "1", Count = 10 })
-                .Notify(new Received<DeactivateInventoryItem> { Command = new DeactivateInventoryItem { Id = "1" } }));
+                .Notify(new Placed<DeactivateInventoryItem> { Command = new DeactivateInventoryItem { Id = "1" } }));
         }
 
         [Fact]
