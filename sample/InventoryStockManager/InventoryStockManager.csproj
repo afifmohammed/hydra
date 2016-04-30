@@ -97,13 +97,17 @@
       <Project>{a0e76561-abd7-4739-8d82-bee6f2ad8ebc}</Project>
       <Name>Api</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Commands\Commands.csproj">
-      <Project>{900b7a11-306e-46ed-9267-552bb7840bc1}</Project>
-      <Name>Commands</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\EventSourcing\Core.csproj">
       <Project>{e6e5141e-a6ac-434a-9697-784811570ecb}</Project>
       <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Pipeline\RequestPipeline.csproj">
+      <Project>{900b7a11-306e-46ed-9267-552bb7840bc1}</Project>
+      <Name>RequestPipeline</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Requests\Requests.csproj">
+      <Project>{eb7a999c-a296-4051-854a-41e5ffaba4d5}</Project>
+      <Name>Requests</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

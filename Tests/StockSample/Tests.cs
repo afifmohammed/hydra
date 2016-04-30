@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Commands;
+using RequestPipeline;
 using EventSourcing;
 using InventoryStockManager.Domain;
 using Xunit;

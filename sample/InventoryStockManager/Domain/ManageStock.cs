@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Commands;
+using RequestPipeline;
 using EventSourcing;
 
 namespace InventoryStockManager.Domain

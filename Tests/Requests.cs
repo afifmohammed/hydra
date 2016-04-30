@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Tests
 {
-    public class DriveByDemo
+    public class RequestsDriveByDemo
     {
         class Connection<T> : IDisposable
         {
@@ -23,7 +23,7 @@ namespace Tests
             }
         }
 
-        class WordsStartingWith : IRequest<string>
+        class WordsStartingWith
         {
             public string Prefix;
         }
@@ -80,7 +80,7 @@ namespace Tests
                 new[] { "gone", "gost", "goose", "gofer" }
                     .OrderBy(x => x)
                     .ToList(),
-                Request.For(new WordsStartingWith { Prefix = "go" })
+                Request<string>.By(new WordsStartingWith { Prefix = "go" })
                     .OrderBy(x => x)
                     .ToList());
 
