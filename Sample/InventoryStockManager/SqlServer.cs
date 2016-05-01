@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Configuration;
+using AdoNet;
+using EventSourcing;
+using RequestPipeline;
 
 namespace InventoryStockManager
 {
@@ -13,4 +16,13 @@ namespace InventoryStockManager
     /// </summary>
     public class ApplicationStore
     { }
+
+    public static class ApplicationRequestPipeline
+    {
+        public static Response<Unit> Dispatch<TCommand>(TCommand command) 
+            where TCommand : IRequest<Unit>, ICorrelated
+        {
+            return RequestPipeline<TCommand, AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Dispatch(command);
+        }
+    }
 }
