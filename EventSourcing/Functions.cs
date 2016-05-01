@@ -116,7 +116,7 @@ namespace EventSourcing
             (
                 handlerDataCorrelationMaps: handlerDataCorrelationMaps,
                 handlerDataCorrelations: HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification)
-            );
+            ).Where(x => handlerDataMappersByNotificationContract.Keys.Any(k => k.Equals(x.Contract)));
 
             var notifications = notificationsByCorrelations(correlations);
 

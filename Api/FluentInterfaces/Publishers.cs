@@ -145,7 +145,10 @@ namespace EventSourcing
         public CorrelationMap<TSubscriberDataContract, TNotification1> When<TNotification1>() 
             where TNotification1 : IDomainEvent
         {
-            return When<TNotification1>((e, d) => d);
+            return new PublisherCorrelationMap<TSubscriberDataContract, TNotification1>(
+                _publisherDataContractMaps,
+                _publisherDataMappers,
+                PublisherBySubscription);
         }
 
         public PublisherContractSubscriptions<TSubscriberDataContract> Then(
