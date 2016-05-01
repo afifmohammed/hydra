@@ -112,17 +112,18 @@ namespace EventSourcing
             where THandlerData : new()
             where TNotification : IDomainEvent
         {
+            var correlations = CorrelationsOfMatchingNotificationsBy
+            (
+                handlerDataCorrelationMaps: handlerDataCorrelationMaps,
+                handlerDataCorrelations: HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification)
+            );
+
+            var notifications = notificationsByCorrelations(correlations);
+
             return FoldHandlerData
             (
                 handlerDataMappersByNotificationContract,
-                notificationsByCorrelations
-                (
-                    CorrelationsOfMatchingNotificationsBy
-                    (
-                        handlerDataCorrelationMaps: handlerDataCorrelationMaps,
-                        handlerDataCorrelations: HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification)
-                    )
-                )
+                notifications    
             );
         }
 
@@ -159,8 +160,8 @@ namespace EventSourcing
             where THandlerData : new()
         {
             var handlerData = new THandlerData();
-
-            return notifications.Aggregate(handlerData, (current, notification) => handlerDataMappersByNotificationContract[notification.Contract](current, notification.JsonContent));
+            var list = notifications.ToList();
+            return list.Aggregate(handlerData, (current, notification) => handlerDataMappersByNotificationContract[notification.Contract](current, notification.JsonContent));
         }
     }
 

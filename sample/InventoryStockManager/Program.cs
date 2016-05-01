@@ -4,6 +4,7 @@ using EventSourcing;
 using Hangfire;
 using Hangfire.SqlServer;
 using InventoryStockManager.Domain;
+using Nancy;
 using Nancy.Hosting.Self;
 
 namespace InventoryStockManager
@@ -12,8 +13,6 @@ namespace InventoryStockManager
     {
         static void Main(string[] args)
         {
-            var uri = new Uri("http://localhost:3579");
-
             foreach (var element in InventoryItemStockHandler.Subsriptions().PublisherBySubscription)
             {
                 EventStore.PublishersBySubscription.Add(element.Key, element.Value);
@@ -29,7 +28,13 @@ namespace InventoryStockManager
                     QueuePollInterval = TimeSpan.FromSeconds(1)
                 });
 
-            using (var host = new NancyHost(uri))
+            HostConfiguration hostConfigs = new HostConfiguration()
+            {
+                UrlReservations = new UrlReservations() { CreateAutomatically = true }
+            };
+
+            var uri = new Uri("http://localhost:3785");
+            using (var host = new NancyHost(uri, new DefaultNancyBootstrapper(), hostConfigs))
             using (new BackgroundJobServer())
             {
                 host.Start();

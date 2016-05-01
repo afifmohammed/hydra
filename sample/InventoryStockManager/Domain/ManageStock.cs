@@ -84,7 +84,7 @@ namespace InventoryStockManager.Domain
 
         public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, Placed<CreateInventoryItem> e)
         {
-            if (d.Sku.Equals(e.Command.Id))
+            if (d.Sku?.Equals(e.Command.Id) == true)
                 return new[] { new JustSpinningMyWheels { Id = e.Command.Id } };
 
             return new[] { new InventoryItemCreated { Id = e.Command.Id } };

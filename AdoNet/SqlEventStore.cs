@@ -122,7 +122,8 @@ namespace AdoNet
                 .Query<dynamic>(
                     sql: "GetEventsWithCorrelations",
                     transaction: transaction,
-                    param: correlations.AsTvp())
+                    param:  new { tvpEvents = correlations.AsTvp() },
+                    commandType:CommandType.StoredProcedure)
                 .Select(x => new SerializedNotification
                 {
                     Contract = new TypeContract {Value = x.EventName},
@@ -135,7 +136,11 @@ namespace AdoNet
             var eventsDataTable = CreateEventTable();
             foreach (var item in correlations)
             {
-                eventsDataTable.Rows.Add(item.Contract, item.PropertyName, item.PropertyValue.Value);
+                var contract = item.Contract.Value;
+                var name = item.PropertyName;
+                var value = item.PropertyValue.Value;
+
+                eventsDataTable.Rows.Add(contract, name, value);
             }
 
             return eventsDataTable.AsTableValuedParameter("dbo.EventTableType");
