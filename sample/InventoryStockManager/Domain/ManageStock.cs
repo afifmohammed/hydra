@@ -77,7 +77,7 @@ namespace InventoryStockManager.Domain
         public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, Placed<DeactivateInventoryItem> e)
         {
             if (!d.IsActive)
-                return new[] { new JustSpinningMyWheels { Id = e.Command.Id } };
+                return new[] { new JustSpinningMyWheels() };
 
             return new[] { new InventoryItemDeactivated { Id = e.Command.Id } };
         }
@@ -85,7 +85,7 @@ namespace InventoryStockManager.Domain
         public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, Placed<CreateInventoryItem> e)
         {
             if (d.Sku?.Equals(e.Command.Id) == true)
-                return new[] { new JustSpinningMyWheels { Id = e.Command.Id } };
+                return new[] { new JustSpinningMyWheels() };
 
             return new[] { new InventoryItemCreated { Id = e.Command.Id } };
         }

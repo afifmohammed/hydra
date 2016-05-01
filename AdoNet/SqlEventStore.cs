@@ -49,23 +49,26 @@ namespace AdoNet
         {
             return notificationsByPublisherAndVersion =>
             {
-                var when = notificationsByPublisherAndVersion.NotificationsByPublisher.When;
-                foreach (var tuple in notificationsByPublisherAndVersion.NotificationsByPublisher.Notifications)
+                foreach (var item in notificationsByPublisherAndVersion
+                    .NotificationsByPublisher
+                    .Notifications
+                    .Where(n => n.Item2.Any())                    
+                    .Select(n => new
+                    {
+                        EventName = n.Item2.GroupBy(x => x.Contract).Single().Key.Value,
+                        Content = JsonConvert.SerializeObject(n.Item1),
+                        EventCorrelations = n.Item2,
+                        When = notificationsByPublisherAndVersion.NotificationsByPublisher.When
+                    }))
                 {
-                    var notification = tuple.Item1;
-
-                    var content = JsonConvert.SerializeObject(notification);
-                    var correlations = tuple.Item2.ToList();
-                    var name = correlations.GroupBy(x => x.Contract).Single().Key.Value;
-
                     transaction.Connection.ExecuteScalar(
                         sql: "AddPublisherEvents",
                         param: new
                         {
-                            EventName = name,
-                            Content = content,
-                            When = when,
-                            EventCorrelations = correlations.AsTvp()
+                            EventName = item.EventName,
+                            Content = item.Content,
+                            When = item.When,
+                            EventCorrelations = item.EventCorrelations.AsTvp()
                         },
                         transaction: transaction,
                         commandType: CommandType.StoredProcedure);

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using EventSourcing;
 
 namespace InventoryStockManager.Domain
@@ -46,7 +47,6 @@ namespace InventoryStockManager.Domain
 
     public class JustSpinningMyWheels : IDomainEvent
     {
-        public string Id { get; set; }
-        public IEnumerable<KeyValuePair<string, object>> Correlations => new[] { this.PropertyNameValue(x => x.Id) };
+        public IEnumerable<KeyValuePair<string, object>> Correlations => Enumerable.Empty<KeyValuePair<string, object>>();
     }
 }
