@@ -119,11 +119,13 @@ namespace EventSourcing
             ).Where(x => handlerDataMappersByNotificationContract.Keys.Any(k => k.Equals(x.Contract)));
 
             var notifications = notificationsByCorrelations(correlations);
+            var handlerData = new THandlerData();
 
             return FoldHandlerData
             (
                 handlerDataMappersByNotificationContract,
-                notifications    
+                notifications,
+                handlerData
             );
         }
 
@@ -156,12 +158,11 @@ namespace EventSourcing
 
         public static THandlerData FoldHandlerData<THandlerData>(
             IDictionary<TypeContract, Func<THandlerData, JsonContent, THandlerData>> handlerDataMappersByNotificationContract,
-            IEnumerable<SerializedNotification> notifications) 
+            IEnumerable<SerializedNotification> notifications,
+            THandlerData handlerData) 
             where THandlerData : new()
         {
-            var handlerData = new THandlerData();
-            var list = notifications.ToList();
-            return list.Aggregate(handlerData, (current, notification) => handlerDataMappersByNotificationContract[notification.Contract](current, notification.JsonContent));
+            return notifications.Aggregate(handlerData, (current, notification) => handlerDataMappersByNotificationContract[notification.Contract](current, notification.JsonContent));
         }
     }
 
