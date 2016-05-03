@@ -42,6 +42,8 @@ namespace EventSourcing
         {
             var properties = propertyName.Split('.');
             var result = properties.First().GetPropertySelector<T>().Compile()(instance);
+            if (ReferenceEquals(result, null)) return null;
+
             return !properties.Skip(1).Any()
                 ? result
                 : typeof(Extensions).GetMethod("GetPropertyValue").MakeGenericMethod(result.GetType())

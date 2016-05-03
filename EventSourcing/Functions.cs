@@ -36,10 +36,11 @@ namespace EventSourcing
                 (
                     FoldHandlerData
                     (
-                        handlerDataCorrelationMaps,
+                        MapsWithMappers(handlerDataCorrelationMaps, consumerDataMappersByNotificationContract),
                         HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification),
                         notificationsByCorrelations,
-                        consumerDataMappersByNotificationContract
+                        consumerDataMappersByNotificationContract,
+                        new TConsumerData()
                     ),
                     notification,
                     endpoint
@@ -66,10 +67,11 @@ namespace EventSourcing
                 (
                     FoldHandlerData
                     (
-                        handlerDataCorrelationMaps,
+                        MapsWithMappers(handlerDataCorrelationMaps, consumerDataMappersByNotificationContract),
                         HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification),
                         notificationsByCorrelations,
-                        consumerDataMappersByNotificationContract
+                        consumerDataMappersByNotificationContract,
+                        new TConsumerData()
                     ),
                     notification,
                     endpoint1,
@@ -98,10 +100,11 @@ namespace EventSourcing
                         (
                             FoldHandlerData
                             (
-                                handlerDataCorrelationMaps,
+                                MapsWithMappers(handlerDataCorrelationMaps, publisherDataMappersByNotificationContract),
                                 HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification),
                                 notificationsByCorrelations,
-                                publisherDataMappersByNotificationContract
+                                publisherDataMappersByNotificationContract,
+                                new TPublisherData()
                             ),
                             notification
                         ).Select
@@ -122,26 +125,71 @@ namespace EventSourcing
             };
         }
 
+        public static IEnumerable<CorrelationMap> MapsWithMappers<THandlerData>(
+            IEnumerable<CorrelationMap> handlerDataCorrelationMaps,
+            IDictionary<TypeContract, Func<THandlerData, JsonContent, THandlerData>>
+                handlerDataMappersByNotificationContract)
+        {
+            return handlerDataCorrelationMaps
+                .Where
+                (
+                    mapper => handlerDataMappersByNotificationContract
+                        .Keys
+                        .Any(notificationContract => notificationContract.Equals(mapper.NotificationContract))
+                );
+        }
+
         public static THandlerData FoldHandlerData<THandlerData>(
             IEnumerable<CorrelationMap> handlerDataCorrelationMaps,
             IEnumerable<Correlation> handlerDataCorrelations,
             NotificationsByCorrelations notificationsByCorrelations,
-            IDictionary<TypeContract, Func<THandlerData, JsonContent, THandlerData>> handlerDataMappersByNotificationContract)
-            where THandlerData : new()
+            IDictionary<TypeContract, Func<THandlerData, JsonContent, THandlerData>> handlerDataMappersByNotificationContract,
+            THandlerData handlerData)
         {
+            if (!handlerDataCorrelationMaps.Any())
+                return handlerData;
+
             var correlations = CorrelationsOfMatchingNotificationsBy
             (
                 handlerDataCorrelationMaps: handlerDataCorrelationMaps,
                 handlerDataCorrelations: handlerDataCorrelations
-            ).Where(x => handlerDataMappersByNotificationContract.Keys.Any(k => k.Equals(x.Contract)));
+            );
+
+            if (!correlations.Any())
+                return handlerData;
 
             var notifications = notificationsByCorrelations(correlations);
-            var handlerData = new THandlerData();
 
-            return FoldHandlerData
+            if (!notifications.Any())
+                return handlerData;
+
+            var content = new JsonContent(handlerData);
+
+            handlerData = FoldHandlerData
             (
                 handlerDataMappersByNotificationContract,
                 notifications,
+                handlerData
+            );
+
+            if(new JsonContent(handlerData).Equals(content))
+                return handlerData;
+
+            var unEvaluatedMaps = handlerDataCorrelationMaps
+                .Where
+                (
+                    map => correlations
+                        .GroupBy(c => c.Contract)
+                        .Select(c => c.Key)
+                        .All(notificationContract => !notificationContract.Equals(map.NotificationContract))
+                ).ToList();
+
+            return FoldHandlerData
+            (
+                unEvaluatedMaps,
+                HandlerDataCorrelationsByHandlerData(unEvaluatedMaps, handlerData),
+                notificationsByCorrelations,
+                handlerDataMappersByNotificationContract,
                 handlerData
             );
         }
@@ -154,22 +202,30 @@ namespace EventSourcing
                 .GroupBy(map => map.NotificationContract)
                 .Where
                 (
-                    group => !handlerDataCorrelations.Any
+                    group => group.All
                     (
-                        correlation => group.Any
+                        map => handlerDataCorrelations.Any
                         (
-                            map => 
-                                map.HandlerDataPropertyName == correlation.PropertyName 
-                                && string.IsNullOrEmpty(correlation.PropertyValue.Value)
+                            correlation =>
+                                map.HandlerDataPropertyName == correlation.PropertyName
+                                && !string.IsNullOrEmpty(correlation.PropertyValue.Value)
                         )
                     )
                 )
                 .SelectMany(group => group)
-                .Select(map => new Correlation
+                .Select(map =>
                 {
-                    PropertyName = map.NotificationPropertyName,
-                    Contract = map.NotificationContract,
-                    PropertyValue = handlerDataCorrelations.Single(x => x.PropertyName == map.HandlerDataPropertyName).PropertyValue
+                    var values = handlerDataCorrelations.Where(x => x.PropertyName == map.HandlerDataPropertyName).ToList();
+                    if(!values.Any())
+                        throw new InvalidOperationException($"{map.HandlerDataContract.Value} does not correlate from {map.HandlerDataPropertyName} to {map.NotificationPropertyName} for {map.NotificationContract.Value}");
+
+                    return new Correlation
+                    {
+                        PropertyName = map.NotificationPropertyName,
+                        Contract = map.NotificationContract,
+                        PropertyValue = values.First().PropertyValue
+                    };
+
                 });
         }
 
@@ -184,17 +240,45 @@ namespace EventSourcing
                 {
                     PropertyName = m.HandlerDataPropertyName,
                     Contract = m.HandlerDataContract,
-                    PropertyValue = new Lazy<string>(() => (m.NotificationPropertyName.GetPropertyValue(notification)).ToString())
+                    PropertyValue = new Lazy<string>(() => (m.NotificationPropertyName.GetPropertyValue(notification))?.ToString())
                 }); 
+        }
+
+        public static IEnumerable<Correlation> HandlerDataCorrelationsByHandlerData<THandlerData>(
+            IEnumerable<CorrelationMap> handlerDataCorrelationMaps,
+            THandlerData handlerData)
+        {
+            return handlerDataCorrelationMaps
+                .Select(m => new Correlation
+                {
+                    PropertyName = m.HandlerDataPropertyName,
+                    Contract = m.HandlerDataContract,
+                    PropertyValue = new Lazy<string>(() => (m.HandlerDataPropertyName.GetPropertyValue(handlerData))?.ToString())
+                });
         }
 
         public static THandlerData FoldHandlerData<THandlerData>(
             IDictionary<TypeContract, Func<THandlerData, JsonContent, THandlerData>> handlerDataMappersByNotificationContract,
             IEnumerable<SerializedNotification> notifications,
             THandlerData handlerData) 
-            where THandlerData : new()
         {
-            return notifications.Aggregate(handlerData, (current, notification) => handlerDataMappersByNotificationContract[notification.Contract](current, notification.JsonContent));
+            return notifications.Aggregate
+            (
+                handlerData,
+                (current, notification)
+                    =>
+                    {
+                        Func<THandlerData, JsonContent, THandlerData> mapper;
+                        if(!handlerDataMappersByNotificationContract.TryGetValue(notification.Contract, out mapper))
+                            throw new InvalidOperationException($"No mapper provided for mapping {notification.Contract.Value} into {typeof(THandlerData).Contract().Value}");
+
+                        return handlerDataMappersByNotificationContract[notification.Contract]
+                        (
+                            current,
+                            notification.JsonContent
+                        );
+                    }
+            );
         }
     }
 

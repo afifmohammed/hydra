@@ -33,6 +33,7 @@ namespace RequestPipeline
     {
         public TCommand Command { get; set; }
         public IEnumerable<KeyValuePair<string, object>> Correlations => Command.Correlations;
+        public DateTimeOffset? When { get; set; }
     }
 
     public class Response<TResult> : ICorrelated

@@ -37,7 +37,7 @@ namespace EventSourcing
 
         public bool Equals(Correlation other)
         {
-            return Contract.Equals(other.Contract) && string.Equals(PropertyName, other.PropertyName) && Equals(PropertyValue, other.PropertyValue);
+            return Contract.Equals(other.Contract) && string.Equals(PropertyName, other.PropertyName) && Equals(PropertyValue.Value, other.PropertyValue.Value);
         }
 
         public override int GetHashCode()

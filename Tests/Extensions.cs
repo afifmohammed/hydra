@@ -42,29 +42,30 @@ namespace Tests
 
         }
 
-        public static IEnumerable<NotificationsByPublisher> Notify<TNotification>(this
+        public static Lazy<IEnumerable<NotificationsByPublisher>> Notify<TNotification>(this
             Func<IDomainEvent, IEnumerable<Func<IDomainEvent, NotificationsByPublisher>>> publishers,
             TNotification notification)
             where TNotification : IDomainEvent
         {
-            return publishers(notification)
-                .Select(x => x(notification));
+            return new Lazy<IEnumerable<NotificationsByPublisher>>(() => publishers(notification)
+                .Select(x => x(notification)));
         }
 
         static NotificationsByCorrelations NotificationsByCorrelations(params IDomainEvent[] notifications)
         {
             return correlations => notifications
-                .Select(n => new
+            .Select(n => new
+            {
+                Notification = new SerializedNotification
                 {
-                    Notification = new SerializedNotification
-                    {
-                        Contract = n.Contract(),
-                        JsonContent = new JsonContent(n)
-                    },
-                    Correlations = n.Correlations()
-                })
-                .Where(n => correlations.Where(c => c.Contract.Equals(n.Contract())).All(c => n.Correlations.Any(nc => nc.Equals(c))))
-                .Select(x => x.Notification);
+                    Contract = n.Contract(),
+                    JsonContent = new JsonContent(n)
+                },
+                Correlations = n.Correlations()
+            })
+            .Where(n => correlations.Any(c => c.Contract.Value.Equals(n.Notification.Contract.Value)))
+            .Where(n => correlations.Any(c => n.Correlations.Any(nc => nc.Contract.Value.Equals(c.Contract.Value) && nc.PropertyName.Equals(c.PropertyName) && nc.PropertyValue.Value.Equals(c.PropertyValue.Value))))
+            .Select(x => x.Notification);
         }
     }
 }

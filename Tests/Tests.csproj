@@ -34,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -60,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
+    <Compile Include="RefundExample\Tests.cs" />
     <Compile Include="Requests.cs" />
     <Compile Include="StockSample\InventoryItemStockView.cs" />
     <Compile Include="StockSample\Tests.cs" />
