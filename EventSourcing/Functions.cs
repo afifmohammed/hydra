@@ -150,12 +150,27 @@ namespace EventSourcing
             IEnumerable<CorrelationMap> handlerDataCorrelationMaps,
             IEnumerable<Correlation> handlerDataCorrelations)
         {
-            return handlerDataCorrelationMaps.Select(map => new Correlation
-            {
-                PropertyName = map.NotificationPropertyName,
-                Contract = map.NotificationContract,
-                PropertyValue = handlerDataCorrelations.Single(x => x.PropertyName == map.HandlerDataPropertyName).PropertyValue
-            });
+            return handlerDataCorrelationMaps
+                .GroupBy(map => map.NotificationContract)
+                .Where
+                (
+                    group => !handlerDataCorrelations.Any
+                    (
+                        correlation => group.Any
+                        (
+                            map => 
+                                map.HandlerDataPropertyName == correlation.PropertyName 
+                                && string.IsNullOrEmpty(correlation.PropertyValue.Value)
+                        )
+                    )
+                )
+                .SelectMany(group => group)
+                .Select(map => new Correlation
+                {
+                    PropertyName = map.NotificationPropertyName,
+                    Contract = map.NotificationContract,
+                    PropertyValue = handlerDataCorrelations.Single(x => x.PropertyName == map.HandlerDataPropertyName).PropertyValue
+                });
         }
 
         public static IEnumerable<Correlation> HandlerDataCorrelationsBy<TNotification>(
