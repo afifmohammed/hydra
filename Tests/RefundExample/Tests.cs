@@ -18,10 +18,10 @@ namespace Tests.RefundExample
                 .PublisherBySubscription
                 .Given
                 (
-                    new CustomerMarkedAsFraud {CustomerId = "customers/4"},
-                    new ProductOnSale {ProductId = "skus/2", WhenSaleExpires = DateTimeOffset.Now.AddDays(10)},
-                    new PolicyInPlace { PolicyId = "skus/2", RefundsAllowed = true, CoolingOffPeriodInDays = 10},
-                    new OrderPlaced { OrderId = "orders/1", ProductId = "skus/2", CustomerId = "customers/4", When = DateTimeOffset.Now.AddDays(-3) }
+                    new CustomerMarkedAsFraud {CustomerId = "customers/1"},
+                    new ProductOnSale {ProductId = "skus/1", PolicyId = "policy/1", WhenSaleExpires = DateTimeOffset.Now.AddDays(10)},
+                    new PolicyInPlace { PolicyId = "policy/1", RefundsAllowed = true, CoolingOffPeriodInDays = 10},
+                    new OrderPlaced { OrderId = "orders/1", ProductId = "skus/1", CustomerId = "customers/1", When = DateTimeOffset.Now.AddDays(-3) }
                 )
                 .Notify(new Placed<RefundProductOrder> {Command = new RefundProductOrder {OrderId = "orders/1"}, When = DateTimeOffset.Now.AddDays(-1)});
         }
@@ -41,19 +41,19 @@ namespace Tests.RefundExample
         }
     }
 
-    public class CannotRefundWhenCannotDetermineProductOnSale
+    public class CannotRefundWhenCannotFindProductOnSale
     {
         readonly Lazy<IEnumerable<NotificationsByPublisher>> _notificationsByPublisher;
 
-        public CannotRefundWhenCannotDetermineProductOnSale()
+        public CannotRefundWhenCannotFindProductOnSale()
         {
             _notificationsByPublisher = RefundProductOrderHandler
                 .Subscriptions()
                 .PublisherBySubscription
                 .Given
                 (
-                    new PolicyInPlace { PolicyId = "skus/2", RefundsAllowed = true, CoolingOffPeriodInDays = 10},
-                    new OrderPlaced { OrderId = "orders/1", ProductId = "skus/2", CustomerId = "customers/4" }
+                    new PolicyInPlace { PolicyId = "policy/1", RefundsAllowed = true, CoolingOffPeriodInDays = 10},
+                    new OrderPlaced { OrderId = "orders/1", ProductId = "skus/1", CustomerId = "customers/1" }
                 )
                 .Notify(new Placed<RefundProductOrder> { Command = new RefundProductOrder { OrderId = "orders/1" } });
         }
@@ -62,6 +62,34 @@ namespace Tests.RefundExample
         public void PublisherThrowsAnExceptionWhenDataNotAvailable()
         {
             Assert.Throws<CannotFindProductOnSale>(() => _notificationsByPublisher
+                .Value
+                .SelectMany(n => n.Notifications)
+                .Select(n => n.Item1)
+                .ToList());
+        }
+    }
+
+    public class CannotRefundWhenCannotFindPolicy
+    {
+        readonly Lazy<IEnumerable<NotificationsByPublisher>> _notificationsByPublisher;
+
+        public CannotRefundWhenCannotFindPolicy()
+        {
+            _notificationsByPublisher = RefundProductOrderHandler
+                .Subscriptions()
+                .PublisherBySubscription
+                .Given
+                (
+                    new ProductOnSale { PolicyId = "policy/1", ProductId = "skus/1", WhenSaleExpires = DateTimeOffset.Now.AddDays(10)},
+                    new OrderPlaced { OrderId = "orders/1", ProductId = "skus/1", CustomerId = "customers/1" }
+                )
+                .Notify(new Placed<RefundProductOrder> { Command = new RefundProductOrder { OrderId = "orders/1" } });
+        }
+
+        [Fact]
+        public void PublisherThrowsAnExceptionWhenDataNotAvailable()
+        {
+            Assert.Throws<CannotFindProductPolicy>(() => _notificationsByPublisher
                 .Value
                 .SelectMany(n => n.Notifications)
                 .Select(n => n.Item1)
@@ -193,7 +221,7 @@ namespace Tests.RefundExample
                 .Given<ProductOnSale>(Map)
                     .Correlate(x => x.ProductId, x => x.Order.Sku)
                 .Given<CustomerMarkedAsFraud>(Map)
-                    .Correlate(x => x.CustomerId, x => x.Order.Sku)        
+                    .Correlate(x => x.CustomerId, x => x.Order.CustomerId)        
                 .When<Placed<RefundProductOrder>>()
                     .Correlate(x => x.Command.OrderId, x => x.OrderId)
                     .Then(Handle);
