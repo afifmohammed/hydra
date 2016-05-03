@@ -29,18 +29,22 @@ namespace EventSourcing
             where TConsumerData : new()
             where TNotification : IDomainEvent
         {
-            return notification => consumer
-            (
-                FoldHandlerData
+            return notification =>
+            {
+                var handlerDataCorrelationMaps = correlationMapsByConsumerDataContract[typeof(TConsumerData).Contract()];
+                consumer
                 (
+                    FoldHandlerData
+                    (
+                        handlerDataCorrelationMaps,
+                        HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification),
+                        notificationsByCorrelations,
+                        consumerDataMappersByNotificationContract
+                    ),
                     notification,
-                    correlationMapsByConsumerDataContract[typeof(TConsumerData).Contract()],
-                    notificationsByCorrelations,
-                    consumerDataMappersByNotificationContract
-                ),
-                notification,
-                endpoint
-            );
+                    endpoint
+                );
+            };
         }
 
         public static Action<TNotification> BuildConsumer<TConsumerData, TNotification, TEndpoint1, TEndpoint2>(
@@ -54,19 +58,24 @@ namespace EventSourcing
             where TConsumerData : new()
             where TNotification : IDomainEvent
         {
-            return notification => consumer
-            (
-                FoldHandlerData
+            return notification =>
+            {
+                var handlerDataCorrelationMaps = correlationMapsByConsumerDataContract[typeof(TConsumerData).Contract()];
+
+                consumer
                 (
+                    FoldHandlerData
+                    (
+                        handlerDataCorrelationMaps,
+                        HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification),
+                        notificationsByCorrelations,
+                        consumerDataMappersByNotificationContract
+                    ),
                     notification,
-                    correlationMapsByConsumerDataContract[typeof(TConsumerData).Contract()],
-                    notificationsByCorrelations,
-                    consumerDataMappersByNotificationContract
-                ),
-                notification,
-                endpoint1,
-                endpoint2
-            );
+                    endpoint1,
+                    endpoint2
+                );
+            };
         }
 
         public static Func<TNotification, NotificationsByPublisher> BuildPublisher<TPublisherData, TNotification>(
@@ -79,43 +88,51 @@ namespace EventSourcing
             where TPublisherData : new()
             where TNotification : IDomainEvent
         {
-            return notification => new NotificationsByPublisher
+            return notification =>
             {
-                Notifications = publisher
-                (
-                    FoldHandlerData
-                    (
-                        notification,
-                        correlationMapsByPublisherDataContract[typeof(TPublisherData).Contract()],
-                        notificationsByCorrelations,
-                        publisherDataMappersByNotificationContract
-                    ),
-                    notification
-                ).Select
-                (
-                    n => new Tuple<IDomainEvent, IEnumerable<Correlation>>
-                    (
-                        n,
-                        n.Correlations()
-                    )
-                ),
-                PublisherDataCorrelations = HandlerDataCorrelationsBy(correlationMapsByPublisherDataContract[typeof(TPublisherData).Contract()], notification),
-                When = clock()
+                var handlerDataCorrelationMaps = correlationMapsByPublisherDataContract[typeof(TPublisherData).Contract()];
+                return
+                    new NotificationsByPublisher
+                    {
+                        Notifications = publisher
+                        (
+                            FoldHandlerData
+                            (
+                                handlerDataCorrelationMaps,
+                                HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification),
+                                notificationsByCorrelations,
+                                publisherDataMappersByNotificationContract
+                            ),
+                            notification
+                        ).Select
+                        (
+                            n => new Tuple<IDomainEvent, IEnumerable<Correlation>>
+                            (
+                                n,
+                                n.Correlations()
+                            )
+                        ),
+                        PublisherDataCorrelations = HandlerDataCorrelationsBy
+                        (
+                            correlationMapsByPublisherDataContract[typeof (TPublisherData).Contract()], 
+                            notification
+                        ),
+                        When = clock()
+                    };
             };
         }
 
-        public static THandlerData FoldHandlerData<THandlerData, TNotification>(
-            TNotification notification,
+        public static THandlerData FoldHandlerData<THandlerData>(
             IEnumerable<CorrelationMap> handlerDataCorrelationMaps,
+            IEnumerable<Correlation> handlerDataCorrelations,
             NotificationsByCorrelations notificationsByCorrelations,
             IDictionary<TypeContract, Func<THandlerData, JsonContent, THandlerData>> handlerDataMappersByNotificationContract)
             where THandlerData : new()
-            where TNotification : IDomainEvent
         {
             var correlations = CorrelationsOfMatchingNotificationsBy
             (
                 handlerDataCorrelationMaps: handlerDataCorrelationMaps,
-                handlerDataCorrelations: HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification)
+                handlerDataCorrelations: handlerDataCorrelations
             ).Where(x => handlerDataMappersByNotificationContract.Keys.Any(k => k.Equals(x.Contract)));
 
             var notifications = notificationsByCorrelations(correlations);
