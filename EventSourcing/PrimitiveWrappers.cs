@@ -19,6 +19,24 @@ namespace EventSourcing
             Value = value;
         }
         public string Value { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(obj, null)) return false;
+            if ((obj is JsonContent) == false) return false;
+
+            return Equals((JsonContent)obj);
+        }
+
+        public bool Equals(JsonContent other)
+        {
+            return string.Equals(Value, other.Value);
+        }
+
+        public override int GetHashCode()
+        {
+            return Value?.GetHashCode() ?? 0;
+        }
     }
 
     public struct Version : Unit<int>
