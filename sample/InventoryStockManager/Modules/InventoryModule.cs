@@ -1,7 +1,7 @@
-﻿using InventoryStockManager.Domain;
-using Nancy;
+﻿using Nancy;
+using RetailDomain.Inventory;
 
-namespace InventoryStockManager.Modules
+namespace WebApi.Modules
 {
     public class InventoryModule : NancyModule
     {

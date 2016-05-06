@@ -4,7 +4,7 @@ using AdoNet;
 using EventSourcing;
 using RequestPipeline;
 
-namespace InventoryStockManager
+namespace WebApi
 {
     static class ConnectionString
     {

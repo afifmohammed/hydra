@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RequestPipeline;
 using EventSourcing;
-using InventoryStockManager.Domain;
+using RetailDomain.Inventory;
 using Xunit;
 
 namespace Tests

@@ -61,10 +61,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
-    <Compile Include="RefundExample\Tests.cs" />
+    <Compile Include="Refunds.cs" />
     <Compile Include="Requests.cs" />
-    <Compile Include="StockSample\InventoryItemStockView.cs" />
-    <Compile Include="StockSample\Tests.cs" />
+    <Compile Include="InventoryItemStockView.cs" />
+    <Compile Include="ManageStock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -84,9 +84,9 @@
       <Project>{EB7A999C-A296-4051-854A-41E5FFABA4D5}</Project>
       <Name>Requests</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sample\InventoryStockManager\InventoryStockManager.csproj">
-      <Project>{F8A5A9AD-F680-46F4-806F-653E7E51A030}</Project>
-      <Name>InventoryStockManager</Name>
+    <ProjectReference Include="..\Sample\RetailDomain\RetailDomain.csproj">
+      <Project>{d7a08a88-5a12-4053-bb27-09593dc7debe}</Project>
+      <Name>RetailDomain</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

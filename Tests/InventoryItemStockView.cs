@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using EventSourcing;
-using InventoryStockManager.Domain;
+using RetailDomain.Inventory;
 
 namespace Tests
 {

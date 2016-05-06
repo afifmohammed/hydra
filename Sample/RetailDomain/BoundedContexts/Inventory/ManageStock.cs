@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using RequestPipeline;
 using EventSourcing;
+using RequestPipeline;
 
-namespace InventoryStockManager.Domain
+namespace RetailDomain.Inventory
 {
     public struct InventoryItemStockData
     {

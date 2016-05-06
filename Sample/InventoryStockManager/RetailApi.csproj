@@ -7,8 +7,8 @@
     <ProjectGuid>{F8A5A9AD-F680-46F4-806F-653E7E51A030}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>InventoryStockManager</RootNamespace>
-    <AssemblyName>InventoryStockManager</AssemblyName>
+    <RootNamespace>WebApi</RootNamespace>
+    <AssemblyName>RetailApi</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -70,13 +70,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Modules\RefundModule.cs" />
     <Compile Include="SqlServer.cs" />
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
-    <Compile Include="Domain\Commands.cs" />
-    <Compile Include="Domain\Events.cs" />
-    <Compile Include="Domain\ManageStock.cs" />
     <Compile Include="Modules\InventoryModule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -108,6 +106,10 @@
     <ProjectReference Include="..\..\Requests\Requests.csproj">
       <Project>{eb7a999c-a296-4051-854a-41e5ffaba4d5}</Project>
       <Name>Requests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RetailDomain\RetailDomain.csproj">
+      <Project>{D7A08A88-5A12-4053-BB27-09593DC7DEBE}</Project>
+      <Name>RetailDomain</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

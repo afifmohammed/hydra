@@ -3,11 +3,11 @@ using AdoNet;
 using EventSourcing;
 using Hangfire;
 using Hangfire.SqlServer;
-using InventoryStockManager.Domain;
 using Nancy;
 using Nancy.Hosting.Self;
+using RetailDomain.Inventory;
 
-namespace InventoryStockManager
+namespace WebApi
 {
     class Program
     {
