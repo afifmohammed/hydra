@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using AdoNet;
 using EventSourcing;
 using Hangfire;
@@ -6,6 +7,7 @@ using Hangfire.SqlServer;
 using Nancy;
 using Nancy.Hosting.Self;
 using RetailDomain.Inventory;
+using RetailDomain.Refunds;
 
 namespace WebApi
 {
@@ -13,11 +15,13 @@ namespace WebApi
     {
         static void Main(string[] args)
         {
-            foreach (var element in InventoryItemStockHandler.Subsriptions().PublisherBySubscription)
+            foreach (var element in new PublishersBySubscription()
+                .Union(InventoryItemStockHandler.Subsriptions().PublisherBySubscription)
+                .Union(RefundProductOrderHandler.Subscriptions().PublisherBySubscription))
             {
                 EventStore.PublishersBySubscription.Add(element.Key, element.Value);
             }
-
+             
             SqlEventStore.Initialize<ApplicationStore>(ConnectionString.ByName, message => BackgroundJob.Enqueue(message));
 
             GlobalConfiguration.Configuration.UseSqlServerStorage(

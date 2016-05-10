@@ -4,14 +4,6 @@ using RequestPipeline;
 
 namespace RetailDomain.Inventory
 {
-    public struct InventoryItemStockData
-    {
-        public string Sku { get; set; }
-        public int Count { get; set; }
-        public bool IsActive { get; set; }
-        public int OverStockLimit { get; set; }
-    }
-
     public static class InventoryItemStockHandler
     {
         public static PublisherSubscriptions Subsriptions()
@@ -142,5 +134,13 @@ namespace RetailDomain.Inventory
                 OverStockLimit = e.Limit
             };
         }
+    }
+
+    public struct InventoryItemStockData
+    {
+        public string Sku { get; set; }
+        public int Count { get; set; }
+        public bool IsActive { get; set; }
+        public int OverStockLimit { get; set; }
     }
 }

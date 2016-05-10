@@ -44,9 +44,4 @@ namespace RetailDomain.Inventory
         public string Reason { get; set; }
         public IEnumerable<KeyValuePair<string, object>> Correlations => new[] { this.PropertyNameValue(x => x.Id) };
     }
-
-    public class JustSpinningMyWheels : IDomainEvent
-    {
-        public IEnumerable<KeyValuePair<string, object>> Correlations => Enumerable.Empty<KeyValuePair<string, object>>();
-    }
 }

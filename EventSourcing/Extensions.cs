@@ -101,8 +101,9 @@ namespace EventSourcing
 
         public static T With<T>(this T instance, Action<T> operation)
         {
-            operation(instance);
-            return instance;
+            var value = instance;
+            operation(value);
+            return value;
         }
     }
 }

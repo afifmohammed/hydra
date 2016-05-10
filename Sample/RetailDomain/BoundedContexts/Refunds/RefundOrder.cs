@@ -2,43 +2,12 @@
 using System.Collections.Generic;
 using EventSourcing;
 using RequestPipeline;
+using RetailDomain.Ops;
+using RetailDomain.Risk;
+using RetailDomain.Sales;
 
 namespace RetailDomain.Refunds
 {
-    public class RefundProductOrderData
-    {
-        public string OrderId { get; set; }
-
-        public Customer Customer { get; set; }
-        public ProductPolicy Policy { get; set; }
-        public Product Product { get; set; }
-        public Order Order { get; set; }
-    }
-
-    public class Order
-    {
-        public string Sku { get; set; }
-        public string CustomerId { get; set; }
-        public DateTimeOffset? WhenOrderPlaced { get; set; }
-    }
-
-    public class Customer
-    {
-        public bool? CustomerMarkedAsFraud { get; set; }
-    }
-
-    public class Product
-    {
-        public string PolicyId { get; set; }
-        public DateTimeOffset? WhenSaleExpires { get; set; }
-    }
-
-    public class ProductPolicy
-    {
-        public int? CoolingOffPeriodInDays { get; set; }
-        public bool? RefundAllowed { get; set; }
-    }
-
     public static class RefundProductOrderHandler
     {
         public static PublisherSubscriptions Subscriptions()
@@ -100,6 +69,40 @@ namespace RetailDomain.Refunds
 
             return new[] { new RefundApproved { OrderId = d.OrderId } };
         }
+    }
+
+    public class RefundProductOrderData
+    {
+        public string OrderId { get; set; }
+
+        public Customer Customer { get; set; }
+        public ProductPolicy Policy { get; set; }
+        public Product Product { get; set; }
+        public Order Order { get; set; }
+    }
+
+    public class Order
+    {
+        public string Sku { get; set; }
+        public string CustomerId { get; set; }
+        public DateTimeOffset? WhenOrderPlaced { get; set; }
+    }
+
+    public class Customer
+    {
+        public bool? CustomerMarkedAsFraud { get; set; }
+    }
+
+    public class Product
+    {
+        public string PolicyId { get; set; }
+        public DateTimeOffset? WhenSaleExpires { get; set; }
+    }
+
+    public class ProductPolicy
+    {
+        public int? CoolingOffPeriodInDays { get; set; }
+        public bool? RefundAllowed { get; set; }
     }
 
     public class CannotFindProductPolicy : EventualConsistencyException { }

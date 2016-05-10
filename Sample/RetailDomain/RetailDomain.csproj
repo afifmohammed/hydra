@@ -46,6 +46,10 @@
     <Compile Include="BoundedContexts\Refunds\Commands.cs" />
     <Compile Include="BoundedContexts\Refunds\Events.cs" />
     <Compile Include="BoundedContexts\Refunds\RefundOrder.cs" />
+    <Compile Include="BoundedContexts\Risk\Events.cs" />
+    <Compile Include="BoundedContexts\Sales\Events.cs" />
+    <Compile Include="Contracts.cs" />
+    <Compile Include="Ops\Events.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

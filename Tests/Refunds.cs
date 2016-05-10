@@ -5,8 +5,11 @@ using EventSourcing;
 using RequestPipeline;
 using Xunit;
 using RetailDomain.Refunds;
+using RetailDomain.Risk;
+using RetailDomain.Sales;
+using RetailDomain.Ops;
 
-namespace Tests.RefundExample
+namespace Tests
 {
     public class CannotRefundWhenCustomerIsFraud
     {

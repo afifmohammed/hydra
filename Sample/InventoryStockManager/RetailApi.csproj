@@ -70,7 +70,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Modules\OpsModule.cs" />
     <Compile Include="Modules\RefundModule.cs" />
+    <Compile Include="Modules\RiskModule.cs" />
+    <Compile Include="Modules\SalesModule.cs" />
     <Compile Include="SqlServer.cs" />
     <None Include="app.config">
       <SubType>Designer</SubType>
