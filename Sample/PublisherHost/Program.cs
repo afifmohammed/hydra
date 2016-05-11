@@ -1,17 +1,28 @@
 ﻿using System;
+using System.Linq;
 using AdoNet;
+using EventSourcing;
 using Hangfire;
 using Hangfire.SqlServer;
 using Nancy;
 using Nancy.Hosting.Self;
+using RetailDomain.Inventory;
+using RetailDomain.Refunds;
 
-namespace WebApi
+namespace PublisherHost
 {
     class Program
     {
         static void Main(string[] args)
         {
-            SqlEventStore.Initialize<ApplicationStore>(ConnectionString.ByName, message => BackgroundJob.Enqueue(message));
+            SqlEventStore.Initialize<ApplicationStore>(ConnectionString.ByName, handler => BackgroundJob.Enqueue(handler));
+
+            foreach (var element in new PublishersBySubscription()
+                .Union(InventoryItemStockHandler.Subsriptions().PublisherBySubscription)
+                .Union(RefundProductOrderHandler.Subscriptions().PublisherBySubscription))
+            {
+                EventStore.PublishersBySubscription.Add(element.Key, element.Value);
+            }
 
             GlobalConfiguration.Configuration.UseSqlServerStorage(
                 nameOrConnectionString: "EventStoreTransport",
@@ -21,8 +32,9 @@ namespace WebApi
                     QueuePollInterval = TimeSpan.FromSeconds(1)
                 });
 
-            var uri = new Uri("http://localhost:3785");
+            var uri = new Uri("http://localhost:3579");
 
+            using (new BackgroundJobServer())
             using (var host = new NancyHost(
                 uri, 
                 new DefaultNancyBootstrapper(), 
