@@ -16,7 +16,7 @@ namespace PublisherHost
         static void Main(string[] args)
         {
             SqlEventStore.Initialize<ApplicationStore>(ConnectionString.ByName, handler => BackgroundJob.Enqueue(handler));
-
+            
             foreach (var element in new PublishersBySubscription()
                 .Union(InventoryItemStockHandler.Subsriptions().PublisherBySubscription)
                 .Union(RefundProductOrderHandler.Subscriptions().PublisherBySubscription))

@@ -24,7 +24,7 @@ namespace EventSourcing
         IDomainEvent notification,
         ConsumersBySubscription<TEndpoint> consumersBySubscription);
 
-    public delegate void Push(
+    public delegate void Handler(
         MessageToPublisher messageToPublisher,
         PublishersBySubscription publishersBySubscription,
         NotificationsByCorrelations notificationsByCorrelations,
@@ -33,7 +33,7 @@ namespace EventSourcing
         Action<NotificationsByPublisherAndVersion> saveNotificationsByPublisherAndVersion,
         Action<IEnumerable<MessageToPublisher>> notify);
 
-    public delegate void Push<TEndpoint>(
+    public delegate void Handler<TEndpoint>(
         MessageToConsumer<TEndpoint> messageToConsumer,
         ConsumersBySubscription<TEndpoint> consumersBySubscription,
         NotificationsByCorrelations notificationsByCorrelations,
@@ -47,7 +47,7 @@ namespace EventSourcing
                 .Where(p => p.Key.NotificationContract.Equals(new TypeContract(notification)))
                 .Select(p => new MessageToConsumer<TEndpoint> { Notification = notification, Subscription = p.Key });
 
-        public static Push<TEndpoint> Push => (
+        public static Handler<TEndpoint> Handler => (
             messageToConsumer, 
             consumersBySubscription, 
             notificationsByCorrelations, 
@@ -69,7 +69,7 @@ namespace EventSourcing
                 .Where(p => p.Key.NotificationContract.Equals(new TypeContract(notification)))
                 .Select(p => new MessageToPublisher {Notification = notification, Subscription = p.Key});
 
-        public static Push Push = (
+        public static Handler Handler = (
             messageToPublisher, 
             publishersBySubscription, 
             notificationsByCorrelations, 

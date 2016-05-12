@@ -22,7 +22,9 @@ namespace AdoNet
                 Notification = (IDomainEvent)JsonConvert.DeserializeObject(message.NotificationContent.Value, message.NotificationType)
             };
 
-            Mailbox<AdoNetTransaction<TStore>, AdoNetTransactionScope>.Route(subscriberMessage);
+            EventStore<AdoNetTransaction<TStore>>.Submit(Post)(subscriberMessage);
         }
+
+        public static Post Post { get; set; }
     }
 }

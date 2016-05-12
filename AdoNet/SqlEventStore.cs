@@ -13,6 +13,8 @@ namespace AdoNet
     {
         public static void Initialize<TStore>(Func<string, string> connectionString, Action<Expression<Action>> enqueue) where TStore : class
         {
+            JsonMessageMailbox<TStore>.Post = messages => Mailbox<AdoNetTransaction<TStore>, AdoNetTransactionScope>.Post(messages);
+
             EventStore<AdoNetTransaction<TStore>>.NotificationsByCorrelations =
                 t => NotificationsByCorrelations(t.Value);
 
