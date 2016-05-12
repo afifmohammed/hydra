@@ -16,7 +16,15 @@ namespace EventSourcing
         public static PublisherVersionByPublisherDataContractCorrelations<TPersistence> PublisherVersionByPublisherDataContractCorrelations { get; set; }
         public static SaveNotificationsByPublisherAndVersion<TPersistence> SaveNotificationsByPublisherAndVersion { get; set; }
 
-        public static Func<Post, NotifyPublisher<TPersistence>> NotifyPublisher = post => (messageToPublisher, handler, commitWork) =>
+        public static Func<Post, NotifyPublisher<TPersistence>> NotifyPublisher = post => 
+            (messageToPublisher, handler, commitWork) => NotifyPublisherAndPost(messageToPublisher, handler, commitWork, post);
+
+        public static CommitWork<TPersistence> CommitEventStoreConnection { get; set; }
+
+        public static Func<Post, Handle> Submit = post => message => Handle(message, post);
+
+        private static void NotifyPublisherAndPost(MessageToPublisher messageToPublisher, Handler handler, CommitWork<TPersistence> commitWork, Post post)
+        {
             commitWork(connection =>
             {
                 handler(
@@ -28,23 +36,20 @@ namespace EventSourcing
                     SaveNotificationsByPublisherAndVersion(connection),
                     messages => post(messages));
             });
+        }
 
-        public static CommitWork<TPersistence> CommitEventStoreConnection { get; set; }
+        private static void Handle(SubscriberMessage message, Post post)
+        {
+            var messageToPublisher = new MessageToPublisher
+            {
+                Notification = message.Notification,
+                Subscription = message.Subscription
+            };
 
-        public static Func<Post, Handle> Submit =
-            post =>
-                message =>
-                {
-                    var messageToPublisher = new MessageToPublisher
-                    {
-                        Notification = message.Notification,
-                        Subscription = message.Subscription
-                    };
+            var notifyPublisher = NotifyPublisher(post);
 
-                    var notifyPublisher = NotifyPublisher(messages => post(messages));
-
-                    notifyPublisher(messageToPublisher, PublisherChannel.Handler, CommitEventStoreConnection);
-                };
+            notifyPublisher(messageToPublisher, PublisherChannel.Handler, CommitEventStoreConnection);
+        }
     }
 
     public static class EventStore
