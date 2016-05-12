@@ -42,7 +42,7 @@ namespace AdoNet
                         SubscriptionType = subscriberMessage.Subscription.GetType(),
                     };
 
-                   enqueue(() => JsonMessageMailbox<TStore>.Route(message));
+                   enqueue(() => JsonMessageMailbox<TStore>.Submit(message));
                 }
             };
         }

@@ -14,7 +14,7 @@ namespace AdoNet
 
     public static class JsonMessageMailbox<TStore> where TStore : class
     {
-        public static void Route(JsonMailboxMessage message)
+        public static void Submit(JsonMailboxMessage message)
         {
             var subscriberMessage = new SubscriberMessage
             {
@@ -22,9 +22,11 @@ namespace AdoNet
                 Notification = (IDomainEvent)JsonConvert.DeserializeObject(message.NotificationContent.Value, message.NotificationType)
             };
 
-            EventStore<AdoNetTransaction<TStore>>.Submit(Post)(subscriberMessage);
+            var handle = EventStore<AdoNetTransaction<TStore>>.Submit(Post);
+
+            handle(subscriberMessage);
         }
 
-        public static Post Post { get; set; }
+        public static Post Post = messages => {};
     }
 }
