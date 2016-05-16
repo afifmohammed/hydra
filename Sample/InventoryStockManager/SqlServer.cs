@@ -12,12 +12,13 @@ namespace WebApi
     class ApplicationStore
     { }
 
-    public static class ApplicationRequestPipeline
+    class EventStoreTransport { }
+
+    class ApplicationRequestPipeline
     {
-        public static Response<Unit> Dispatch<TCommand>(TCommand command) 
-            where TCommand : IRequest<Unit>, ICorrelated
+        public static Response<Unit> Dispatch<TCommand>(TCommand command) where TCommand : IRequest<Unit>, ICorrelated
         {
-            return RequestPipeline<TCommand, AdoNetTransaction<ApplicationStore>, AdoNetTransactionScope>.Dispatch(command);
-        }
+            return RequestPipeline<AdoNetTransactionScope>.Dispatch(command);
+        }  
     }
 }

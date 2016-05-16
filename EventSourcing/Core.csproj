@@ -48,7 +48,8 @@
     <Compile Include="Channel.cs" />
     <Compile Include="Correlations.cs" />
     <Compile Include="EventStore.cs" />
-    <Compile Include="Mailbox.cs" />
+    <Compile Include="JsonMessages.cs" />
+    <Compile Include="PostBox.cs" />
     <Compile Include="PrimitiveWrappers.cs" />
     <Compile Include="Functions.cs" />
     <Compile Include="Extensions.cs" />

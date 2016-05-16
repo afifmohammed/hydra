@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Linq.Expressions;
 using Dapper;
 using EventSourcing;
 using Newtonsoft.Json;
@@ -11,40 +10,19 @@ namespace AdoNet
 {
     public static class SqlEventStore
     {
-        public static void Initialize<TStore>(Func<string, string> connectionString, Action<Expression<Action>> enqueue) where TStore : class
+        public static void Initialize<TStoreName>(Func<string, string> connectionString) where TStoreName : class
         {
-            JsonMessageMailbox<TStore>.Post = messages => Mailbox<AdoNetTransaction<TStore>, AdoNetTransactionScope>.Post(messages);
-
-            EventStore<AdoNetTransaction<TStore>>.NotificationsByCorrelations =
+            EventStore<AdoNetTransaction<TStoreName>>.NotificationsByCorrelations =
                 t => NotificationsByCorrelations(t.Value);
 
-            EventStore<AdoNetTransaction<TStore>>.PublisherVersionByPublisherDataContractCorrelations =
+            EventStore<AdoNetTransaction<TStoreName>>.PublisherVersionByPublisherDataContractCorrelations =
                 t => PublisherVersionByContractAndCorrelations(t.Value);
 
-            EventStore<AdoNetTransaction<TStore>>.SaveNotificationsByPublisherAndVersion =
+            EventStore<AdoNetTransaction<TStoreName>>.SaveNotificationsByPublisherAndVersion = 
                 t => SaveNotificationsByPublisherAndVersion(t.Value);
 
-            Mailbox<AdoNetTransaction<TStore>, AdoNetTransactionScope>.CommitEventStoreConnection =
-                AdoNetTransaction<TStore>.CommitWork(connectionString);
-
-            Mailbox<AdoNetTransaction<TStore>, AdoNetTransactionScope>.CommitTransportConnection =
-                AdoNetTransactionScope.Commit();
-
-            Mailbox<AdoNetTransaction<TStore>, AdoNetTransactionScope>.Enqueue = (endpoint, messages) =>
-            {
-                foreach (var subscriberMessage in messages)
-                {
-                    var message = new JsonMailboxMessage
-                    {
-                        NotificationContent = new JsonContent(subscriberMessage.Notification),
-                        NotificationType = subscriberMessage.Notification.GetType(),
-                        Subscription = new JsonContent(subscriberMessage.Subscription),
-                        SubscriptionType = subscriberMessage.Subscription.GetType(),
-                    };
-
-                   enqueue(() => JsonMessageMailbox<TStore>.Submit(message));
-                }
-            };
+            EventStore<AdoNetTransaction<TStoreName>>.CommitEventStoreConnection =
+                AdoNetTransaction<TStoreName>.CommitWork(connectionString);
         }
 
         static Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion(IDbTransaction transaction)

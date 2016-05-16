@@ -11,15 +11,7 @@ namespace WebApi
     {
         static void Main(string[] args)
         {
-            SqlEventStore.Initialize<ApplicationStore>(ConnectionString.ByName, message => BackgroundJob.Enqueue(message));
-
-            GlobalConfiguration.Configuration.UseSqlServerStorage(
-                nameOrConnectionString: "EventStoreTransport",
-                options: new SqlServerStorageOptions
-                {
-                    PrepareSchemaIfNecessary = true,
-                    QueuePollInterval = TimeSpan.FromSeconds(1)
-                });
+            SqlTransport.Initialize<ApplicationStore, EventStoreTransport>(ConnectionString.ByName);
 
             var uri = new Uri("http://localhost:3785");
 

@@ -1,10 +1,9 @@
 ﻿using System;
-using EventSourcing;
 using Newtonsoft.Json;
 
-namespace AdoNet
+namespace EventSourcing
 {
-    public class JsonMailboxMessage
+    public class JsonMessage
     {
         public JsonContent Subscription { get; set; }
         public JsonContent NotificationContent { get; set; }
@@ -12,9 +11,9 @@ namespace AdoNet
         public Type SubscriptionType { get; set; }
     }
 
-    public static class JsonMessageMailbox<TStore> where TStore : class
+    public static class JsonEventStoreMessageHandler<TPersistence> where TPersistence : class
     {
-        public static void Submit(JsonMailboxMessage message)
+        public static void Handle(JsonMessage message)
         {
             var subscriberMessage = new SubscriberMessage
             {
@@ -22,7 +21,7 @@ namespace AdoNet
                 Notification = (IDomainEvent)JsonConvert.DeserializeObject(message.NotificationContent.Value, message.NotificationType)
             };
 
-            var handle = EventStore<AdoNetTransaction<TStore>>.Submit(Post);
+            var handle = EventStore<TPersistence>.Submit(Post);
 
             handle(subscriberMessage);
         }

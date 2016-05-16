@@ -8,7 +8,6 @@ namespace AdoNet
 {
     public class AdoNetTransactionScope : Unit<TransactionScope>, IDisposable
     {
-        
         public AdoNetTransactionScope()
         {
             Value = new TransactionScope();

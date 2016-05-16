@@ -5,4 +5,6 @@
     /// </summary>
     class ApplicationStore
     { }
+
+    class EventStoreTransport { }
 }
