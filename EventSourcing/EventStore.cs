@@ -25,6 +25,8 @@ namespace EventSourcing
 
         private static void NotifyPublisherAndPost(MessageToPublisher messageToPublisher, Handler handler, CommitWork<TPersistence> commitWork, Post post)
         {
+            var list = new List<MessageToPublisher>();
+
             commitWork(connection =>
             {
                 handler(
@@ -34,8 +36,10 @@ namespace EventSourcing
                     PublisherVersionByPublisherDataContractCorrelations(connection),
                     () => DateTimeOffset.Now,
                     SaveNotificationsByPublisherAndVersion(connection),
-                    messages => post(messages));
+                    messages => list.AddRange(messages));
             });
+
+            post(list);
         }
 
         private static void Handle(SubscriberMessage message, Post post)
