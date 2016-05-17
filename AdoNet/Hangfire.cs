@@ -9,7 +9,8 @@ using Hangfire.States;
 
 namespace AdoNet
 {
-    public static class Hangfire<TConnectionStringName>
+    public static class Hangfire<TConnectionStringName> 
+        where TConnectionStringName : class
     {
         static Hangfire()
         {
@@ -32,9 +33,9 @@ namespace AdoNet
         }
 
         [UseQueueFromParameter(0)]
-        public static void Handle<TStoreName>(JsonMessage message) where TStoreName : class
+        public static void Handle<TEventStoreName>(JsonMessage message) where TEventStoreName : class
         {
-            JsonEventStoreMessageHandler<AdoNetTransaction<TStoreName>>.Handle(message);
+            JsonEventStoreMessageHandler<AdoNetTransaction<TEventStoreName>>.Handle(message);
         }
 
         public static Func<string, string> ConnectionString = name => ConfigurationManager.ConnectionStrings[name].ConnectionString;

@@ -5,7 +5,9 @@ namespace AdoNet
 {
     public static class SqlTransport
     {
-        public static void Initialize<TEventStoreName, TTransportStoreName>(Func<string, string> connectionString) where TEventStoreName : class
+        public static void Initialize<TEventStoreName, TTransportStoreName>(Func<string, string> connectionString) 
+            where TEventStoreName : class
+            where TTransportStoreName : class
         {
             PostBox<AdoNetTransactionScope>.CommitTransportConnection = AdoNetTransactionScope.Commit();
 
