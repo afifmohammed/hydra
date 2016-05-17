@@ -1,7 +1,5 @@
 ﻿using System;
 using AdoNet;
-using Hangfire;
-using Hangfire.SqlServer;
 using Nancy;
 using Nancy.Hosting.Self;
 

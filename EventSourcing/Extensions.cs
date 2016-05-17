@@ -91,10 +91,10 @@ namespace EventSourcing
         {
             if (type.GetGenericArguments().Length == 0)
             {
-                return type.Name;
+                return type.FullName;
             }
             var genericArguments = type.GetGenericArguments();
-            var typeDefeninition = type.Name;
+            var typeDefeninition = type.FullName;
             var unmangledName = typeDefeninition.Substring(0, typeDefeninition.IndexOf("`"));
             return unmangledName + "(of " + string.Join(",", genericArguments.Select(FriendlyName)) + ")";
         }

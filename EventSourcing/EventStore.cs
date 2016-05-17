@@ -21,7 +21,7 @@ namespace EventSourcing
 
         public static CommitWork<TPersistence> CommitEventStoreConnection { get; set; }
 
-        public static Func<Post, Handle> Submit = post => message => Handle(message, post);
+        public static Func<Post, Handle> Handler = post => message => Handle(message, post);
 
         private static void NotifyPublisherAndPost(MessageToPublisher messageToPublisher, Handler handler, CommitWork<TPersistence> commitWork, Post post)
         {

@@ -1,10 +1,24 @@
 ﻿using System;
-using Newtonsoft.Json;
 
 namespace EventSourcing
 {
     public class JsonMessage
     {
+        public JsonMessage()
+        {
+            HandlerAddress = "default";
+        }
+
+        public JsonMessage(SubscriberMessage subscriberMessage)
+        {
+            NotificationContent = new JsonContent(subscriberMessage.Notification);
+            NotificationType = subscriberMessage.Notification.GetType();
+            Subscription = new JsonContent(subscriberMessage.Subscription);
+            SubscriptionType = subscriberMessage.Subscription.GetType();
+            HandlerAddress = subscriberMessage.Subscription.SubscriberDataContract.Value;
+        }
+
+        public string HandlerAddress { get; set; }
         public JsonContent Subscription { get; set; }
         public JsonContent NotificationContent { get; set; }
         public Type NotificationType { get; set; }
@@ -15,15 +29,9 @@ namespace EventSourcing
     {
         public static void Handle(JsonMessage message)
         {
-            var subscriberMessage = new SubscriberMessage
-            {
-                Subscription = (Subscription)JsonConvert.DeserializeObject(message.Subscription.Value, message.SubscriptionType),
-                Notification = (IDomainEvent)JsonConvert.DeserializeObject(message.NotificationContent.Value, message.NotificationType)
-            };
+            var handle = EventStore<TPersistence>.Handler(Post);
 
-            var handle = EventStore<TPersistence>.Submit(Post);
-
-            handle(subscriberMessage);
+            handle(new SubscriberMessage(message));
         }
 
         public static Post Post = messages => {};
