@@ -5,14 +5,6 @@ using EventSourcing;
 
 namespace Polling
 {
-    public static class Builder<TEndpointConnection> where TEndpointConnection : EndpointConnection
-    {
-        public static Func<TEndpointConnection, LastSeen> LastSeen { get; set; }
-        public static Func<TEndpointConnection, RecentNotifications> RecentNotifications { get; set; }
-        public static Func<TEndpointConnection, RecordLastSeen> RecordLastSeen { get; set; }
-        public static CommitWork<TEndpointConnection> CommitWork { get; set; }
-    }
-
     public static class Functions
     {        
         public static void Handle<TEndpointConnection>(            
@@ -21,8 +13,8 @@ namespace Polling
             Func<TEndpointConnection, RecentNotifications> buildRecentNotifications,
             IEnumerable<TypeContract> contracts,
             Action<IEnumerable<IDomainEvent>> publish,
-            Func<TEndpointConnection, RecordLastSeen> buildRecordLastSeen
-            ) where TEndpointConnection : EndpointConnection
+            Func<TEndpointConnection, RecordLastSeen> buildRecordLastSeen) 
+            where TEndpointConnection : EndpointConnection
         {
             commit
             (
