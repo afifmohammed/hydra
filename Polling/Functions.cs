@@ -7,29 +7,37 @@ namespace Polling
 {
     public static class Functions
     {        
-        public static void Handle<TEndpointConnection>(            
-            CommitWork<TEndpointConnection> commit,
-            Func<TEndpointConnection, LastSeen> buildLastSeen,
-            Func<TEndpointConnection, RecentNotifications> buildRecentNotifications,
+        public static void Handle<TStreamConnection, TStateConnection>(            
+            CommitWork<TStateConnection> commitState,
+            CommitWork<TStreamConnection> commitStream,
+            Func<TStateConnection, LastSeen> lastSeenFunction,
+            Func<TStreamConnection, RecentNotifications> recentNotificationsFunction,
             IEnumerable<TypeContract> contracts,
             Action<IEnumerable<IDomainEvent>> publish,
-            Func<TEndpointConnection, RecordLastSeen> buildRecordLastSeen) 
-            where TEndpointConnection : EndpointConnection
+            Func<TStateConnection, RecordLastSeen> recordLastSeenFunction) 
+            where TStreamConnection : EndpointConnection
+            where TStateConnection : EndpointConnection
         {
-            commit
+            commitState
             (
-                endpoint =>
+                stateEndpointConnection =>
                 {
-                    var lastSeen = Consume
+                    commitStream
                     (
-                        lastSeen: buildLastSeen(endpoint),
-                        recentNotifications: buildRecentNotifications(endpoint),
-                        contracts: contracts,
-                        publish: publish
-                    );
-                    var recordLastSeen = buildRecordLastSeen(endpoint);
-                    var id = lastSeen();
-                    recordLastSeen(id);
+                        streamEndpointConnection =>
+                        {
+                            var lastSeen = Consume
+                            (
+                                lastSeen: lastSeenFunction(stateEndpointConnection),
+                                recentNotifications: recentNotificationsFunction(streamEndpointConnection),
+                                contracts: contracts,
+                                publish: publish
+                            );
+                            var recordLastSeen = recordLastSeenFunction(stateEndpointConnection);
+                            var id = lastSeen();
+                            recordLastSeen(id);
+                        }
+                    );                    
                 }
             );
         }

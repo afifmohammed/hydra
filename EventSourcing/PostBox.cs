@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace EventSourcing
@@ -14,7 +15,10 @@ namespace EventSourcing
 
     public delegate void Post(IEnumerable<SubscriberMessage> messages);
 
-    public delegate void Enqueue<in TEndpointConnection>(TEndpointConnection endpoint, IEnumerable<SubscriberMessage> messages) where TEndpointConnection : EndpointConnection;
+    public delegate void Enqueue<in TEndpointConnection>(
+        TEndpointConnection endpoint, 
+        IEnumerable<SubscriberMessage> messages) 
+        where TEndpointConnection : EndpointConnection;
 
     public static class PostBox<TEndpointConnection>
         where TEndpointConnection : EndpointConnection
@@ -26,11 +30,19 @@ namespace EventSourcing
             PostBox.NotifyViaPost
             (
                 notification, 
-                domainEvent => PostBox.SubscriberMessagesByNotificationList.SelectMany(subscriberMessagesByNotification => subscriberMessagesByNotification(domainEvent)), 
+                domainEvent => SubscriberMessages(new[] { domainEvent }, PostBox.SubscriberMessagesByNotificationList), 
                 Post
             );
 
         public static Post Post = messages => CommitTransportConnection(endpoint => Enqueue(endpoint, messages));
+
+        public static Func<IEnumerable<IDomainEvent>, List<SubscriberMessagesByNotification>, IEnumerable<SubscriberMessage>> SubscriberMessages = 
+            (notifications, subscriberMessagesByNotificationList) =>
+                notifications.SelectMany
+                (
+                    domainEvent => subscriberMessagesByNotificationList
+                        .SelectMany(subscriberMessagesByNotification => subscriberMessagesByNotification(domainEvent))
+                );
     }
 
     public static class PostBox

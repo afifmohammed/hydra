@@ -45,10 +45,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AdoNet\AdoNet.csproj">
-      <Project>{223a1668-8fc2-4399-9047-287b9dbf2636}</Project>
-      <Name>AdoNet</Name>
-    </ProjectReference>
     <ProjectReference Include="..\EventSourcing\Core.csproj">
       <Project>{e6e5141e-a6ac-434a-9697-784811570ecb}</Project>
       <Name>Core</Name>

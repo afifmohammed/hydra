@@ -68,4 +68,37 @@ namespace AdoNet
             };
         }
     }
+
+    public class AdoNetConnection<TConnectionStringName> : Unit<IDbConnection>, IDisposable, EndpointConnection
+        where TConnectionStringName : class
+    {
+        public AdoNetConnection(Func<string, string> getConnectionString)
+        {
+            Value = Connection(getConnectionString(typeof(TConnectionStringName).FriendlyName()));
+        }
+        public IDbConnection Value { get; }
+
+        static IDbConnection Connection(string connectionString)
+        {
+            var c = new SqlConnection(connectionString);
+            c.Open();
+            return c;
+        }
+
+        public void Dispose()
+        {
+            Value?.Dispose();
+        }
+
+        public static CommitWork<AdoNetConnection<TConnectionStringName>> CommitWork(Func<string, string> getConnectionString)
+        {
+            return doWork =>
+            {
+                using (var t = new AdoNetConnection<TConnectionStringName>(getConnectionString))
+                {
+                    doWork(t);                    
+                }
+            };
+        }
+    }
 }
