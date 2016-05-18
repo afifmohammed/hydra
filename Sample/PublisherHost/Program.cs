@@ -5,6 +5,7 @@ using EventSourcing;
 using Hangfire;
 using RetailDomain.Inventory;
 using RetailDomain.Refunds;
+using SerializedInvocation;
 
 namespace PublisherHost
 {

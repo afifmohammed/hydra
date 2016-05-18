@@ -46,10 +46,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Api\FluentApi.csproj">
-      <Project>{a0e76561-abd7-4739-8d82-bee6f2ad8ebc}</Project>
-      <Name>FluentApi</Name>
-    </ProjectReference>
     <ProjectReference Include="..\EventSourcing\Core.csproj">
       <Project>{E6E5141E-A6AC-434A-9697-784811570ECB}</Project>
       <Name>Core</Name>

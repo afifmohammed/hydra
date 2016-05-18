@@ -1,4 +1,6 @@
-﻿using EventSourcing;
+﻿using System;
+using System.Configuration;
+using EventSourcing;
 
 namespace AdoNet
 {
@@ -26,19 +28,6 @@ namespace AdoNet
         {
             EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.Post = PostBox<AdoNetTransactionScope>.Post;
             return config;
-        }
-
-        public static EventStoreConfiguration ConfigureTransport<HangfireConnectionStringName, EventStoreConnectionStringName>(this EventStoreConfiguration config)
-            where EventStoreConnectionStringName : class
-            where HangfireConnectionStringName : class
-        {
-            Hangfire.Initialize<HangfireConnectionStringName, EventStoreConnectionStringName>();
-
-            PostBox<AdoNetTransactionScope>.CommitTransportConnection = AdoNetTransactionScope.Commit();
-
-            PostBox<AdoNetTransactionScope>.Enqueue = Hangfire.Enqueue;
-
-            return config;
-        }
+        }        
     }
 }

@@ -38,16 +38,17 @@
       <HintPath>..\..\packages\Dapper.1.42\lib\net45\Dapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Hangfire.Core, Version=1.5.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Hangfire.Core.1.5.5\lib\net45\Hangfire.Core.dll</HintPath>
+    <Reference Include="Hangfire.Core, Version=1.5.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Hangfire.Core.1.5.6\lib\net45\Hangfire.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Hangfire.SqlServer, Version=1.5.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Hangfire.SqlServer.1.5.5\lib\net45\Hangfire.SqlServer.dll</HintPath>
+    <Reference Include="Hangfire.SqlServer, Version=1.5.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Hangfire.SqlServer.1.5.6\lib\net45\Hangfire.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Nancy">
-      <HintPath>..\..\packages\Nancy.1.4.1\lib\net40\Nancy.dll</HintPath>
+    <Reference Include="Nancy, Version=1.4.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Nancy.1.4.3\lib\net40\Nancy.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Nancy.Hosting.Self, Version=1.4.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Nancy.Hosting.Self.1.4.1\lib\net40\Nancy.Hosting.Self.dll</HintPath>
@@ -94,21 +95,25 @@
       <Project>{223A1668-8FC2-4399-9047-287B9DBF2636}</Project>
       <Name>AdoNet</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Api\FluentApi.csproj">
-      <Project>{a0e76561-abd7-4739-8d82-bee6f2ad8ebc}</Project>
-      <Name>FluentApi</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\EventSourcing\Core.csproj">
       <Project>{e6e5141e-a6ac-434a-9697-784811570ecb}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Pipeline\RequestPipeline.csproj">
+    <ProjectReference Include="..\..\FluentApi\FluentApi.csproj">
+      <Project>{a0e76561-abd7-4739-8d82-bee6f2ad8ebc}</Project>
+      <Name>FluentApi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\RequestPipeline\RequestPipeline.csproj">
       <Project>{900b7a11-306e-46ed-9267-552bb7840bc1}</Project>
       <Name>RequestPipeline</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Requests\Requests.csproj">
       <Project>{eb7a999c-a296-4051-854a-41e5ffaba4d5}</Project>
       <Name>Requests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SerializedInvocation\SerializedInvocation.csproj">
+      <Project>{9b9f6273-3b0f-477c-ad7c-1e56cc213a5e}</Project>
+      <Name>SerializedInvocation</Name>
     </ProjectReference>
     <ProjectReference Include="..\RetailDomain\RetailDomain.csproj">
       <Project>{d7a08a88-5a12-4053-bb27-09593dc7debe}</Project>

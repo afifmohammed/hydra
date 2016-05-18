@@ -53,16 +53,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Api\FluentApi.csproj">
-      <Project>{A0E76561-ABD7-4739-8D82-BEE6F2AD8EBC}</Project>
-      <Name>FluentApi</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\EventSourcing\Core.csproj">
       <Project>{E6E5141E-A6AC-434A-9697-784811570ECB}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Pipeline\RequestPipeline.csproj">
-      <Project>{900B7A11-306E-46ED-9267-552BB7840BC1}</Project>
+    <ProjectReference Include="..\..\FluentApi\FluentApi.csproj">
+      <Project>{a0e76561-abd7-4739-8d82-bee6f2ad8ebc}</Project>
+      <Name>FluentApi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\RequestPipeline\RequestPipeline.csproj">
+      <Project>{900b7a11-306e-46ed-9267-552bb7840bc1}</Project>
       <Name>RequestPipeline</Name>
     </ProjectReference>
   </ItemGroup>
