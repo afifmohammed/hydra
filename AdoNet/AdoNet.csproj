@@ -67,7 +67,6 @@
     <Compile Include="Hangfire.cs" />
     <Compile Include="SqlEventStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlTransport.cs" />
     <Compile Include="Transactions.cs" />
     <Compile Include="ViewStore.cs" />
   </ItemGroup>

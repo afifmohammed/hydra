@@ -10,27 +10,7 @@ namespace AdoNet
 {
     public static class SqlEventStore
     {
-        public static void ConfigurePublishingNotification<ConnectionStringName>() where ConnectionStringName : class
-        {
-            EventStore<AdoNetTransaction<ConnectionStringName>>.Post = PostBox<AdoNetTransactionScope>.Post;
-        }
-
-        public static void ConfigurePublishers<ConnectionStringName>(Func<string, string> connectionString) where ConnectionStringName : class
-        {
-            EventStore<AdoNetTransaction<ConnectionStringName>>.NotificationsByCorrelations =
-                t => NotificationsByCorrelations(t.Value);
-
-            EventStore<AdoNetTransaction<ConnectionStringName>>.PublisherVersionByPublisherDataContractCorrelations =
-                t => PublisherVersionByContractAndCorrelations(t.Value);
-
-            EventStore<AdoNetTransaction<ConnectionStringName>>.SaveNotificationsByPublisherAndVersion = 
-                t => SaveNotificationsByPublisherAndVersion(t.Value);
-
-            EventStore<AdoNetTransaction<ConnectionStringName>>.CommitEventStoreConnection =
-                AdoNetTransaction<ConnectionStringName>.CommitWork(connectionString);
-        }
-
-        static Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion(IDbTransaction transaction)
+        public static Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion(IDbTransaction transaction)
         {
             return notificationsByPublisherAndVersion =>
             {
@@ -90,7 +70,7 @@ namespace AdoNet
 
         }
 
-        static Func<IEnumerable<Correlation>, int> PublisherVersionByContractAndCorrelations(IDbTransaction transaction)
+        public static Func<IEnumerable<Correlation>, int> PublisherVersionByContractAndCorrelations(IDbTransaction transaction)
         {
             return correlations => transaction.Connection
                 .Query<int>(
@@ -104,7 +84,7 @@ namespace AdoNet
                 .FirstOrDefault();
         }
 
-        static NotificationsByCorrelations NotificationsByCorrelations(IDbTransaction transaction)
+        public static NotificationsByCorrelations NotificationsByCorrelations(IDbTransaction transaction)
         {
             return correlations => transaction.Connection
                 .Query<dynamic>(
@@ -119,7 +99,7 @@ namespace AdoNet
                 });
         }
 
-        static SqlMapper.ICustomQueryParameter AsTvp(this IEnumerable<Correlation> correlations)
+        public static SqlMapper.ICustomQueryParameter AsTvp(this IEnumerable<Correlation> correlations)
         {
             var eventsDataTable = CreateEventTable();
             foreach (var item in correlations)

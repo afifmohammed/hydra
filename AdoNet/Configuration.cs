@@ -7,14 +7,24 @@ namespace AdoNet
         public static EventStoreConfiguration ConfigurePublishers<EventStoreConnectionStringName>(this EventStoreConfiguration config)
             where EventStoreConnectionStringName : class
         {
-            SqlEventStore.ConfigurePublishers<EventStoreConnectionStringName>(ConnectionString.ByName);
+            EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.NotificationsByCorrelations =
+                t => SqlEventStore.NotificationsByCorrelations(t.Value);
+
+            EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.PublisherVersionByPublisherDataContractCorrelations =
+                t => SqlEventStore.PublisherVersionByContractAndCorrelations(t.Value);
+
+            EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.SaveNotificationsByPublisherAndVersion =
+                t => SqlEventStore.SaveNotificationsByPublisherAndVersion(t.Value);
+
+            EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.CommitEventStoreConnection =
+                AdoNetTransaction<EventStoreConnectionStringName>.CommitWork(ConnectionString.ByName);
             return config;
         }
 
         public static EventStoreConfiguration ConfigurePublishingNotifications<EventStoreConnectionStringName>(this EventStoreConfiguration config)
             where EventStoreConnectionStringName : class
         {
-            SqlEventStore.ConfigurePublishingNotification<EventStoreConnectionStringName>();
+            EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.Post = PostBox<AdoNetTransactionScope>.Post;
             return config;
         }
 
@@ -22,7 +32,12 @@ namespace AdoNet
             where EventStoreConnectionStringName : class
             where HangfireConnectionStringName : class
         {
-            SqlTransport.Initialize<EventStoreConnectionStringName, HangfireConnectionStringName>(ConnectionString.ByName);
+            Hangfire.Initialize<HangfireConnectionStringName, EventStoreConnectionStringName>();
+
+            PostBox<AdoNetTransactionScope>.CommitTransportConnection = AdoNetTransactionScope.Commit();
+
+            PostBox<AdoNetTransactionScope>.Enqueue = Hangfire.Enqueue;
+
             return config;
         }
     }
