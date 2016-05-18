@@ -15,29 +15,29 @@ namespace Polling
 
     public static class Functions
     {        
-        public static void Apply<TEndpointConnection>(            
+        public static void Handle<TEndpointConnection>(            
             CommitWork<TEndpointConnection> commit,
-            Func<TEndpointConnection, LastSeen> lastSeen,
-            Func<TEndpointConnection, RecentNotifications> recentNotifications,
+            Func<TEndpointConnection, LastSeen> buildLastSeen,
+            Func<TEndpointConnection, RecentNotifications> buildRecentNotifications,
             IEnumerable<TypeContract> contracts,
             Action<IEnumerable<IDomainEvent>> publish,
-            Func<TEndpointConnection, RecordLastSeen> recordLastSeen
+            Func<TEndpointConnection, RecordLastSeen> buildRecordLastSeen
             ) where TEndpointConnection : EndpointConnection
         {
             commit
             (
                 endpoint =>
                 {
-                    var last = Consume
+                    var lastSeen = Consume
                     (
-                        lastSeen(endpoint),
-                        recentNotifications(endpoint),
-                        contracts,
-                        publish
+                        lastSeen: buildLastSeen(endpoint),
+                        recentNotifications: buildRecentNotifications(endpoint),
+                        contracts: contracts,
+                        publish: publish
                     );
-                    var id = last();
-                    var record = recordLastSeen(endpoint);
-                    record(id);
+                    var recordLastSeen = buildRecordLastSeen(endpoint);
+                    var id = lastSeen();
+                    recordLastSeen(id);
                 }
             );
         }
@@ -48,7 +48,7 @@ namespace Polling
             IEnumerable<TypeContract> contracts,
             Action<IEnumerable<IDomainEvent>> publish)
         {
-            return () => Apply
+            return () => PublishAndReturnLastSeen
             (
                 recentNotifications
                 (
@@ -59,7 +59,7 @@ namespace Polling
             );
         }
 
-        static EventId Apply(
+        static EventId PublishAndReturnLastSeen(
             IEnumerable<Notification> notifications,
             Action<IEnumerable<IDomainEvent>> publish)
         {
