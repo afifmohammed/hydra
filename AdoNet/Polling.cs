@@ -34,9 +34,9 @@ namespace AdoNet
                         notifications, 
                         new SubscriberMessagesByNotification[] 
                         {
-                            e => subscriptions
-                                .Where(x => x.NotificationContract.Equals(new TypeContract(e)))
-                                .Select(x => new SubscriberMessage { Notification = e, Subscription = x })
+                            notification => subscriptions
+                                .Where(subscription => subscription.NotificationContract.Equals(new TypeContract(notification)))
+                                .Select(subscription => new SubscriberMessage { Notification = notification, Subscription = subscription })
                         }.ToList())),
                 RecordLastSeenFunction
             );
