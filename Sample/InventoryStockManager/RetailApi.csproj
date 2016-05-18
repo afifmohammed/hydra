@@ -88,7 +88,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.png" />
-    <Content Include="Schema.sql" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\AdoNet\AdoNet.csproj">
