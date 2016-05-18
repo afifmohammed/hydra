@@ -32,11 +32,5 @@ namespace Polling
 
     public delegate void RecordLastSeen(EventId id);
 
-    public delegate EventId LastSeen();
-
-    public delegate LastSeen Consume(
-        LastSeen lastSeen,
-        RecentNotifications recentNotifications,
-        IEnumerable<TypeContract> contracts,
-        Action<IEnumerable<IDomainEvent>> publish);
+    public delegate EventId LastSeen();    
 }

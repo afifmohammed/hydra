@@ -15,8 +15,7 @@ namespace Polling
 
     public static class Functions
     {        
-        public static void Apply<TEndpointConnection>(
-            Consume consume, 
+        public static void Apply<TEndpointConnection>(            
             CommitWork<TEndpointConnection> commit,
             Func<TEndpointConnection, LastSeen> lastSeen,
             Func<TEndpointConnection, RecentNotifications> recentNotifications,
@@ -27,21 +26,23 @@ namespace Polling
         {
             commit
             (
-                endpoint => Apply
-                (
-                    consume
+                endpoint =>
+                {
+                    var last = Consume
                     (
-                        lastSeen(endpoint), 
-                        recentNotifications(endpoint), 
-                        contracts, 
+                        lastSeen(endpoint),
+                        recentNotifications(endpoint),
+                        contracts,
                         publish
-                    ), 
-                    recordLastSeen(endpoint)
-                )
+                    );
+                    var id = last();
+                    var record = recordLastSeen(endpoint);
+                    record(id);
+                }
             );
         }
 
-        public static LastSeen Apply(
+        static LastSeen Consume(
             LastSeen lastSeen,
             RecentNotifications recentNotifications,
             IEnumerable<TypeContract> contracts,
@@ -70,11 +71,6 @@ namespace Polling
                 return x.Event;
             }));
             return id;
-        }
-
-        static void Apply(LastSeen lastSeen, RecordLastSeen recordLastSeen)
-        {
-            recordLastSeen(lastSeen());
-        }
+        }        
     }
 }
