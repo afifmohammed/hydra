@@ -28,8 +28,14 @@ namespace Polling
             IEnumerable<Notification> notifications,
             Action<IEnumerable<IDomainEvent>> publish)
         {
-            publish(notifications.Select(x => x.Event));
-            return notifications.Reverse().First().Id;
+            EventId id = new NoEventId();
+
+            publish(notifications.OrderBy(x => x.Id.Value).Select(x => 
+            {
+                id = x.Id;
+                return x.Event;
+            }));
+            return id;
         }
     }
 }

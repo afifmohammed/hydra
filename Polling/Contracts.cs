@@ -3,6 +3,8 @@ using EventSourcing;
 
 namespace Polling
 {
+    public class NoEventId : EventId { }
+
     public class EventId : Unit<long>
     {
         public long Value
