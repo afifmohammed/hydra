@@ -45,13 +45,7 @@ namespace AdoNet
                     .AsPublisherNameAndCorrelation();
 
                 var rowCount = transaction.Connection.Execute(
-                    sql: notificationsByPublisherAndVersion.ExpectedVersion.Value == 0
-                        ? @"INSERT INTO Publishers (Name, Correlation, Version)
-                            VALUES (@Name, @Correlation, @Version)"
-                        : @"UPDATE Publishers SET Version = @Version 
-                            WHERE Name = @Name 
-                            AND Correlation = @Correlation 
-                            AND Version = @ExpectedVersion",
+                    sql: "UpsertPublisher",
                     transaction: transaction,
                     param: new
                     {
@@ -74,11 +68,7 @@ namespace AdoNet
         {
             return correlations => transaction.Connection
                 .Query<int>(
-                    sql: @"
-                        SELECT Version
-                        FROM Publishers
-                        WHERE Name = @Name
-                            AND Correlation = @Correlation;",
+                    sql: @"GetPublisherVersion",
                     transaction: transaction,
                     param: correlations.AsPublisherNameAndCorrelation().As(x => new {Name = x.Item1, Correlation = x.Item2}))
                 .FirstOrDefault();

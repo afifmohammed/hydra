@@ -71,7 +71,61 @@ BEGIN
 	SET NOCOUNT ON
 	SELECT e.EventName, e.Content
 	FROM [Events] as e INNER JOIN EventCorrelations AS ec ON e.Id = ec.EventId 
-	INNER JOIN @tvpEvents as t 	ON e.EventName = t.EventName AND ec.PropertyName = t.PropertyName AND ec.PropertyValue = t.PropertyValue 
+	INNER JOIN @tvpEvents as t ON e.EventName = t.EventName AND ec.PropertyName = t.PropertyName AND ec.PropertyValue = t.PropertyValue 
 	Group by e.Id, e.EventName, e.Content
 	ORDER BY e.Id
+END
+
+GO
+
+CREATE PROCEDURE [dbo].[GetLatestEvents] (@tvpEvents dbo.EventTableType READONLY, @StartEventId bigint = null)
+AS
+BEGIN
+	SET NOCOUNT ON
+	IF @StartEventId IS NULL
+		BEGIN
+			SELECT TOP 100 e.EventName, e.Content
+			FROM [Events] as e INNER JOIN EventCorrelations AS ec ON e.Id = ec.EventId 
+			INNER JOIN @tvpEvents as t ON e.EventName = t.EventName
+			WHERE e.Id > @StartEventId
+			Group by e.Id, e.EventName, e.Content
+			ORDER BY e.Id
+		END
+	ELSE
+		BEGIN
+			SELECT TOP 1 e.EventName, e.Content
+			FROM [Events] as e INNER JOIN EventCorrelations AS ec ON e.Id = ec.EventId 
+			INNER JOIN @tvpEvents as t ON e.EventName = t.EventName
+			Group by e.Id, e.EventName, e.Content
+			ORDER BY e.Id DESC
+		END
+END
+
+GO
+
+CREATE PROCEDURE [dbo].[UpsertPublisher] (@Name varchar(50), @Correlation varchar(850), @Version int, @ExpectedVersion int)
+AS
+BEGIN
+	SET NOCOUNT ON
+	IF @ExpectedVersion = 0
+		BEGIN
+			INSERT INTO Publishers (Name, Correlation, Version)
+			VALUES (@Name, @Correlation, @Version)
+        END           
+	ELSE
+		BEGIN
+			UPDATE Publishers SET Version = @Version 
+			WHERE Name = @Name AND Correlation = @Correlation AND Version = @ExpectedVersion
+		END
+END
+
+GO
+
+CREATE PROCEDURE [dbo].[GetPublisherVersion] (@Name varchar(50), @Correlation varchar(850))
+AS
+BEGIN
+	SET NOCOUNT ON
+		SELECT Version
+        FROM Publishers
+        WHERE Name = @Name AND Correlation = @Correlation
 END
