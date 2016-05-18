@@ -12,19 +12,22 @@ namespace PublisherHost
     {
         static void Main(string[] args)
         {
-            SqlEventStore.Initialize<ApplicationStore>(ConnectionString.ByName);
-            SqlTransport.Initialize<ApplicationStore, EventStoreTransport>(ConnectionString.ByName);
+            new EventStoreConfiguration()
+                .ConfigurePublishers<EventStoreConnectionString>()
+                .ConfigurePublishingNotifications<EventStoreConnectionString>()
+                .ConfigureTransport<EventStoreTransportConnectionString, EventStoreConnectionString>()
+                .ConfigureSubscriptions(
+                    InventoryItemStockHandler.Subscriptions(),
+                    RefundProductOrderHandler.Subscriptions());
 
-            foreach (var element in new PublishersBySubscription()
-                .Union(InventoryItemStockHandler.Subsriptions().PublisherBySubscription)
-                .Union(RefundProductOrderHandler.Subscriptions().PublisherBySubscription))
+            var options = new BackgroundJobServerOptions
             {
-                EventStore.PublishersBySubscription.Add(element.Key, element.Value);
-            }
+                Queues = EventStore.PublishersBySubscription.Keys.Select(x => x.SubscriberDataContract.Value.ToLower()).ToArray()
+            };
 
-            using (new BackgroundJobServer())
-            { 
-                Console.WriteLine("Press any [Enter] to close the host.");
+            using (new BackgroundJobServer(options))
+            {
+                Console.WriteLine("Press any [Enter] to close the Publisher Host.");
                 Console.ReadLine();
             }
         }

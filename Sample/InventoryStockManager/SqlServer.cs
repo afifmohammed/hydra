@@ -7,15 +7,15 @@ using RequestPipeline;
 namespace WebApi
 {
     /// <summary>
-    /// This class is used as place holder to specify that the name of the connection string is <see cref="ApplicationStore"/>
+    /// This class is used as place holder to specify that the name of the connection string is <see cref="EventStoreConnectionString"/>
     /// </summary>
-    class ApplicationStore
+    class EventStoreConnectionString
     { }
 
     /// <summary>
-    /// This class is used as place holder to specify that the name of the connection string is <see cref="EventStoreTransport"/>
+    /// This class is used as place holder to specify that the name of the connection string is <see cref="EventStoreTransportConnectionString"/>
     /// </summary>
-    class EventStoreTransport { }
+    class EventStoreTransportConnectionString { }
 
     class ApplicationRequestPipeline
     {

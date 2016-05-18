@@ -30,7 +30,7 @@ namespace Tests
         public CanDeactivateAStockedItem()
         {
             _notificationsByPublisher = InventoryItemStockHandler
-                .Subsriptions()
+                .Subscriptions()
                 .PublisherBySubscription
                 .Given(
                     new InventoryItemCreated {Id = "1"},

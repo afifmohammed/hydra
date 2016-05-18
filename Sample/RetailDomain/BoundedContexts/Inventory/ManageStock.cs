@@ -6,7 +6,7 @@ namespace RetailDomain.Inventory
 {
     public static class InventoryItemStockHandler
     {
-        public static PublisherSubscriptions Subsriptions()
+        public static PublisherSubscriptions Subscriptions()
         {
             return new PublisherBuilder<InventoryItemStockData>()
                 .Given<InventoryItemCreated>(Map)

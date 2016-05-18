@@ -2,23 +2,23 @@
 
 namespace EventSourcing
 {
-    public delegate void PostAndCommit<TEndpoint>(
-        MessageToConsumer<TEndpoint> messageToConsumer,
-        ConsumersBySubscription<TEndpoint> consumersBySubscription,
+    public delegate void PostAndCommit<TEndpointConnection>(
+        MessageToConsumer<TEndpointConnection> messageToConsumer,
+        ConsumersBySubscription<TEndpointConnection> consumersBySubscription,
         NotificationsByCorrelations notificationsByCorrelations,
-        CommitWork<TEndpoint> commit) 
-        where TEndpoint : class;
+        CommitWork<TEndpointConnection> commit) 
+        where TEndpointConnection : EndpointConnection;
 
-    public static class ViewStore<TEndpoint> where  TEndpoint : class
+    public static class ViewStore<TEndpointConnection> where  TEndpointConnection : EndpointConnection
     {
-        public static PostAndCommit<TEndpoint> PostAndCommit = (
+        public static PostAndCommit<TEndpointConnection> PostAndCommit = (
             messageToConsumer, 
             consumersBySubscription, 
             notificationsByCorrelations, 
             commit) => 
                 commit(
                     connection => 
-                        ConsumerChannel<TEndpoint>.Handler(
+                        ConsumerChannel<TEndpointConnection>.Handler(
                             messageToConsumer,
                             consumersBySubscription,
                             notificationsByCorrelations,

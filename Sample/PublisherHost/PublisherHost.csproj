@@ -75,9 +75,9 @@
       <Project>{223A1668-8FC2-4399-9047-287B9DBF2636}</Project>
       <Name>AdoNet</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Api\Api.csproj">
+    <ProjectReference Include="..\..\Api\FluentApi.csproj">
       <Project>{A0E76561-ABD7-4739-8D82-BEE6F2AD8EBC}</Project>
-      <Name>Api</Name>
+      <Name>FluentApi</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\EventSourcing\Core.csproj">
       <Project>{E6E5141E-A6AC-434A-9697-784811570ECB}</Project>

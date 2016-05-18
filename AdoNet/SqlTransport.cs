@@ -5,13 +5,15 @@ namespace AdoNet
 {
     public static class SqlTransport
     {
-        public static void Initialize<TEventStoreName, TTransportStoreName>(Func<string, string> connectionString) 
-            where TEventStoreName : class
-            where TTransportStoreName : class
+        public static void Initialize<EventStoreConnectionStringName, HangfireConnectionStringName>(Func<string, string> connectionString) 
+            where EventStoreConnectionStringName : class
+            where HangfireConnectionStringName : class
         {
+            Hangfire.Initialize<HangfireConnectionStringName, EventStoreConnectionStringName>();
+
             PostBox<AdoNetTransactionScope>.CommitTransportConnection = AdoNetTransactionScope.Commit();
 
-            PostBox<AdoNetTransactionScope>.Enqueue = Hangfire<TTransportStoreName>.Enqueue<TEventStoreName>;
+            PostBox<AdoNetTransactionScope>.Enqueue = Hangfire.Enqueue;
         }
     }
 }

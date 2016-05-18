@@ -13,14 +13,14 @@ namespace RequestPipeline
         }
     }
 
-    public static class RequestPipeline<TTransport> where TTransport : class
+    public static class RequestPipeline<TEndpointConnection> where TEndpointConnection : EndpointConnection
     {
         public static Response<Unit> Dispatch<TRequest>(TRequest input) where TRequest : IRequest<Unit>, ICorrelated => 
             RequestPipeline<TRequest, Unit>.DispatchThroughPipeline(
                 input,
                 request =>
                 {
-                    PostBox<TTransport>.Drop(new Placed<TRequest> {Command = request});
+                    PostBox<TEndpointConnection>.Drop(new Placed<TRequest> {Command = request});
                     return Enumerable.Empty<Unit>();
                 });
     }

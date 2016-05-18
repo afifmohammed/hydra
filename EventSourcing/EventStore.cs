@@ -1,29 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace EventSourcing
 {
     public delegate void Handle(SubscriberMessage message);
-    public delegate void NotifyPublisher<in TEndpoint>(MessageToPublisher messageToPublisher, Handler handler, CommitWork<TEndpoint> commitWork) where TEndpoint : class;
-    public delegate Func<IEnumerable<Correlation>, int> PublisherVersionByPublisherDataContractCorrelations<in TEndpoint>(TEndpoint connection) where TEndpoint : class;
+    public delegate void NotifyPublisher<in TEndpointConnection>(MessageToPublisher messageToPublisher, Handler handler, CommitWork<TEndpointConnection> commitWork) where TEndpointConnection : EndpointConnection;
+    public delegate Func<IEnumerable<Correlation>, int> PublisherVersionByPublisherDataContractCorrelations<in TEndpointConnection>(TEndpointConnection connection) where TEndpointConnection : EndpointConnection;
     public delegate IEnumerable<SerializedNotification> NotificationsByCorrelations(IEnumerable<Correlation> correlation);
-    public delegate NotificationsByCorrelations NotificationsByCorrelations<in TEndpoint>(TEndpoint connection) where TEndpoint : class;
-    public delegate Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion<in TEndpoint>(TEndpoint connection) where TEndpoint : class;
+    public delegate NotificationsByCorrelations NotificationsByCorrelations<in TEndpointConnection>(TEndpointConnection connection) where TEndpointConnection : EndpointConnection;
+    public delegate Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion<in TEndpointConnection>(TEndpointConnection connection) where TEndpointConnection : EndpointConnection;
     
-    public static class EventStore<TPersistence> where TPersistence : class
+    public static class EventStore<TEndpointConnection> where TEndpointConnection : EndpointConnection
     {
-        public static NotificationsByCorrelations<TPersistence> NotificationsByCorrelations { get; set; }
-        public static PublisherVersionByPublisherDataContractCorrelations<TPersistence> PublisherVersionByPublisherDataContractCorrelations { get; set; }
-        public static SaveNotificationsByPublisherAndVersion<TPersistence> SaveNotificationsByPublisherAndVersion { get; set; }
+        public static NotificationsByCorrelations<TEndpointConnection> NotificationsByCorrelations { get; set; }
+        public static PublisherVersionByPublisherDataContractCorrelations<TEndpointConnection> PublisherVersionByPublisherDataContractCorrelations { get; set; }
+        public static SaveNotificationsByPublisherAndVersion<TEndpointConnection> SaveNotificationsByPublisherAndVersion { get; set; }
 
-        public static Func<Post, NotifyPublisher<TPersistence>> NotifyPublisher = post => 
+        public static Func<Post, NotifyPublisher<TEndpointConnection>> NotifyPublisher = post => 
             (messageToPublisher, handler, commitWork) => NotifyPublisherAndPost(messageToPublisher, handler, commitWork, post);
 
-        public static CommitWork<TPersistence> CommitEventStoreConnection { get; set; }
+        public static CommitWork<TEndpointConnection> CommitEventStoreConnection { get; set; }
 
-        public static Func<Post, Handle> Handler = post => message => Handle(message, post);
+        public static Handle Handle = message => HandleAndPost(message, Post);
 
-        private static void NotifyPublisherAndPost(MessageToPublisher messageToPublisher, Handler handler, CommitWork<TPersistence> commitWork, Post post)
+        public static Post Post = messages => { };
+
+        private static void NotifyPublisherAndPost(MessageToPublisher messageToPublisher, Handler handler, CommitWork<TEndpointConnection> commitWork, Post post)
         {
             var list = new List<MessageToPublisher>();
 
@@ -42,7 +45,7 @@ namespace EventSourcing
             post(list);
         }
 
-        private static void Handle(SubscriberMessage message, Post post)
+        private static void HandleAndPost(SubscriberMessage message, Post post)
         {
             var messageToPublisher = new MessageToPublisher
             {
@@ -64,5 +67,15 @@ namespace EventSourcing
         }
 
         public static PublishersBySubscription PublishersBySubscription { get; set; }
+
+        public static void Register(params IDictionary<Subscription, Publisher>[] subscriptions)
+        {
+            PublishersBySubscription = PublishersBySubscription ?? new PublishersBySubscription();
+            foreach (var subscription in subscriptions)
+                foreach (var kvp in subscription)
+                    PublishersBySubscription.Add(kvp.Key, kvp.Value);
+        }        
     }
+
+
 }

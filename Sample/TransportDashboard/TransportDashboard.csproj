@@ -96,13 +96,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\AdoNet\AdoNet.csproj">
-      <Project>{223a1668-8fc2-4399-9047-287b9dbf2636}</Project>
-      <Name>AdoNet</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\EventSourcing\Core.csproj">
-      <Project>{e6e5141e-a6ac-434a-9697-784811570ecb}</Project>
-      <Name>Core</Name>
+    <ProjectReference Include="..\InventoryStockManager\RetailApi.csproj">
+      <Project>{f8a5a9ad-f680-46f4-806f-653e7e51a030}</Project>
+      <Name>RetailApi</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

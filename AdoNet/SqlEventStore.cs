@@ -10,19 +10,24 @@ namespace AdoNet
 {
     public static class SqlEventStore
     {
-        public static void Initialize<TStoreName>(Func<string, string> connectionString) where TStoreName : class
+        public static void ConfigurePublishingNotification<ConnectionStringName>() where ConnectionStringName : class
         {
-            EventStore<AdoNetTransaction<TStoreName>>.NotificationsByCorrelations =
+            EventStore<AdoNetTransaction<ConnectionStringName>>.Post = PostBox<AdoNetTransactionScope>.Post;
+        }
+
+        public static void ConfigurePublishers<ConnectionStringName>(Func<string, string> connectionString) where ConnectionStringName : class
+        {
+            EventStore<AdoNetTransaction<ConnectionStringName>>.NotificationsByCorrelations =
                 t => NotificationsByCorrelations(t.Value);
 
-            EventStore<AdoNetTransaction<TStoreName>>.PublisherVersionByPublisherDataContractCorrelations =
+            EventStore<AdoNetTransaction<ConnectionStringName>>.PublisherVersionByPublisherDataContractCorrelations =
                 t => PublisherVersionByContractAndCorrelations(t.Value);
 
-            EventStore<AdoNetTransaction<TStoreName>>.SaveNotificationsByPublisherAndVersion = 
+            EventStore<AdoNetTransaction<ConnectionStringName>>.SaveNotificationsByPublisherAndVersion = 
                 t => SaveNotificationsByPublisherAndVersion(t.Value);
 
-            EventStore<AdoNetTransaction<TStoreName>>.CommitEventStoreConnection =
-                AdoNetTransaction<TStoreName>.CommitWork(connectionString);
+            EventStore<AdoNetTransaction<ConnectionStringName>>.CommitEventStoreConnection =
+                AdoNetTransaction<ConnectionStringName>.CommitWork(connectionString);
         }
 
         static Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersion(IDbTransaction transaction)

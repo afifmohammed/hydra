@@ -1,6 +1,4 @@
 ﻿using System;
-using Hangfire;
-using Hangfire.SqlServer;
 using Microsoft.Owin.Hosting;
 
 namespace TransportDashboard
@@ -9,9 +7,11 @@ namespace TransportDashboard
     {
         static void Main(string[] args)
         {
-            using (WebApp.Start<Startup>("http://localhost:5368"))
+            var uri = new Uri("http://localhost:5368");
+            using (WebApp.Start<Startup>(uri.AbsoluteUri))
             {
-                Console.WriteLine("Server started... press ENTER to shut down");
+                Console.WriteLine("Dashboard is running on " + uri);
+                Console.WriteLine("Press any [Enter] to close the Dashboard Host.");
                 Console.ReadLine();
             }
         }

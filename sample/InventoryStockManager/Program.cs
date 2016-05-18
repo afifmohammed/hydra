@@ -1,7 +1,10 @@
 ﻿using System;
 using AdoNet;
+using EventSourcing;
 using Nancy;
 using Nancy.Hosting.Self;
+using RetailDomain.Inventory;
+using RetailDomain.Refunds;
 
 namespace WebApi
 {
@@ -9,7 +12,11 @@ namespace WebApi
     {
         static void Main(string[] args)
         {
-            SqlTransport.Initialize<ApplicationStore, EventStoreTransport>(ConnectionString.ByName);
+            new EventStoreConfiguration()
+                .ConfigureTransport<EventStoreTransportConnectionString, EventStoreConnectionString>()
+                .ConfigureSubscriptions(
+                    InventoryItemStockHandler.Subscriptions(),
+                    RefundProductOrderHandler.Subscriptions());
 
             var uri = new Uri("http://localhost:3785");
 
@@ -21,7 +28,7 @@ namespace WebApi
                 host.Start();
 
                 Console.WriteLine("Your application is running on " + uri);
-                Console.WriteLine("Press any [Enter] to close the host.");
+                Console.WriteLine("Press any [Enter] to close the Api Host.");
                 Console.ReadLine();
             }
         }

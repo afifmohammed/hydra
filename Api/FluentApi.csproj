@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EventSourcing</RootNamespace>
-    <AssemblyName>Api</AssemblyName>
+    <AssemblyName>FluentApi</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration.cs" />
     <Compile Include="FluentInterfaces\Publishers.cs" />
     <Compile Include="FluentInterfaces\Subscribers\OneEndpoint.cs" />
     <Compile Include="FluentInterfaces\Subscribers\TwoEndpoints.cs" />

@@ -6,7 +6,7 @@ using EventSourcing;
 
 namespace AdoNet
 {
-    public class AdoNetTransactionScope : Unit<TransactionScope>, IDisposable
+    public class AdoNetTransactionScope : Unit<TransactionScope>, IDisposable, EndpointConnection
     {
         public AdoNetTransactionScope()
         {
@@ -33,12 +33,12 @@ namespace AdoNet
         public TransactionScope Value { get; }
     }
 
-    public class AdoNetTransaction<TStore> : Unit<IDbTransaction>, IDisposable
-        where TStore : class
+    public class AdoNetTransaction<TConnectionStringName> : Unit<IDbTransaction>, IDisposable, EndpointConnection
+        where TConnectionStringName : class
     {
         public AdoNetTransaction(Func<string, string> getConnectionString)
         {
-            Value = Transaction(getConnectionString(typeof(TStore).FriendlyName()));
+            Value = Transaction(getConnectionString(typeof(TConnectionStringName).FriendlyName()));
         }
         public IDbTransaction Value { get; }
 
@@ -56,11 +56,11 @@ namespace AdoNet
             Value.Dispose();
         }
 
-        public static CommitWork<AdoNetTransaction<TStore>> CommitWork(Func<string, string> getConnectionString)
+        public static CommitWork<AdoNetTransaction<TConnectionStringName>> CommitWork(Func<string, string> getConnectionString)
         {
             return doWork =>
             {
-                using (var t = new AdoNetTransaction<TStore>(getConnectionString))
+                using (var t = new AdoNetTransaction<TConnectionStringName>(getConnectionString))
                 {
                     doWork(t);
                     t.Value.Commit();

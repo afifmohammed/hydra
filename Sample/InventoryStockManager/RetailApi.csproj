@@ -94,9 +94,9 @@
       <Project>{223A1668-8FC2-4399-9047-287B9DBF2636}</Project>
       <Name>AdoNet</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Api\Api.csproj">
+    <ProjectReference Include="..\..\Api\FluentApi.csproj">
       <Project>{a0e76561-abd7-4739-8d82-bee6f2ad8ebc}</Project>
-      <Name>Api</Name>
+      <Name>FluentApi</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\EventSourcing\Core.csproj">
       <Project>{e6e5141e-a6ac-434a-9697-784811570ecb}</Project>
@@ -111,7 +111,7 @@
       <Name>Requests</Name>
     </ProjectReference>
     <ProjectReference Include="..\RetailDomain\RetailDomain.csproj">
-      <Project>{D7A08A88-5A12-4053-BB27-09593DC7DEBE}</Project>
+      <Project>{d7a08a88-5a12-4053-bb27-09593dc7debe}</Project>
       <Name>RetailDomain</Name>
     </ProjectReference>
   </ItemGroup>

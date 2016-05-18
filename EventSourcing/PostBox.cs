@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace EventSourcing
@@ -15,13 +14,13 @@ namespace EventSourcing
 
     public delegate void Post(IEnumerable<SubscriberMessage> messages);
 
-    public delegate void Enqueue<in TEndpoint>(TEndpoint endpoint, IEnumerable<SubscriberMessage> messages) where TEndpoint : class;
+    public delegate void Enqueue<in TEndpointConnection>(TEndpointConnection endpoint, IEnumerable<SubscriberMessage> messages) where TEndpointConnection : EndpointConnection;
 
-    public static class PostBox<TTransportEndpoint>
-        where TTransportEndpoint : class
+    public static class PostBox<TEndpointConnection>
+        where TEndpointConnection : EndpointConnection
     {
-        public static Enqueue<TTransportEndpoint> Enqueue { get; set; }
-        public static CommitWork<TTransportEndpoint> CommitTransportConnection { get; set; }
+        public static Enqueue<TEndpointConnection> Enqueue { get; set; }
+        public static CommitWork<TEndpointConnection> CommitTransportConnection { get; set; }
 
         public static Notify Drop = notification => 
             PostBox.NotifyViaPost

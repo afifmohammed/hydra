@@ -7,15 +7,6 @@ namespace EventSourcing
 {
     public class SubscriberMessage
     {
-        public SubscriberMessage()
-        {}
-
-        public SubscriberMessage(JsonMessage message)
-        {
-            Subscription = (Subscription) JsonConvert.DeserializeObject(message.Subscription.Value, message.SubscriptionType);
-            Notification = (IDomainEvent) JsonConvert.DeserializeObject(message.NotificationContent.Value, message.NotificationType);
-        }
-
         public Subscription Subscription { get; set; }
         public IDomainEvent Notification { get; set; }
     }

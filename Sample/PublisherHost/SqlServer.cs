@@ -1,10 +1,13 @@
 ﻿namespace PublisherHost
 {
     /// <summary>
-    /// This class is used as place holder to specify that the name of the connection string is <see cref="ApplicationStore"/>
+    /// This class is used as place holder to specify that the name of the connection string is <see cref="EventStoreConnectionString"/>
     /// </summary>
-    class ApplicationStore
+    class EventStoreConnectionString
     { }
 
-    class EventStoreTransport { }
+    /// <summary>
+    /// This class is used as place holder to specify that the name of the connection string is <see cref="EventStoreTransportConnectionString"/>
+    /// </summary>
+    class EventStoreTransportConnectionString { }
 }
