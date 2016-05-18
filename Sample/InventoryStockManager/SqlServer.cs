@@ -12,6 +12,9 @@ namespace WebApi
     class ApplicationStore
     { }
 
+    /// <summary>
+    /// This class is used as place holder to specify that the name of the connection string is <see cref="EventStoreTransport"/>
+    /// </summary>
     class EventStoreTransport { }
 
     class ApplicationRequestPipeline
