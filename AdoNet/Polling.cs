@@ -6,19 +6,19 @@ using Polling;
 
 namespace AdoNet
 {
-    public static class Polling<EventStoreConnectionString, StateConnectionString>
-        where EventStoreConnectionString : class
-        where StateConnectionString : class
+    public static class Polling<TEventStoreConnectionString, TStateConnectionString>
+        where TEventStoreConnectionString : class
+        where TStateConnectionString : class
     {
-        public static Func<AdoNetTransaction<StateConnectionString>, LastSeen> LastSeenFunction { get; set; }
-        public static Func<AdoNetConnection<EventStoreConnectionString>, RecentNotifications> RecentNotificationsFunction { get; set; }
-        public static Func<AdoNetTransaction<StateConnectionString>, RecordLastSeen> RecordLastSeenFunction { get; set; }
+        public static Func<AdoNetTransaction<TStateConnectionString>, LastSeen> LastSeenFunction { get; set; }
+        public static Func<AdoNetConnection<TEventStoreConnectionString>, RecentNotifications> RecentNotificationsFunction { get; set; }
+        public static Func<AdoNetTransaction<TStateConnectionString>, RecordLastSeen> RecordLastSeenFunction { get; set; }
 
-        public static CommitWork<AdoNetTransaction<StateConnectionString>> CommitState = 
-            AdoNetTransaction<StateConnectionString>.CommitWork(ConnectionString.ByName);
+        public static CommitWork<AdoNetTransaction<TStateConnectionString>> CommitState = 
+            AdoNetTransaction<TStateConnectionString>.CommitWork(ConnectionString.ByName);
 
-        public static CommitWork<AdoNetConnection<EventStoreConnectionString>> CommitStream = 
-            AdoNetConnection<EventStoreConnectionString>.CommitWork(ConnectionString.ByName);
+        public static CommitWork<AdoNetConnection<TEventStoreConnectionString>> CommitStream = 
+            AdoNetConnection<TEventStoreConnectionString>.CommitWork(ConnectionString.ByName);
 
         public static void Handler(IEnumerable<Subscription> subscriptions)
         {

@@ -1,5 +1,4 @@
 ﻿using System;
-using AdoNet;
 using EventSourcing;
 using Nancy;
 using Nancy.Hosting.Self;

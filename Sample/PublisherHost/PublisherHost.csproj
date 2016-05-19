@@ -84,7 +84,7 @@
       <Name>FluentApi</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\SerializedInvocation\SerializedInvocation.csproj">
-      <Project>{9b9f6273-3b0f-477c-ad7c-1e56cc213a5e}</Project>
+      <Project>{9B9F6273-3B0F-477C-AD7C-1E56CC213A5E}</Project>
       <Name>SerializedInvocation</Name>
     </ProjectReference>
     <ProjectReference Include="..\RetailDomain\RetailDomain.csproj">

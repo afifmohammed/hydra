@@ -10,12 +10,12 @@ namespace SerializedInvocation
 {
     public static class HangfireConfiguration
     {
-        public static EventStoreConfiguration ConfigureTransport<HangfireConnectionStringName, EventStoreConnectionStringName>(
+        public static EventStoreConfiguration ConfigureTransport<THangfireConnectionStringName, TEventStoreConnectionStringName>(
             this EventStoreConfiguration config)
-            where EventStoreConnectionStringName : class
-            where HangfireConnectionStringName : class
+            where TEventStoreConnectionStringName : class
+            where THangfireConnectionStringName : class
         {
-            Initialize<HangfireConnectionStringName, EventStoreConnectionStringName>();
+            Initialize<THangfireConnectionStringName, TEventStoreConnectionStringName>();
 
             PostBox<AdoNetTransactionScope>.CommitTransportConnection = AdoNetTransactionScope.Commit();
 
@@ -24,32 +24,19 @@ namespace SerializedInvocation
             return config;
         }
 
-        static void Initialize<HangfireConnectionStringName, EventStoreConnectionStringName>()
-            where HangfireConnectionStringName : class
-            where EventStoreConnectionStringName : class
+        static void Initialize<THangfireConnectionStringName, TEventStoreConnectionStringName>()
+            where THangfireConnectionStringName : class
+            where TEventStoreConnectionStringName : class
         {
             GlobalConfiguration.Configuration.UseSqlServerStorage(
-                nameOrConnectionString: ConnectionString.ByName(typeof(HangfireConnectionStringName).FriendlyName()),
+                nameOrConnectionString: ConnectionString.ByName(typeof(THangfireConnectionStringName).FriendlyName()),
                 options: new SqlServerStorageOptions
                 {
                     PrepareSchemaIfNecessary = true,
                     QueuePollInterval = TimeSpan.FromSeconds(1)
                 });
 
-            JsonMessageHandler.HandleInstance = message =>
-            {
-                var subscriberMessage = new SubscriberMessage();
-
-                subscriberMessage.Subscription = (Subscription)JsonConvert.DeserializeObject(
-                    message.Subscription.Value, 
-                    message.SubscriptionType);
-
-                subscriberMessage.Notification = (IDomainEvent)JsonConvert.DeserializeObject(
-                    message.NotificationContent.Value, 
-                    message.NotificationType);
-
-                EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.Handle(subscriberMessage);
-            };
+            JsonMessageHandler.Initialize<TEventStoreConnectionStringName>();
         }
 
         static void Enqueue(AdoNetTransactionScope endpoint, IEnumerable<SubscriberMessage> messages)

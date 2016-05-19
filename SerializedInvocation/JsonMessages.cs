@@ -1,5 +1,7 @@
 using System;
+using AdoNet;
 using EventSourcing;
+using Newtonsoft.Json;
 
 namespace SerializedInvocation
 {
@@ -12,6 +14,25 @@ namespace SerializedInvocation
         }
 
         public static Action<JsonMessage> HandleInstance = m => { };
+
+        public static void Initialize<TEventStoreConnectionStringName>()
+            where TEventStoreConnectionStringName : class
+        {
+            HandleInstance = message =>
+            {
+                var subscriberMessage = new SubscriberMessage
+                {
+                    Subscription = (Subscription)JsonConvert.DeserializeObject(
+                        message.Subscription.Value,
+                        message.SubscriptionType),
+                    Notification = (IDomainEvent)JsonConvert.DeserializeObject(
+                        message.NotificationContent.Value,
+                        message.NotificationType)
+                };
+
+                EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.Handle(subscriberMessage);
+            };
+        }
     }
 
     public class JsonMessage

@@ -1,32 +1,30 @@
-﻿using System;
-using System.Configuration;
-using EventSourcing;
+﻿using EventSourcing;
 
 namespace AdoNet
 {
     public static class SqlStoreConfiguration
     {
-        public static EventStoreConfiguration ConfigurePublishers<EventStoreConnectionStringName>(this EventStoreConfiguration config)
-            where EventStoreConnectionStringName : class
+        public static EventStoreConfiguration ConfigurePublishers<TEventStoreConnectionStringName>(this EventStoreConfiguration config)
+            where TEventStoreConnectionStringName : class
         {
-            EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.NotificationsByCorrelations =
+            EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.NotificationsByCorrelationsFunction =
                 t => SqlEventStore.NotificationsByCorrelations(t.Value);
 
-            EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.PublisherVersionByPublisherDataContractCorrelations =
+            EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.PublisherVersionByPublisherDataContractCorrelationsFunction =
                 t => SqlEventStore.PublisherVersionByContractAndCorrelations(t.Value);
 
-            EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.SaveNotificationsByPublisherAndVersion =
+            EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.SaveNotificationsByPublisherAndVersionAction =
                 t => SqlEventStore.SaveNotificationsByPublisherAndVersion(t.Value);
 
-            EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.CommitEventStoreConnection =
-                AdoNetTransaction<EventStoreConnectionStringName>.CommitWork(ConnectionString.ByName);
+            EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.CommitEventStoreConnection =
+                AdoNetTransaction<TEventStoreConnectionStringName>.CommitWork(ConnectionString.ByName);
             return config;
         }
 
-        public static EventStoreConfiguration ConfigurePublishingNotifications<EventStoreConnectionStringName>(this EventStoreConfiguration config)
-            where EventStoreConnectionStringName : class
+        public static EventStoreConfiguration ConfigurePublishingNotifications<TEventStoreConnectionStringName>(this EventStoreConfiguration config)
+            where TEventStoreConnectionStringName : class
         {
-            EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.Post = PostBox<AdoNetTransactionScope>.Post;
+            EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.Post = PostBox<AdoNetTransactionScope>.Post;
             return config;
         }        
     }

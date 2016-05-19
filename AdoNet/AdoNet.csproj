@@ -56,7 +56,6 @@
     <Compile Include="SqlEventStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Transactions.cs" />
-    <Compile Include="ViewStore.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EventSourcing\Core.csproj">
@@ -64,7 +63,7 @@
       <Name>Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Polling\Polling.csproj">
-      <Project>{cddcefe4-144a-40fe-8f95-d22b50283267}</Project>
+      <Project>{CDDCEFE4-144A-40FE-8F95-D22B50283267}</Project>
       <Name>Polling</Name>
     </ProjectReference>
   </ItemGroup>

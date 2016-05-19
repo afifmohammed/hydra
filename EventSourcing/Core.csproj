@@ -58,7 +58,7 @@
     <Compile Include="Subscribers.cs" />
     <Compile Include="Subscriptions.cs" />
     <Compile Include="Transactions.cs" />
-    <Compile Include="ViewStore.cs" />
+    <Compile Include="ConsumerStore.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
