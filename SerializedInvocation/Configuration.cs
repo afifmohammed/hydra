@@ -10,12 +10,11 @@ namespace SerializedInvocation
 {
     public static class HangfireConfiguration
     {
-        public static EventStoreConfiguration ConfigureTransport<THangfireConnectionStringName, TEventStoreConnectionStringName>(
+        public static EventStoreConfiguration ConfigureTransport<THangfireConnectionStringName>(
             this EventStoreConfiguration config)
-            where TEventStoreConnectionStringName : class
             where THangfireConnectionStringName : class
         {
-            Initialize<THangfireConnectionStringName, TEventStoreConnectionStringName>();
+            Initialize<THangfireConnectionStringName>();
 
             PostBox<AdoNetTransactionScope>.CommitTransportConnection = AdoNetTransactionScope.Commit();
 
@@ -24,9 +23,8 @@ namespace SerializedInvocation
             return config;
         }
 
-        static void Initialize<THangfireConnectionStringName, TEventStoreConnectionStringName>()
+        static void Initialize<THangfireConnectionStringName>()
             where THangfireConnectionStringName : class
-            where TEventStoreConnectionStringName : class
         {
             GlobalConfiguration.Configuration.UseSqlServerStorage(
                 nameOrConnectionString: ConnectionString.ByName(typeof(THangfireConnectionStringName).FriendlyName()),
@@ -35,8 +33,6 @@ namespace SerializedInvocation
                     PrepareSchemaIfNecessary = true,
                     QueuePollInterval = TimeSpan.FromSeconds(1)
                 });
-
-            JsonMessageHandler.Initialize<TEventStoreConnectionStringName>();
         }
 
         static void Enqueue(AdoNetTransactionScope endpoint, IEnumerable<SubscriberMessage> messages)

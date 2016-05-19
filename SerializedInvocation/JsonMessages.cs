@@ -1,5 +1,4 @@
 using System;
-using AdoNet;
 using EventSourcing;
 using Newtonsoft.Json;
 
@@ -10,29 +9,13 @@ namespace SerializedInvocation
         [UseQueueFromParameter(0)]
         public static void Handle(JsonMessage message)
         {
-            HandleInstance(message);
+            HandleInstance(message.AsSubscriberMessage());
         }
 
-        public static Action<JsonMessage> HandleInstance = m => { };
-
-        public static void Initialize<TEventStoreConnectionStringName>()
-            where TEventStoreConnectionStringName : class
-        {
-            HandleInstance = message =>
-            {
-                var subscriberMessage = new SubscriberMessage
-                {
-                    Subscription = (Subscription)JsonConvert.DeserializeObject(
-                        message.Subscription.Value,
-                        message.SubscriptionType),
-                    Notification = (IDomainEvent)JsonConvert.DeserializeObject(
-                        message.NotificationContent.Value,
-                        message.NotificationType)
-                };
-
-                EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.Handle(subscriberMessage);
-            };
-        }
+        /// <summary>
+        /// To be overriden at the server that deserialises and invokes this call
+        /// </summary>
+        public static Action<SubscriberMessage> HandleInstance = m => { };
     }
 
     public class JsonMessage
@@ -56,5 +39,23 @@ namespace SerializedInvocation
         public JsonContent NotificationContent { get; set; }
         public Type NotificationType { get; set; }
         public Type SubscriptionType { get; set; }
+    }
+
+    public static class JsonMessageConverter
+    {
+        public static SubscriberMessage AsSubscriberMessage(this JsonMessage message)
+        {
+            var subscriberMessage = new SubscriberMessage
+            {
+                Subscription = (Subscription) JsonConvert.DeserializeObject(
+                    message.Subscription.Value,
+                    message.SubscriptionType),
+                Notification = (IDomainEvent) JsonConvert.DeserializeObject(
+                    message.NotificationContent.Value,
+                    message.NotificationType)
+            };
+
+            return subscriberMessage;
+        }
     }    
 }

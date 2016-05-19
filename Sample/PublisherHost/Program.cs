@@ -16,7 +16,7 @@ namespace PublisherHost
             new EventStoreConfiguration()
                 .ConfigurePublishers<EventStoreConnectionString>()
                 .ConfigurePublishingNotifications<EventStoreConnectionString>()
-                .ConfigureTransport<EventStoreTransportConnectionString, EventStoreConnectionString>()
+                .ConfigureTransport<EventStoreTransportConnectionString>()
                 .ConfigureSubscriptions(
                     InventoryItemStockHandler.Subscriptions(),
                     RefundProductOrderHandler.Subscriptions());

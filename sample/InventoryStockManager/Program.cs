@@ -13,7 +13,7 @@ namespace WebApi
         static void Main(string[] args)
         {
             new EventStoreConfiguration()
-                .ConfigureTransport<EventStoreTransportConnectionString, EventStoreConnectionString>()
+                .ConfigureTransport<EventStoreTransportConnectionString>()
                 .ConfigureSubscriptions(
                     InventoryItemStockHandler.Subscriptions(),
                     RefundProductOrderHandler.Subscriptions());
