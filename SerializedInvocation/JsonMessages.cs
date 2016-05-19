@@ -13,7 +13,7 @@ namespace SerializedInvocation
         }
 
         /// <summary>
-        /// To be overriden at the server that deserialises and invokes this call
+        /// To be overriden at the server where the <see cref="Handle"/> job is deserialized and invoked 
         /// </summary>
         public static Action<SubscriberMessage> HandleInstance = m => { };
     }
