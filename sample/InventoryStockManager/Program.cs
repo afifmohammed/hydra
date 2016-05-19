@@ -1,5 +1,4 @@
 ﻿using System;
-using AdoNet;
 using EventSourcing;
 using Nancy;
 using Nancy.Hosting.Self;
@@ -13,8 +12,8 @@ namespace WebApi
     {
         static void Main(string[] args)
         {
-            new EventStoreConfiguration()
-                .ConfigureTransport<EventStoreTransportConnectionString, EventStoreConnectionString>()
+            EventStoreWithTransportConfiguration<EventStoreConnectionString>
+                .CreateWithTransport<EventStoreTransportConnectionString>()
                 .ConfigureSubscriptions(
                     InventoryItemStockHandler.Subscriptions(),
                     RefundProductOrderHandler.Subscriptions());

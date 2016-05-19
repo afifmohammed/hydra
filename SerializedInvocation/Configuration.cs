@@ -10,7 +10,7 @@ namespace SerializedInvocation
 {
     public static class HangfireConfiguration
     {
-        public static EventStoreConfiguration ConfigureTransport<HangfireConnectionStringName, EventStoreConnectionStringName>(
+        internal static EventStoreConfiguration ConfigureTransport<HangfireConnectionStringName, EventStoreConnectionStringName>(
             this EventStoreConfiguration config)
             where EventStoreConnectionStringName : class
             where HangfireConnectionStringName : class
@@ -41,11 +41,11 @@ namespace SerializedInvocation
                 var subscriberMessage = new SubscriberMessage();
 
                 subscriberMessage.Subscription = (Subscription)JsonConvert.DeserializeObject(
-                    message.Subscription.Value, 
+                    message.Subscription.Value,
                     message.SubscriptionType);
 
                 subscriberMessage.Notification = (IDomainEvent)JsonConvert.DeserializeObject(
-                    message.NotificationContent.Value, 
+                    message.NotificationContent.Value,
                     message.NotificationType);
 
                 EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.Handle(subscriberMessage);
@@ -59,6 +59,6 @@ namespace SerializedInvocation
                 var message = new JsonMessage(subscriberMessage);
                 BackgroundJob.Enqueue(() => JsonMessageHandler.Handle(message));
             }
-        }        
+        }
     }
 }

@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventStoreWithTransportConfiguration.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="DynamicQueueRouting.cs" />
     <Compile Include="JsonMessages.cs" />

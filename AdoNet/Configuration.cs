@@ -1,12 +1,10 @@
-﻿using System;
-using System.Configuration;
-using EventSourcing;
+﻿using EventSourcing;
 
 namespace AdoNet
 {
     public static class SqlStoreConfiguration
     {
-        public static EventStoreConfiguration ConfigurePublishers<EventStoreConnectionStringName>(this EventStoreConfiguration config)
+        internal static EventStoreConfiguration ConfigurePublishers<EventStoreConnectionStringName>(this EventStoreConfiguration config)
             where EventStoreConnectionStringName : class
         {
             EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.NotificationsByCorrelations =
@@ -23,11 +21,12 @@ namespace AdoNet
             return config;
         }
 
-        public static EventStoreConfiguration ConfigurePublishingNotifications<EventStoreConnectionStringName>(this EventStoreConfiguration config)
+        internal static EventStoreConfiguration ConfigurePublishingNotifications<EventStoreConnectionStringName>(this EventStoreConfiguration config)
             where EventStoreConnectionStringName : class
         {
             EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.Post = PostBox<AdoNetTransactionScope>.Post;
             return config;
-        }        
+        }
     }
+
 }
