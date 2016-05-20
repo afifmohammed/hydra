@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AdoNet;
+using System;
 using System.Linq;
 using EventSourcing;
 using Hangfire;
@@ -12,13 +13,15 @@ namespace PublisherHost
     {
         static void Main(string[] args)
         {
-            EventStoreConfiguration<EventStoreConnectionString, EventStoreTransportConnectionString>
-                .CreateWithTransport()  
+           new EventStoreConfiguration()             
+                .ConfigureEventStoreWithTransportConnection<EventStoreConnectionString, EventStoreTransportConnectionString>()
+                .ConfigureTransport()
                 .ConfigurePublishers()
-                .ConfigurePublishingNotifications()      
+                .ConfigurePublishingNotifications()
                 .ConfigureSubscriptions(
                     InventoryItemStockHandler.Subscriptions(),
                     RefundProductOrderHandler.Subscriptions());
+
 
             var options = new BackgroundJobServerOptions
             {

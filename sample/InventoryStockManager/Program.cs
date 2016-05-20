@@ -12,9 +12,10 @@ namespace WebApi
     {
         static void Main(string[] args)
         {
-            EventStoreWithTransportConfiguration<EventStoreConnectionString>
-                .CreateWithTransport<EventStoreTransportConnectionString>()
-                .ConfigureSubscriptions(
+            new EventStoreConfiguration()
+                 .ConfigureEventStoreWithTransportConnection<EventStoreConnectionString, EventStoreTransportConnectionString>()
+                 .ConfigureTransport()
+                 .ConfigureSubscriptions(
                     InventoryItemStockHandler.Subscriptions(),
                     RefundProductOrderHandler.Subscriptions());
 

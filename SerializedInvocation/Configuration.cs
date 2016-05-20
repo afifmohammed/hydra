@@ -10,12 +10,20 @@ namespace SerializedInvocation
 {
     public static class HangfireConfiguration
     {
-        internal static EventStoreConfiguration ConfigureTransport<HangfireConnectionStringName, EventStoreConnectionStringName>(
+        public static EventStoreConfiguration<TEventSource, TTransport> ConfigureEventStoreWithTransportConnection<TEventSource, TTransport>(
             this EventStoreConfiguration config)
+            where TEventSource : class
+            where TTransport : class
+        {
+            return new EventStoreConfiguration<TEventSource, TTransport>();
+        }
+
+        public static EventStoreConfiguration<EventStoreConnectionStringName, HangfireConnectionStringName> ConfigureTransport<EventStoreConnectionStringName, HangfireConnectionStringName>(
+            this EventStoreConfiguration<EventStoreConnectionStringName, HangfireConnectionStringName> config)
             where EventStoreConnectionStringName : class
             where HangfireConnectionStringName : class
         {
-            Initialize<HangfireConnectionStringName, EventStoreConnectionStringName>();
+            Initialize<EventStoreConnectionStringName, HangfireConnectionStringName>();
 
             PostBox<AdoNetTransactionScope>.CommitTransportConnection = AdoNetTransactionScope.Commit();
 
@@ -24,7 +32,7 @@ namespace SerializedInvocation
             return config;
         }
 
-        static void Initialize<HangfireConnectionStringName, EventStoreConnectionStringName>()
+        static void Initialize<EventStoreConnectionStringName, HangfireConnectionStringName>()
             where HangfireConnectionStringName : class
             where EventStoreConnectionStringName : class
         {

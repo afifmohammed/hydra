@@ -4,7 +4,7 @@ namespace AdoNet
 {
     public static class SqlStoreConfiguration
     {
-        internal static EventStoreConfiguration ConfigurePublishers<EventStoreConnectionStringName>(this EventStoreConfiguration config)
+        public static EventStoreConfiguration<EventStoreConnectionStringName> ConfigurePublishers<EventStoreConnectionStringName>(this EventStoreConfiguration<EventStoreConnectionStringName> config)
             where EventStoreConnectionStringName : class
         {
             EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.NotificationsByCorrelations =
@@ -21,12 +21,16 @@ namespace AdoNet
             return config;
         }
 
-        internal static EventStoreConfiguration ConfigurePublishingNotifications<EventStoreConnectionStringName>(this EventStoreConfiguration config)
+        public static EventStoreConfiguration<EventStoreConnectionStringName> ConfigurePublishingNotifications<EventStoreConnectionStringName>(this EventStoreConfiguration<EventStoreConnectionStringName> config)
             where EventStoreConnectionStringName : class
         {
             EventStore<AdoNetTransaction<EventStoreConnectionStringName>>.Post = PostBox<AdoNetTransactionScope>.Post;
             return config;
         }
-    }
 
+        public static EventStoreConfiguration<TEventStore> ConfigureEventStoreConnection<TEventStore>(this EventStoreConfiguration config) where TEventStore : class
+        {
+            return new EventStoreConfiguration<TEventStore>();
+        }
+    }
 }
