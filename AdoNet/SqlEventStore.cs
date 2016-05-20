@@ -69,17 +69,12 @@ namespace AdoNet
         {
             return correlations =>
             {
-                var param = correlations.AsPublisherNameAndCorrelation();
                 return transaction.Connection
                     .Query<int>(
                         sql: "GetPublisherVersion",
                         transaction: transaction,
                         commandType: CommandType.StoredProcedure,
-                        param: new
-                        {
-                            Name = param.Item1,
-                            Correlation = param.Item2
-                        })
+                        param: correlations.AsPublisherNameAndCorrelation().As(x => new { Name = x.Item1, Correlation = x.Item2 }))
                     .FirstOrDefault();
             };
         }
