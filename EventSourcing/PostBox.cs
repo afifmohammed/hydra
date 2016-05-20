@@ -49,7 +49,7 @@ namespace EventSourcing
     {
         public static readonly List<SubscriberMessagesByNotification> SubscriberMessagesByNotificationList =
             new List<SubscriberMessagesByNotification>()
-                .With(x => x.Add(e => PublisherChannel.PrepareMessages(e, EventStore.PublishersBySubscription)));
+                .With(x => x.Add(e => Messages.PrepareMessages(e, EventStore.PublishersBySubscription.Keys)));
 
         public static NotifyViaPost NotifyViaPost = (notification, subscriberMessagesByNotification, post) =>
             post(subscriberMessagesByNotification(notification));

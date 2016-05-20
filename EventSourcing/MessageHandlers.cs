@@ -4,95 +4,91 @@ using System.Linq;
 
 namespace EventSourcing
 {
+    public delegate void Handle(SubscriberMessage message);
+    
     public class SubscriberMessage
     {
         public Subscription Subscription { get; set; }
         public IDomainEvent Notification { get; set; }
     }
 
-    public class MessageToPublisher : SubscriberMessage
-    {}
-
-    public class MessageToConsumer<TEndpoint> : SubscriberMessage
-    {}
-
-    public delegate IEnumerable<MessageToPublisher> PrepareMessages(
-        IDomainEvent notification,
-        PublishersBySubscription publishersBySubscription);
-
-    public delegate IEnumerable<MessageToConsumer<TEndpoint>> PrepareMessages<TEndpoint>(
-        IDomainEvent notification,
-        ConsumersBySubscription<TEndpoint> consumersBySubscription);
-
     public delegate void Handler(
-        MessageToPublisher messageToPublisher,
+        SubscriberMessage messageToPublisher,
         PublishersBySubscription publishersBySubscription,
         NotificationsByCorrelations notificationsByCorrelations,
         Func<IEnumerable<Correlation>, int> publisherVersionByPublisherDataContractCorrelations,
         Func<DateTimeOffset> clock,
         Action<NotificationsByPublisherAndVersion> saveNotificationsByPublisherAndVersion,
-        Action<IEnumerable<MessageToPublisher>> notify);
+        Action<IEnumerable<SubscriberMessage>> notify);
 
     public delegate void Handler<TEndpoint>(
-        MessageToConsumer<TEndpoint> messageToConsumer,
+        SubscriberMessage messageToConsumer,
         ConsumersBySubscription<TEndpoint> consumersBySubscription,
         NotificationsByCorrelations notificationsByCorrelations,
         Func<DateTimeOffset> clock,
         TEndpoint endpoint);
 
-    public static class ConsumerChannel<TEndpoint>
-    {
-        public static PrepareMessages<TEndpoint> PrepareMessages = (notification, consumersBySubscription) => 
-            consumersBySubscription
-                .Where(p => p.Key.NotificationContract.Equals(new TypeContract(notification)))
-                .Select(p => new MessageToConsumer<TEndpoint> { Notification = notification, Subscription = p.Key });
+    public delegate IEnumerable<SubscriberMessage> PrepareMessages(
+        IDomainEvent notification,
+        IEnumerable<Subscription> subscriptions);
 
-        public static Handler<TEndpoint> Handler => (
-            messageToConsumer, 
-            consumersBySubscription, 
-            notificationsByCorrelations, 
-            clock, 
-            endpoint) => 
-            consumersBySubscription[messageToConsumer.Subscription]
-            (
-                messageToConsumer.Notification, 
-                notificationsByCorrelations, 
-                clock, 
-                endpoint
-            );
+    public static class Messages
+    {
+        public static PrepareMessages PrepareMessages = (notification, subscriptions) =>
+                subscriptions
+                    .Where(subscription => subscription.NotificationContract.Equals(new TypeContract(notification)))
+                    .Select(subscription => new SubscriberMessage { Notification = notification, Subscription = subscription });
     }
 
-    public static class PublisherChannel
+    public static class HandlerWithNoSideEffects
     {
-        public static PrepareMessages PrepareMessages = (notification, publishersBySubscription) =>  
-            publishersBySubscription
-                .Where(p => p.Key.NotificationContract.Equals(new TypeContract(notification)))
-                .Select(p => new MessageToPublisher {Notification = notification, Subscription = p.Key});
+        public static Handler Handle = (
+            SubscriberMessage message,
+            PublishersBySubscription publishersBySubscription,
+            NotificationsByCorrelations notificationsByCorrelations,
+            Func<IEnumerable<Correlation>, int> publisherVersionByPublisherDataContractCorrelations,
+            Func<DateTimeOffset> clock,
+            Action<NotificationsByPublisherAndVersion> saveNotificationsByPublisherAndVersion,
+            Action<IEnumerable<SubscriberMessage>> notify) =>
+        {
+            var publisher = publishersBySubscription[message.Subscription];
 
-        public static Handler Handler = (
-            messageToPublisher, 
-            publishersBySubscription, 
-            notificationsByCorrelations, 
-            publisherVersionByPublisherDataContractCorrelations, 
-            clock, 
-            saveNotificationsByPublisherAndVersion, 
-            notify) =>
-            {
-                var publisher = publishersBySubscription[messageToPublisher.Subscription];
+            var notificationsByPublisher = publisher(
+                message.Notification,
+                notificationsByCorrelations,
+                clock);
 
-                var notificationsByPublisher = publisher(messageToPublisher.Notification, notificationsByCorrelations,
-                    clock);
+            var notificationsByPublisherAndVersion = Functions.AppendPublisherVersion(
+                notificationsByPublisher,
+                publisherVersionByPublisherDataContractCorrelations);
 
-                var notificationsByPublisherAndVersion = Functions.AppendPublisherVersion(
-                    notificationsByPublisher,
-                    publisherVersionByPublisherDataContractCorrelations);
+            saveNotificationsByPublisherAndVersion(notificationsByPublisherAndVersion);
 
-                saveNotificationsByPublisherAndVersion(notificationsByPublisherAndVersion);
+            notify(notificationsByPublisher
+                .Notifications
+                .SelectMany(n => Messages.PrepareMessages(n.Item1, publishersBySubscription.Keys))
+                .ToArray());
+        };
+    }
 
-                notify(notificationsByPublisher
-                    .Notifications
-                    .SelectMany(n => PrepareMessages(n.Item1, publishersBySubscription))
-                    .ToArray());
-            };
+    public static class HandlerWithSideEffectsTo<TEndpoint>
+    {
+        public static Handler<TEndpoint> Handle = (
+            SubscriberMessage message,
+            ConsumersBySubscription<TEndpoint> consumersBySubscription,
+            NotificationsByCorrelations notificationsByCorrelations,
+            Func<DateTimeOffset> clock,
+            TEndpoint endpoint) =>
+        {
+            var consumer = consumersBySubscription[message.Subscription];
+
+            consumer
+            (
+                message.Notification,
+                notificationsByCorrelations,
+                clock,
+                endpoint
+            );
+        };
     }
 }
