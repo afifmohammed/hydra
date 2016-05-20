@@ -6,7 +6,7 @@ using EventSourcing;
 namespace Polling
 {
     public static class Functions
-    {        
+    {
         public static void Handle<TStreamConnection, TStateConnection>(            
             CommitWork<TStateConnection> commitState,
             CommitWork<TStreamConnection> commitStream,
@@ -20,26 +20,36 @@ namespace Polling
         {
             commitState
             (
-                stateEndpointConnection =>
-                {
-                    commitStream
+                stateEndpointConnection => commitStream
+                (
+                    streamEndpointConnection => ConsumeAndRecordLastSeen
                     (
-                        streamEndpointConnection =>
-                        {
-                            var lastSeen = Consume
-                            (
-                                lastSeen: lastSeenFunction(stateEndpointConnection),
-                                recentNotifications: recentNotificationsFunction(streamEndpointConnection),
-                                contracts: contracts,
-                                publish: publish
-                            );
-                            var recordLastSeen = recordLastSeenFunction(stateEndpointConnection);
-                            var id = lastSeen();
-                            recordLastSeen(id);
-                        }
-                    );                    
-                }
+                        lastSeenFunction(stateEndpointConnection),
+                        recentNotificationsFunction(streamEndpointConnection),
+                        contracts,
+                        publish,
+                        recordLastSeenFunction(stateEndpointConnection)
+                    )
+                )
             );
+        }
+
+        static void ConsumeAndRecordLastSeen(
+            LastSeen lastSeen,
+            RecentNotifications recentNotifications,
+            IEnumerable<TypeContract> contracts,
+            Action<IEnumerable<IDomainEvent>> publish,
+            RecordLastSeen recordLastSeen)
+        {
+            var id = Consume
+            (
+                lastSeen: lastSeen,
+                recentNotifications: recentNotifications,
+                contracts: contracts,
+                publish: publish
+            )();
+            
+            recordLastSeen(id);
         }
 
         static LastSeen Consume(
