@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace EventSourcing
 {
-    public delegate Func<IEnumerable<Correlation>, int> PublisherVersionByPublisherDataContractCorrelationsFunction<in TEndpointConnection>(
+    public delegate Func<IEnumerable<Correlation>, int> PublisherVersionByCorrelationsFunction<in TEndpointConnection>(
         TEndpointConnection connection) 
         where TEndpointConnection : EndpointConnection;
 
@@ -22,7 +22,7 @@ namespace EventSourcing
     public static class EventStore<TEndpointConnection> where TEndpointConnection : EndpointConnection
     {
         public static NotificationsByCorrelationsFunction<TEndpointConnection> NotificationsByCorrelationsFunction { get; set; }
-        public static PublisherVersionByPublisherDataContractCorrelationsFunction<TEndpointConnection> PublisherVersionByPublisherDataContractCorrelationsFunction { get; set; }
+        public static PublisherVersionByCorrelationsFunction<TEndpointConnection> PublisherVersionByCorrelationsFunction { get; set; }
         public static SaveNotificationsByPublisherAndVersionAction<TEndpointConnection> SaveNotificationsByPublisherAndVersionAction { get; set; }
         public static CommitWork<TEndpointConnection> CommitEventStoreConnection { get; set; }
         public static Post Post = messages => { };
@@ -33,7 +33,7 @@ namespace EventSourcing
             EventStore.PublishersBySubscription,
             HandlerWithNoSideEffects.Handle, 
             NotificationsByCorrelationsFunction,
-            PublisherVersionByPublisherDataContractCorrelationsFunction,
+            PublisherVersionByCorrelationsFunction,
             SaveNotificationsByPublisherAndVersionAction,
             CommitEventStoreConnection, 
             Post
@@ -44,7 +44,7 @@ namespace EventSourcing
             PublishersBySubscription publishersBySubscription,
             Handler handler,
             NotificationsByCorrelationsFunction<TEndpointConnection> notificationsByCorrelationsFunction,
-            PublisherVersionByPublisherDataContractCorrelationsFunction<TEndpointConnection> publisherVersionByPublisherDataContractCorrelationsFunction,
+            PublisherVersionByCorrelationsFunction<TEndpointConnection> publisherVersionByCorrelationsFunction,
             SaveNotificationsByPublisherAndVersionAction<TEndpointConnection> saveNotificationsByPublisherAndVersionAction,
             CommitWork<TEndpointConnection> commitWork, 
             Post post)
@@ -57,7 +57,7 @@ namespace EventSourcing
                     message,
                     publishersBySubscription,
                     notificationsByCorrelationsFunction(connection),
-                    publisherVersionByPublisherDataContractCorrelationsFunction(connection),
+                    publisherVersionByCorrelationsFunction(connection),
                     () => DateTimeOffset.Now,
                     saveNotificationsByPublisherAndVersionAction(connection),
                     messages => list.AddRange(messages));

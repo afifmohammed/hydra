@@ -10,7 +10,7 @@ namespace AdoNet
             EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.NotificationsByCorrelationsFunction =
                 t => SqlEventStore.NotificationsByCorrelations(t.Value);
 
-            EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.PublisherVersionByPublisherDataContractCorrelationsFunction =
+            EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.PublisherVersionByCorrelationsFunction =
                 t => SqlEventStore.PublisherVersionByContractAndCorrelations(t.Value);
 
             EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.SaveNotificationsByPublisherAndVersionAction =
