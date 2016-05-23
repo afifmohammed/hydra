@@ -16,12 +16,12 @@ namespace RequestPipeline
 
     public static class RequestPipeline<TProvider> where TProvider : IProvider
     {
-        public static Func<TRequest, Response<Unit>> Dispatch<TRequest>(IEnumerable<Subscription> subscriptions) where TRequest : IRequest<Unit>, ICorrelated => 
+        public static Func<TRequest, Response<Unit>> Dispatch<TRequest>(Func<IEnumerable<Subscription>> getSubscriptions) where TRequest : IRequest<Unit>, ICorrelated => 
             input => RequestPipeline<TRequest, Unit>.DispatchThroughPipeline(
                 input,
                 request =>
                 {
-                    PostBox<TProvider>.Drop(subscriptions)(new Placed<TRequest> {Command = request});
+                    PostBox<TProvider>.Drop(getSubscriptions)(new Placed<TRequest> {Command = request});
                     return Enumerable.Empty<Unit>();
                 });
     }

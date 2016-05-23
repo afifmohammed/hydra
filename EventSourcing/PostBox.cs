@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace EventSourcing
 {
-    public delegate Action<IDomainEvent> Notify(IEnumerable<Subscription> subscriptions);
+    public delegate Action<IDomainEvent> Notify(Func<IEnumerable<Subscription>> subscriptions);
 
     public delegate void Post(IEnumerable<SubscriberMessage> messages);
 
@@ -19,9 +19,9 @@ namespace EventSourcing
         public static CommitWork<TProvider> CommitWork { get; set; }
 
         public static Notify Drop = 
-            subscriptions =>
+            getSubscriptions =>
                 notification => 
-                    Post(SubscriberMessages.By(notification, subscriptions));
+                    Post(SubscriberMessages.By(notification, getSubscriptions()));
             
         public static Post Post = messages => CommitWork(provider => Enqueue(provider, messages));
     }
