@@ -11,6 +11,8 @@ namespace EventSourcing
     public class ConsumersBySubscription<TEndpoint1, TEndpoint2> : Dictionary<Subscription, Consumer<TEndpoint1, TEndpoint2>>
     { }
 
+    public class Subscriptions : Dictionary<Subscription, Handle> { }
+
     public struct Subscription
     {
         public Subscription(TypeContract notificationContract, TypeContract subscriberDataContract)
