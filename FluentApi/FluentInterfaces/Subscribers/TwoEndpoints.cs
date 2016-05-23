@@ -152,7 +152,7 @@ namespace EventSourcing
             IntegratorBySubscription.Add
             (
                 new Subscription(typeof(TNotification).Contract(), typeof(TSubscriberDataContract).Contract()),
-                (notification, queryNotificationsByCorrelations, clock, endpoint1, endpoint2) => Functions.BuildConsumer
+                (notification, queryNotificationsByCorrelations, clock, endpoint1, endpoint2) => Functions.BuildIntegrator
                                     (
                                         handler,
                                         _subscriberDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => x.Select(a => a.Value)),

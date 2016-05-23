@@ -14,14 +14,14 @@ namespace RequestPipeline
         }
     }
 
-    public static class RequestPipeline<TEndpointConnection> where TEndpointConnection : IProvider
+    public static class RequestPipeline<TProvider> where TProvider : IProvider
     {
         public static Func<TRequest, Response<Unit>> Dispatch<TRequest>(IEnumerable<Subscription> subscriptions) where TRequest : IRequest<Unit>, ICorrelated => 
             input => RequestPipeline<TRequest, Unit>.DispatchThroughPipeline(
                 input,
                 request =>
                 {
-                    PostBox<TEndpointConnection>.Drop(subscriptions)(new Placed<TRequest> {Command = request});
+                    PostBox<TProvider>.Drop(subscriptions)(new Placed<TRequest> {Command = request});
                     return Enumerable.Empty<Unit>();
                 });
     }

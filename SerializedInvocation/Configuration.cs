@@ -35,7 +35,7 @@ namespace SerializedInvocation
                 });
         }
 
-        static void Enqueue(AdoNetTransactionScopeProvider endpoint, IEnumerable<SubscriberMessage> messages)
+        static void Enqueue(AdoNetTransactionScopeProvider provider, IEnumerable<SubscriberMessage> messages)
         {
             foreach (var subscriberMessage in messages)
             {

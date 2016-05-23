@@ -7,10 +7,10 @@ namespace Tests
 {
     static class Extensions
     {
-        public static ConsumerContractSubscriptions<TSubscriberDataContract, TEndpoint> Notify<TSubscriberDataContract, TEndpoint>(
-            this ConsumerContractSubscriptions<TSubscriberDataContract, TEndpoint> consumerContractSubscriptions,
+        public static ConsumerContractSubscriptions<TSubscriberDataContract, TProvider> Notify<TSubscriberDataContract, TProvider>(
+            this ConsumerContractSubscriptions<TSubscriberDataContract, TProvider> consumerContractSubscriptions,
             IDomainEvent notification,
-            TEndpoint endpoint) 
+            TProvider provider) 
             where TSubscriberDataContract : new()
         {
             consumerContractSubscriptions
@@ -19,7 +19,7 @@ namespace Tests
                     notification, 
                     NotificationsByCorrelations(), 
                     () => DateTimeOffset.Now, 
-                    endpoint
+                    provider
                 );
             return consumerContractSubscriptions;
         }

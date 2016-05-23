@@ -23,6 +23,6 @@ namespace EventSourcing
                 notification => 
                     Post(SubscriberMessages.By(notification, subscriptions));
             
-        public static Post Post = messages => CommitWork(endpoint => Enqueue(endpoint, messages));
+        public static Post Post = messages => CommitWork(provider => Enqueue(provider, messages));
     }
 }

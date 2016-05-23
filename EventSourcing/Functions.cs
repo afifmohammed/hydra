@@ -19,11 +19,11 @@ namespace EventSourcing
             };
         }
 
-        public static Action<TNotification> BuildConsumer<TConsumerData, TNotification, TEndpoint>(
-            Action<TConsumerData, TNotification, TEndpoint> consumer,
+        public static Action<TNotification> BuildExporter<TConsumerData, TNotification, TExportProvider>(
+            Action<TConsumerData, TNotification, TExportProvider> consumer,
             IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByConsumerDataContract,
             NotificationsByCorrelations notificationsByCorrelations,
-            TEndpoint endpoint,
+            TExportProvider exportProvider,
             IDictionary<TypeContract, Func<TConsumerData, JsonContent, TConsumerData>> consumerDataMappersByNotificationContract,
             Func<DateTimeOffset> clock)
             where TConsumerData : new()
@@ -43,17 +43,17 @@ namespace EventSourcing
                         new TConsumerData()
                     ),
                     notification,
-                    endpoint
+                    exportProvider
                 );
             };
         }
 
-        public static Action<TNotification> BuildConsumer<TConsumerData, TNotification, TEndpoint1, TEndpoint2>(
-            Action<TConsumerData, TNotification, TEndpoint1, TEndpoint2> consumer,
+        public static Action<TNotification> BuildIntegrator<TConsumerData, TNotification, TProvider1, TProvider2>(
+            Action<TConsumerData, TNotification, TProvider1, TProvider2> consumer,
             IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByConsumerDataContract,
             NotificationsByCorrelations notificationsByCorrelations,
-            TEndpoint1 endpoint1,
-            TEndpoint2 endpoint2,
+            TProvider1 provider1,
+            TProvider2 provider2,
             IDictionary<TypeContract, Func<TConsumerData, JsonContent, TConsumerData>> consumerDataMappersByNotificationContract,
             Func<DateTimeOffset> clock)
             where TConsumerData : new()
@@ -74,8 +74,8 @@ namespace EventSourcing
                         new TConsumerData()
                     ),
                     notification,
-                    endpoint1,
-                    endpoint2
+                    provider1,
+                    provider2
                 );
             };
         }
