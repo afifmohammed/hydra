@@ -7,28 +7,28 @@ namespace Polling
 {
     public static class Functions
     {
-        public static void Handle<TStreamConnection, TStateConnection>(            
-            CommitWork<TStateConnection> commitState,
-            CommitWork<TStreamConnection> commitStream,
-            Func<TStateConnection, LastSeen> lastSeenFunction,
-            Func<TStreamConnection, RecentNotifications> recentNotificationsFunction,
+        public static void Handle<TStreamProvider, TStateProvider>(            
+            CommitWork<TStateProvider> commitState,
+            CommitWork<TStreamProvider> commitStream,
+            Func<TStateProvider, LastSeen> lastSeenFunction,
+            Func<TStreamProvider, RecentNotifications> recentNotificationsFunction,
             IEnumerable<TypeContract> contracts,
             Action<IEnumerable<IDomainEvent>> publish,
-            Func<TStateConnection, RecordLastSeen> recordLastSeenFunction) 
-            where TStreamConnection : IProvider
-            where TStateConnection : IProvider
+            Func<TStateProvider, RecordLastSeen> recordLastSeenFunction) 
+            where TStreamProvider : IProvider
+            where TStateProvider : IProvider
         {
             commitState
             (
-                stateEndpointConnection => commitStream
+                stateProvider => commitStream
                 (
-                    streamEndpointConnection => ConsumeAndRecordLastSeen
+                    streamProvider => ConsumeAndRecordLastSeen
                     (
-                        lastSeenFunction(stateEndpointConnection),
-                        recentNotificationsFunction(streamEndpointConnection),
+                        lastSeenFunction(stateProvider),
+                        recentNotificationsFunction(streamProvider),
                         contracts,
                         publish,
-                        recordLastSeenFunction(stateEndpointConnection)
+                        recordLastSeenFunction(stateProvider)
                     )
                 )
             );

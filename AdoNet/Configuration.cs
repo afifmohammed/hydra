@@ -16,7 +16,7 @@ namespace AdoNet
             EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.SaveNotificationsByPublisherAndVersionAction =
                 t => SqlEventStore.SaveNotificationsByPublisherAndVersion(t.Value);
 
-            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.CommitEventStoreConnection =
+            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.CommitEventStoreWork =
                 AdoNetTransactionProvider<TEventStoreConnectionStringName>.CommitWork(ConnectionString.ByName);
             return config;
         }

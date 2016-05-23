@@ -3,39 +3,39 @@ using System.Collections.Generic;
 
 namespace Requests
 {
-    public class RequestsRegistration<TConnection> where TConnection : IDisposable
+    public class RequestsRegistration<TProvider> where TProvider : IDisposable
     {
-        readonly Func<TConnection> _connectionFactory;
+        readonly Func<TProvider> _providerFactory;
 
-        public RequestsRegistration(Func<TConnection> connectionFactory)
+        public RequestsRegistration(Func<TProvider> providerFactory)
         {
-            _connectionFactory = connectionFactory;
+            _providerFactory = providerFactory;
         }
 
-        public RequestsRegistration<TConnection> Register<TInput, TOutput>(
-            Func<TInput, TConnection, TOutput> function,
-            Func<Func<TInput, TConnection, TOutput>, Func<TInput, TConnection, IEnumerable<TOutput>>> list)
+        public RequestsRegistration<TProvider> Register<TInput, TOutput>(
+            Func<TInput, TProvider, TOutput> function,
+            Func<Func<TInput, TProvider, TOutput>, Func<TInput, TProvider, IEnumerable<TOutput>>> list)
             where TOutput : class
         {
-            RequestHandlers.Routes.Add(Function.ToKvp(list(function), ProvideConnection));
+            RequestHandlers.Routes.Add(Function.ToKvp(list(function), ProvideProvider));
             return this;
         }
 
-        public RequestsRegistration<TConnection> Register<TInput, TOutput>(
-            Func<TInput, TConnection, IEnumerable<TOutput>> function)
+        public RequestsRegistration<TProvider> Register<TInput, TOutput>(
+            Func<TInput, TProvider, IEnumerable<TOutput>> function)
             where TOutput : class
         {
-            RequestHandlers.Routes.Add(Function.ToKvp(function, ProvideConnection));
+            RequestHandlers.Routes.Add(Function.ToKvp(function, ProvideProvider));
             return this;
         }
 
-        Func<TInput, IEnumerable<TResult>> ProvideConnection<TInput, TResult>(
-            Func<TInput, TConnection, IEnumerable<TResult>> query)
+        Func<TInput, IEnumerable<TResult>> ProvideProvider<TInput, TResult>(
+            Func<TInput, TProvider, IEnumerable<TResult>> query)
             where TResult : class
         {
             return input =>
             {
-                using (var c = _connectionFactory())
+                using (var c = _providerFactory())
                     return query(input, c);
             };
         }

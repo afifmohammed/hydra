@@ -41,15 +41,15 @@ namespace EventSourcing
         {
             commitExportProvider
             (
-                consumerEndpointConnection => commitEventStoreProvider
+                exportProvider => commitEventStoreProvider
                 (
-                    eventStoreConnection => handler
+                    eventStoreProvider => handler
                     (
                         message,
                         exportersBySubscription,
-                        notificationsByCorrelationsFunction(eventStoreConnection),
+                        notificationsByCorrelationsFunction(eventStoreProvider),
                         clock,
-                        consumerEndpointConnection
+                        exportProvider
                     )
                 )
             );

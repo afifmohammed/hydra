@@ -5,18 +5,18 @@ using System.Linq;
 namespace EventSourcing
 {
     public delegate Func<IEnumerable<Correlation>, int> PublisherVersionByCorrelationsFunction<in TProvider>(
-        TProvider connection) 
+        TProvider provider) 
         where TProvider : IProvider;
 
     public delegate IEnumerable<SerializedNotification> NotificationsByCorrelations(
         IEnumerable<Correlation> correlation);
 
     public delegate NotificationsByCorrelations NotificationsByCorrelationsFunction<in TProvider>(
-        TProvider connection) 
+        TProvider provider) 
         where TProvider : IProvider;
 
     public delegate Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersionAction<in TProvider>(
-        TProvider connection) 
+        TProvider provider) 
         where TProvider : IProvider;
 
     public static class EventStore<TProvider> where TProvider : IProvider
@@ -24,7 +24,7 @@ namespace EventSourcing
         public static NotificationsByCorrelationsFunction<TProvider> NotificationsByCorrelationsFunction { get; set; }
         public static PublisherVersionByCorrelationsFunction<TProvider> PublisherVersionByCorrelationsFunction { get; set; }
         public static SaveNotificationsByPublisherAndVersionAction<TProvider> SaveNotificationsByPublisherAndVersionAction { get; set; }
-        public static CommitWork<TProvider> CommitEventStoreConnection { get; set; }
+        public static CommitWork<TProvider> CommitEventStoreWork { get; set; }
         public static Post Post = messages => { };
 
         public static Subscriber Subscriber = message => 
@@ -35,7 +35,7 @@ namespace EventSourcing
                 NotificationsByCorrelationsFunction,
                 PublisherVersionByCorrelationsFunction,
                 SaveNotificationsByPublisherAndVersionAction,
-                CommitEventStoreConnection, 
+                CommitEventStoreWork, 
                 Post
             );
 
