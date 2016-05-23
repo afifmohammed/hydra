@@ -109,13 +109,13 @@ BEGIN
 	SET NOCOUNT ON
 	IF @ExpectedVersion = 0
 		BEGIN
-			INSERT INTO Publishers (Name, Correlation, Version)
+			INSERT INTO Publishers (Name, Correlation, [Version])
 			VALUES (@Name, @Correlation, @Version)
         END           
 	ELSE
 		BEGIN
-			UPDATE Publishers SET Version = @Version 
-			WHERE Name = @Name AND Correlation = @Correlation AND Version = @ExpectedVersion
+			UPDATE Publishers SET [Version] = @Version 
+			WHERE Name = @Name AND Correlation = @Correlation AND [Version] = @ExpectedVersion
 		END
 END
 

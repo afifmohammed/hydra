@@ -1,6 +1,6 @@
-﻿using System;
+﻿using AdoNet;
+using System;
 using System.Linq;
-using AdoNet;
 using EventSourcing;
 using Hangfire;
 using RetailDomain.Inventory;
@@ -13,13 +13,15 @@ namespace PublisherHost
     {
         static void Main(string[] args)
         {
-            new EventStoreConfiguration()
-                .ConfigurePublishers<EventStoreConnectionString>()
-                .ConfigurePublishingNotifications<EventStoreConnectionString>()
+           new EventStoreConfiguration()             
+                .ConfigureEventStoreConnection<EventStoreConnectionString>()                
+                .ConfigurePublishers()
+                .ConfigurePublishingNotifications()
                 .ConfigureTransport<EventStoreTransportConnectionString>()
                 .ConfigureSubscriptions(
                     InventoryItemStockHandler.Subscriptions(),
                     RefundProductOrderHandler.Subscriptions());
+
 
             var options = new BackgroundJobServerOptions
             {

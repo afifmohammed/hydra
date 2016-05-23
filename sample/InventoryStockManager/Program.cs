@@ -13,16 +13,16 @@ namespace WebApi
         static void Main(string[] args)
         {
             new EventStoreConfiguration()
-                .ConfigureTransport<EventStoreTransportConnectionString>()
-                .ConfigureSubscriptions(
+                 .ConfigureTransport<EventStoreTransportConnectionString>()
+                 .ConfigureSubscriptions(
                     InventoryItemStockHandler.Subscriptions(),
                     RefundProductOrderHandler.Subscriptions());
 
             var uri = new Uri("http://localhost:3785");
 
             using (var host = new NancyHost(
-                uri, 
-                new DefaultNancyBootstrapper(), 
+                uri,
+                new DefaultNancyBootstrapper(),
                 new HostConfiguration { UrlReservations = new UrlReservations() { CreateAutomatically = true } }))
             {
                 host.Start();

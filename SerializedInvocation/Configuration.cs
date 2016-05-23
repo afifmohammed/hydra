@@ -42,6 +42,6 @@ namespace SerializedInvocation
                 var message = new JsonMessage(subscriberMessage);
                 BackgroundJob.Enqueue(() => JsonMessageHandler.Handle(message));
             }
-        }        
+        }
     }
 }
