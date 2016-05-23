@@ -4,66 +4,93 @@ using System.Linq;
 
 namespace EventSourcing
 {
-    public delegate Func<IEnumerable<Correlation>, int> PublisherVersionByCorrelationsFunction<in TEndpointConnection>(
-        TEndpointConnection connection) 
-        where TEndpointConnection : EndpointConnection;
+    public delegate Func<IEnumerable<Correlation>, int> PublisherVersionByCorrelationsFunction<in TProvider>(
+        TProvider connection) 
+        where TProvider : IProvider;
 
     public delegate IEnumerable<SerializedNotification> NotificationsByCorrelations(
         IEnumerable<Correlation> correlation);
 
-    public delegate NotificationsByCorrelations NotificationsByCorrelationsFunction<in TEndpointConnection>(
-        TEndpointConnection connection) 
-        where TEndpointConnection : EndpointConnection;
+    public delegate NotificationsByCorrelations NotificationsByCorrelationsFunction<in TProvider>(
+        TProvider connection) 
+        where TProvider : IProvider;
 
-    public delegate Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersionAction<in TEndpointConnection>(
-        TEndpointConnection connection) 
-        where TEndpointConnection : EndpointConnection;
-    
-    public static class EventStore<TEndpointConnection> where TEndpointConnection : EndpointConnection
+    public delegate Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersionAction<in TProvider>(
+        TProvider connection) 
+        where TProvider : IProvider;
+
+    public static class EventStore<TProvider> where TProvider : IProvider
     {
-        public static NotificationsByCorrelationsFunction<TEndpointConnection> NotificationsByCorrelationsFunction { get; set; }
-        public static PublisherVersionByCorrelationsFunction<TEndpointConnection> PublisherVersionByCorrelationsFunction { get; set; }
-        public static SaveNotificationsByPublisherAndVersionAction<TEndpointConnection> SaveNotificationsByPublisherAndVersionAction { get; set; }
-        public static CommitWork<TEndpointConnection> CommitEventStoreConnection { get; set; }
+        public static NotificationsByCorrelationsFunction<TProvider> NotificationsByCorrelationsFunction { get; set; }
+        public static PublisherVersionByCorrelationsFunction<TProvider> PublisherVersionByCorrelationsFunction { get; set; }
+        public static SaveNotificationsByPublisherAndVersionAction<TProvider> SaveNotificationsByPublisherAndVersionAction { get; set; }
+        public static CommitWork<TProvider> CommitEventStoreConnection { get; set; }
         public static Post Post = messages => { };
 
-        public static Handle Handle = message => HandleAndCommitAndPost
-        (
-            message, 
-            EventStore.PublishersBySubscription,
-            HandlerWithNoSideEffects.Handle, 
-            NotificationsByCorrelationsFunction,
-            PublisherVersionByCorrelationsFunction,
-            SaveNotificationsByPublisherAndVersionAction,
-            CommitEventStoreConnection, 
-            Post
-        );
+        public static Subscriber Subscriber = message => 
+            HandleAndCommitAndPost
+            (
+                message, 
+                EventStore.PublishersBySubscription,
+                NotificationsByCorrelationsFunction,
+                PublisherVersionByCorrelationsFunction,
+                SaveNotificationsByPublisherAndVersionAction,
+                CommitEventStoreConnection, 
+                Post
+            );
 
-        static void HandleAndCommitAndPost(
+        internal static void HandleAndCommitAndPost(
             SubscriberMessage message,
             PublishersBySubscription publishersBySubscription,
-            Handler handler,
-            NotificationsByCorrelationsFunction<TEndpointConnection> notificationsByCorrelationsFunction,
-            PublisherVersionByCorrelationsFunction<TEndpointConnection> publisherVersionByCorrelationsFunction,
-            SaveNotificationsByPublisherAndVersionAction<TEndpointConnection> saveNotificationsByPublisherAndVersionAction,
-            CommitWork<TEndpointConnection> commitWork, 
+            NotificationsByCorrelationsFunction<TProvider> notificationsByCorrelationsFunction,
+            PublisherVersionByCorrelationsFunction<TProvider> publisherVersionByCorrelationsFunction,
+            SaveNotificationsByPublisherAndVersionAction<TProvider> saveNotificationsByPublisherAndVersionAction,
+            CommitWork<TProvider> commitWork, 
             Post post)
         {
             var list = new List<SubscriberMessage>();
 
-            commitWork(connection =>
+            commitWork(provider =>
             {
-                handler(
+                Handle(
                     message,
                     publishersBySubscription,
-                    notificationsByCorrelationsFunction(connection),
-                    publisherVersionByCorrelationsFunction(connection),
+                    notificationsByCorrelationsFunction(provider),
+                    publisherVersionByCorrelationsFunction(provider),
                     () => DateTimeOffset.Now,
-                    saveNotificationsByPublisherAndVersionAction(connection),
+                    saveNotificationsByPublisherAndVersionAction(provider),
                     messages => list.AddRange(messages));
             });
 
             post(list);
+        }
+
+        internal static void Handle(
+            SubscriberMessage message,
+            PublishersBySubscription publishersBySubscription,
+            NotificationsByCorrelations notificationsByCorrelations,
+            Func<IEnumerable<Correlation>, int> publisherVersionByPublisherDataContractCorrelations,
+            Func<DateTimeOffset> clock,
+            Action<NotificationsByPublisherAndVersion> saveNotificationsByPublisherAndVersion,
+            Action<IEnumerable<SubscriberMessage>> notify)
+        {
+            var publisher = publishersBySubscription[message.Subscription];
+
+            var notificationsByPublisher = publisher(
+                message.Notification,
+                notificationsByCorrelations,
+                clock);
+
+            var notificationsByPublisherAndVersion = Functions.AppendPublisherVersion(
+                notificationsByPublisher,
+                publisherVersionByPublisherDataContractCorrelations);
+
+            saveNotificationsByPublisherAndVersion(notificationsByPublisherAndVersion);
+
+            notify(notificationsByPublisher
+                .Notifications
+                .SelectMany(n => SubscriberMessages.By(n.Item1, publishersBySubscription.Keys))
+                .ToArray());
         }
     }
 

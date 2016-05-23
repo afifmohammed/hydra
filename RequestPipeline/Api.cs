@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using EventSourcing;
 using Requests;
@@ -13,14 +14,14 @@ namespace RequestPipeline
         }
     }
 
-    public static class RequestPipeline<TEndpointConnection> where TEndpointConnection : EndpointConnection
+    public static class RequestPipeline<TEndpointConnection> where TEndpointConnection : IProvider
     {
-        public static Response<Unit> Dispatch<TRequest>(TRequest input) where TRequest : IRequest<Unit>, ICorrelated => 
-            RequestPipeline<TRequest, Unit>.DispatchThroughPipeline(
+        public static Func<TRequest, Response<Unit>> Dispatch<TRequest>(IEnumerable<Subscription> subscriptions) where TRequest : IRequest<Unit>, ICorrelated => 
+            input => RequestPipeline<TRequest, Unit>.DispatchThroughPipeline(
                 input,
                 request =>
                 {
-                    PostBox<TEndpointConnection>.Drop(new Placed<TRequest> {Command = request});
+                    PostBox<TEndpointConnection>.Drop(subscriptions)(new Placed<TRequest> {Command = request});
                     return Enumerable.Empty<Unit>();
                 });
     }

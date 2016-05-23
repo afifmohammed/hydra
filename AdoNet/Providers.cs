@@ -6,9 +6,9 @@ using EventSourcing;
 
 namespace AdoNet
 {
-    public class AdoNetTransactionScope : Unit<TransactionScope>, IDisposable, EndpointConnection
+    public class AdoNetTransactionScopeProvider : Unit<TransactionScope>, IDisposable, IProvider
     {
-        public AdoNetTransactionScope()
+        public AdoNetTransactionScopeProvider()
         {
             Value = new TransactionScope();
         }
@@ -18,11 +18,11 @@ namespace AdoNet
             Value.Dispose();
         }
 
-        public static CommitWork<AdoNetTransactionScope> Commit()
+        public static CommitWork<AdoNetTransactionScopeProvider> Commit()
         {
             return work =>
             {
-                using (var scope = new AdoNetTransactionScope())
+                using (var scope = new AdoNetTransactionScopeProvider())
                 {
                     work(scope);
                     scope.Value.Complete();
@@ -33,10 +33,10 @@ namespace AdoNet
         public TransactionScope Value { get; }
     }
 
-    public class AdoNetTransaction<TConnectionStringName> : Unit<IDbTransaction>, IDisposable, EndpointConnection
+    public class AdoNetTransactionProvider<TConnectionStringName> : Unit<IDbTransaction>, IDisposable, IProvider
         where TConnectionStringName : class
     {
-        public AdoNetTransaction(Func<string, string> getConnectionString)
+        public AdoNetTransactionProvider(Func<string, string> getConnectionString)
         {
             Value = Transaction(getConnectionString(typeof(TConnectionStringName).FriendlyName()));
         }
@@ -56,11 +56,11 @@ namespace AdoNet
             Value.Dispose();
         }
 
-        public static CommitWork<AdoNetTransaction<TConnectionStringName>> CommitWork(Func<string, string> getConnectionString)
+        public static CommitWork<AdoNetTransactionProvider<TConnectionStringName>> CommitWork(Func<string, string> getConnectionString)
         {
             return doWork =>
             {
-                using (var t = new AdoNetTransaction<TConnectionStringName>(getConnectionString))
+                using (var t = new AdoNetTransactionProvider<TConnectionStringName>(getConnectionString))
                 {
                     doWork(t);
                     t.Value.Commit();
@@ -69,10 +69,10 @@ namespace AdoNet
         }
     }
 
-    public class AdoNetConnection<TConnectionStringName> : Unit<IDbConnection>, IDisposable, EndpointConnection
+    public class AdoNetConnectionProvider<TConnectionStringName> : Unit<IDbConnection>, IDisposable, IProvider
         where TConnectionStringName : class
     {
-        public AdoNetConnection(Func<string, string> getConnectionString)
+        public AdoNetConnectionProvider(Func<string, string> getConnectionString)
         {
             Value = Connection(getConnectionString(typeof(TConnectionStringName).FriendlyName()));
         }
@@ -90,11 +90,11 @@ namespace AdoNet
             Value?.Dispose();
         }
 
-        public static CommitWork<AdoNetConnection<TConnectionStringName>> CommitWork(Func<string, string> getConnectionString)
+        public static CommitWork<AdoNetConnectionProvider<TConnectionStringName>> CommitWork(Func<string, string> getConnectionString)
         {
             return doWork =>
             {
-                using (var t = new AdoNetConnection<TConnectionStringName>(getConnectionString))
+                using (var t = new AdoNetConnectionProvider<TConnectionStringName>(getConnectionString))
                 {
                     doWork(t);                    
                 }

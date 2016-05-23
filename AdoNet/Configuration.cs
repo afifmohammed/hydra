@@ -7,24 +7,24 @@ namespace AdoNet
         public static EventStoreConfiguration<TEventStoreConnectionStringName> ConfigurePublishers<TEventStoreConnectionStringName>(this EventStoreConfiguration<TEventStoreConnectionStringName> config)
             where TEventStoreConnectionStringName : class
         {
-            EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.NotificationsByCorrelationsFunction =
+            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.NotificationsByCorrelationsFunction =
                 t => SqlEventStore.NotificationsByCorrelations(t.Value);
 
-            EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.PublisherVersionByCorrelationsFunction =
+            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.PublisherVersionByCorrelationsFunction =
                 t => SqlEventStore.PublisherVersionByContractAndCorrelations(t.Value);
 
-            EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.SaveNotificationsByPublisherAndVersionAction =
+            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.SaveNotificationsByPublisherAndVersionAction =
                 t => SqlEventStore.SaveNotificationsByPublisherAndVersion(t.Value);
 
-            EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.CommitEventStoreConnection =
-                AdoNetTransaction<TEventStoreConnectionStringName>.CommitWork(ConnectionString.ByName);
+            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.CommitEventStoreConnection =
+                AdoNetTransactionProvider<TEventStoreConnectionStringName>.CommitWork(ConnectionString.ByName);
             return config;
         }
 
         public static EventStoreConfiguration<TEventStoreConnectionStringName> ConfigurePublishingNotifications<TEventStoreConnectionStringName>(this EventStoreConfiguration<TEventStoreConnectionStringName> config)
             where TEventStoreConnectionStringName : class
         {
-            EventStore<AdoNetTransaction<TEventStoreConnectionStringName>>.Post = PostBox<AdoNetTransactionScope>.Post;
+            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.Post = PostBox<AdoNetTransactionScopeProvider>.Post;
             return config;
         }
 

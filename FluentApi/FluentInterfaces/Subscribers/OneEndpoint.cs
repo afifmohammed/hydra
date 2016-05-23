@@ -13,7 +13,7 @@ namespace EventSourcing
 
     public interface ConsumerSubscriptions<TEndpoint>
     {
-        ConsumersBySubscription<TEndpoint> ConsumerBySubscription { get; }
+        ExportersBySubscription<TEndpoint> ExportersBySubscription { get; }
     }
 
     public interface CorrelationMap<TSubscriberDataContract, TNotification, TEndpoint> :
@@ -68,7 +68,7 @@ namespace EventSourcing
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
                 new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> { Type<TSubscriberDataContract>.Maps(mapper) },
-                new ConsumersBySubscription<TEndpoint>()
+                new ExportersBySubscription<TEndpoint>()
             );
         }
 
@@ -80,7 +80,7 @@ namespace EventSourcing
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
                 new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> { Type<TSubscriberDataContract>.Maps(mapper) },
-                new ConsumersBySubscription<TEndpoint>()
+                new ExportersBySubscription<TEndpoint>()
             );
         }
 
@@ -91,7 +91,7 @@ namespace EventSourcing
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
                 new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>>(),
-                new ConsumersBySubscription<TEndpoint>()
+                new ExportersBySubscription<TEndpoint>()
             );
         }
     }
@@ -102,19 +102,19 @@ namespace EventSourcing
     {
         readonly List<KeyValuePair<TypeContract, CorrelationMap>> _subscriberDataContractMaps;
         readonly List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> _subscriberDataMappers;
-        public ConsumersBySubscription<TEndpoint> ConsumerBySubscription { get; }
+        public ExportersBySubscription<TEndpoint> ExportersBySubscription { get; }
 
         public ConsumerCorrelationMap(
             List<KeyValuePair<TypeContract, CorrelationMap>> maps,
             List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> mappers,
-            ConsumersBySubscription<TEndpoint> consumerByNotificationAndConsumerContract)
+            ExportersBySubscription<TEndpoint> exportersByNotificationContract)
         {
             _subscriberDataContractMaps = maps ?? new List<KeyValuePair<TypeContract, CorrelationMap>>();
 
             _subscriberDataMappers = mappers 
                 ?? new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>>();
 
-            ConsumerBySubscription = consumerByNotificationAndConsumerContract ?? new ConsumersBySubscription<TEndpoint>();
+            ExportersBySubscription = exportersByNotificationContract ?? new ExportersBySubscription<TEndpoint>();
         }
 
         public CorrelationMap<TSubscriberDataContract, TNotification1, TEndpoint> Given<TNotification1>(
@@ -126,7 +126,7 @@ namespace EventSourcing
             return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification1, TEndpoint>(
                 _subscriberDataContractMaps, 
                 _subscriberDataMappers, 
-                ConsumerBySubscription);
+                ExportersBySubscription);
         }
 
         public CorrelationMap<TSubscriberDataContract, TNotification1, TEndpoint> When<TNotification1>(
@@ -138,7 +138,7 @@ namespace EventSourcing
             return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification1, TEndpoint>(
                 _subscriberDataContractMaps, 
                 _subscriberDataMappers, 
-                ConsumerBySubscription);
+                ExportersBySubscription);
         }
 
         public CorrelationMap<TSubscriberDataContract, TNotification1, TEndpoint> When<TNotification1>()
@@ -150,7 +150,7 @@ namespace EventSourcing
         public ConsumerContractSubscriptions<TSubscriberDataContract, TEndpoint> Then(
             Action<TSubscriberDataContract, TNotification, TEndpoint> handler)
         {
-            ConsumerBySubscription.Add
+            ExportersBySubscription.Add
             (
                 new Subscription(typeof(TNotification).Contract(), typeof(TSubscriberDataContract).Contract()),
                 (notification, queryNotificationsByCorrelations, clock, endpoint) => Functions.BuildConsumer

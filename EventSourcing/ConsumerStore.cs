@@ -2,48 +2,74 @@
 
 namespace EventSourcing
 {
-    public static class ConsumerStore<TEndpointConnection, TEventStoreEndpointConnection> 
-        where TEndpointConnection : EndpointConnection
-        where TEventStoreEndpointConnection : EndpointConnection
+    public delegate void Handler<TProvider>(
+        SubscriberMessage messageToConsumer,
+        ExportersBySubscription<TProvider> exportersBySubscription,
+        NotificationsByCorrelations notificationsByCorrelations,
+        Func<DateTimeOffset> clock,
+        TProvider provider);
+
+    public static class ExporterStore<TExportProvider, TEventStoreProvider> 
+        where TExportProvider : IProvider
+        where TEventStoreProvider : IProvider
     {
-        public static ConsumersBySubscription<TEndpointConnection> ConsumersBySubscription { get; set; }
-        public static CommitWork<TEndpointConnection> CommitEndpointConnection { get; set; }
-        public static CommitWork<TEventStoreEndpointConnection> CommitEventStoreEndpointConnection { get; set; }
-        public static NotificationsByCorrelationsFunction<TEventStoreEndpointConnection> NotificationsByCorrelationsFunction { get; set; }
+        public static ExportersBySubscription<TExportProvider> ExportersBySubscription { get; set; }
+        public static CommitWork<TExportProvider> CommitExportProvider { get; set; }
+        public static CommitWork<TEventStoreProvider> CommitEventStoreProvider { get; set; }
+        public static NotificationsByCorrelationsFunction<TEventStoreProvider> NotificationsByCorrelationsFunction { get; set; }
 
-        public static Handle Handle = message => HandleAndCommit
-        (
-            message,
-            ConsumersBySubscription,
-            HandlerWithSideEffectsTo<TEndpointConnection>.Handle,
-            NotificationsByCorrelationsFunction,
-            CommitEndpointConnection,
-            CommitEventStoreEndpointConnection,
-            () => DateTimeOffset.Now
-        );
+        public static Subscriber Subscriber = message => 
+            HandleAndCommit
+            (
+                message,
+                ExportersBySubscription,
+                Handle,
+                NotificationsByCorrelationsFunction,
+                CommitExportProvider,
+                CommitEventStoreProvider,
+                () => DateTimeOffset.Now
+            );
 
-        static void HandleAndCommit(
+        internal static void HandleAndCommit(
             SubscriberMessage message,
-            ConsumersBySubscription<TEndpointConnection> consumersBySubscription,
-            Handler<TEndpointConnection> handler,
-            NotificationsByCorrelationsFunction<TEventStoreEndpointConnection> notificationsByCorrelationsFunction,
-            CommitWork<TEndpointConnection> commitEndpointConnection,
-            CommitWork<TEventStoreEndpointConnection> commitEventStoreEndpointConnection,
+            ExportersBySubscription<TExportProvider> exportersBySubscription,
+            Handler<TExportProvider> handler,
+            NotificationsByCorrelationsFunction<TEventStoreProvider> notificationsByCorrelationsFunction,
+            CommitWork<TExportProvider> commitExportProvider,
+            CommitWork<TEventStoreProvider> commitEventStoreProvider,
             Func<DateTimeOffset> clock)
         {
-            commitEndpointConnection
+            commitExportProvider
             (
-                consumerEndpointConnection => commitEventStoreEndpointConnection
+                consumerEndpointConnection => commitEventStoreProvider
                 (
                     eventStoreConnection => handler
                     (
                         message,
-                        consumersBySubscription,
+                        exportersBySubscription,
                         notificationsByCorrelationsFunction(eventStoreConnection),
                         clock,
                         consumerEndpointConnection
                     )
                 )
+            );
+        }
+
+        internal static void Handle(
+            SubscriberMessage message,
+            ExportersBySubscription<TExportProvider> exportersBySubscription,
+            NotificationsByCorrelations notificationsByCorrelations,
+            Func<DateTimeOffset> clock,
+            TExportProvider integrationProvider)
+        {
+            var consumer = exportersBySubscription[message.Subscription];
+
+            consumer
+            (
+                message.Notification,
+                notificationsByCorrelations,
+                clock,
+                integrationProvider
             );
         }
     }

@@ -15,8 +15,8 @@ namespace Polling
             IEnumerable<TypeContract> contracts,
             Action<IEnumerable<IDomainEvent>> publish,
             Func<TStateConnection, RecordLastSeen> recordLastSeenFunction) 
-            where TStreamConnection : EndpointConnection
-            where TStateConnection : EndpointConnection
+            where TStreamConnection : IProvider
+            where TStateConnection : IProvider
         {
             commitState
             (

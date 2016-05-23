@@ -13,7 +13,7 @@ namespace EventSourcing
 
     public interface ConsumerSubscriptions<TEndpoint1, TEndpoint2>
     {
-        ConsumersBySubscription<TEndpoint1, TEndpoint2> ConsumerBySubscription { get; }
+        IntegratorsBySubscription<TEndpoint1, TEndpoint2> IntegratorBySubscription { get; }
     }
 
     public interface CorrelationMap<TSubscriberDataContract, TNotification, TEndpoint1, TEndpoint2> :
@@ -68,7 +68,7 @@ namespace EventSourcing
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
                 new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> { Type<TSubscriberDataContract>.Maps(mapper) },
-                new ConsumersBySubscription<TEndpoint1, TEndpoint2>()
+                new IntegratorsBySubscription<TEndpoint1, TEndpoint2>()
             );
         }
 
@@ -80,7 +80,7 @@ namespace EventSourcing
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
                 new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> { Type<TSubscriberDataContract>.Maps(mapper) },
-                new ConsumersBySubscription<TEndpoint1, TEndpoint2>()
+                new IntegratorsBySubscription<TEndpoint1, TEndpoint2>()
             );
         }
 
@@ -91,7 +91,7 @@ namespace EventSourcing
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
                 new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>>(),
-                new ConsumersBySubscription<TEndpoint1, TEndpoint2>()
+                new IntegratorsBySubscription<TEndpoint1, TEndpoint2>()
             );
         }
     }
@@ -103,19 +103,19 @@ namespace EventSourcing
     {
         readonly List<KeyValuePair<TypeContract, CorrelationMap>> _subscriberDataContractMaps;
         readonly List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> _subscriberDataMappers;
-        public ConsumersBySubscription<TEndpoint1, TEndpoint2> ConsumerBySubscription { get; }
+        public IntegratorsBySubscription<TEndpoint1, TEndpoint2> IntegratorBySubscription { get; }
 
         public ConsumerCorrelationMap(
             List<KeyValuePair<TypeContract, CorrelationMap>> maps,
             List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> mappers,
-            ConsumersBySubscription<TEndpoint1, TEndpoint2> consumerByNotificationAndConsumerContract)
+            IntegratorsBySubscription<TEndpoint1, TEndpoint2> integratorByNotificationAndContract)
         {
             _subscriberDataContractMaps = maps ?? new List<KeyValuePair<TypeContract, CorrelationMap>>();
 
             _subscriberDataMappers = mappers 
                 ?? new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>>();
 
-            ConsumerBySubscription = consumerByNotificationAndConsumerContract ?? new ConsumersBySubscription<TEndpoint1, TEndpoint2>();
+            IntegratorBySubscription = integratorByNotificationAndContract ?? new IntegratorsBySubscription<TEndpoint1, TEndpoint2>();
         }
 
         public CorrelationMap<TSubscriberDataContract, TNotification1, TEndpoint1, TEndpoint2> Given<TNotification1>(
@@ -126,7 +126,7 @@ namespace EventSourcing
             return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification1, TEndpoint1, TEndpoint2>(
                 _subscriberDataContractMaps, 
                 _subscriberDataMappers, 
-                ConsumerBySubscription);
+                IntegratorBySubscription);
         }
 
         public CorrelationMap<TSubscriberDataContract, TNotification1, TEndpoint1, TEndpoint2> When<TNotification1>(
@@ -137,7 +137,7 @@ namespace EventSourcing
             return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification1, TEndpoint1, TEndpoint2>(
                 _subscriberDataContractMaps, 
                 _subscriberDataMappers, 
-                ConsumerBySubscription);
+                IntegratorBySubscription);
         }
 
         public CorrelationMap<TSubscriberDataContract, TNotification1, TEndpoint1, TEndpoint2> When<TNotification1>() 
@@ -149,7 +149,7 @@ namespace EventSourcing
         public ConsumerContractSubscriptions<TSubscriberDataContract, TEndpoint1, TEndpoint2> Then(
             Action<TSubscriberDataContract, TNotification, TEndpoint1, TEndpoint2> handler)
         {
-            ConsumerBySubscription.Add
+            IntegratorBySubscription.Add
             (
                 new Subscription(typeof(TNotification).Contract(), typeof(TSubscriberDataContract).Contract()),
                 (notification, queryNotificationsByCorrelations, clock, endpoint1, endpoint2) => Functions.BuildConsumer

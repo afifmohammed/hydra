@@ -16,9 +16,9 @@ namespace SerializedInvocation
         {
             Initialize<THangfireConnectionStringName>();
 
-            PostBox<AdoNetTransactionScope>.CommitTransportConnection = AdoNetTransactionScope.Commit();
+            PostBox<AdoNetTransactionScopeProvider>.CommitWork = AdoNetTransactionScopeProvider.Commit();
 
-            PostBox<AdoNetTransactionScope>.Enqueue = Enqueue;
+            PostBox<AdoNetTransactionScopeProvider>.Enqueue = Enqueue;
 
             return config;
         }
@@ -35,7 +35,7 @@ namespace SerializedInvocation
                 });
         }
 
-        static void Enqueue(AdoNetTransactionScope endpoint, IEnumerable<SubscriberMessage> messages)
+        static void Enqueue(AdoNetTransactionScopeProvider endpoint, IEnumerable<SubscriberMessage> messages)
         {
             foreach (var subscriberMessage in messages)
             {

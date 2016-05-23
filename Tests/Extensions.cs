@@ -14,7 +14,7 @@ namespace Tests
             where TSubscriberDataContract : new()
         {
             consumerContractSubscriptions
-                .ConsumerBySubscription[new Subscription(notificationContract: new TypeContract(notification), subscriberDataContract: new TypeContract(typeof (TSubscriberDataContract)))]
+                .ExportersBySubscription[new Subscription(notificationContract: new TypeContract(notification), subscriberDataContract: new TypeContract(typeof (TSubscriberDataContract)))]
                 (
                     notification, 
                     NotificationsByCorrelations(), 

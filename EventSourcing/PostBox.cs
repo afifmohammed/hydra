@@ -1,57 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace EventSourcing
 {
-    public delegate void Notify(IDomainEvent notification);
-
-    public delegate void NotifyViaPost(
-        IDomainEvent notification,
-        SubscriberMessagesByNotification subscriberMessagesByNotification,
-        Post post);
-
-    public delegate IEnumerable<SubscriberMessage> SubscriberMessagesByNotification(IDomainEvent notification);
+    public delegate Action<IDomainEvent> Notify(IEnumerable<Subscription> subscriptions);
 
     public delegate void Post(IEnumerable<SubscriberMessage> messages);
 
-    public delegate void Enqueue<in TEndpointConnection>(
-        TEndpointConnection endpoint, 
+    public delegate void Enqueue<in TProvider>(
+        TProvider provider, 
         IEnumerable<SubscriberMessage> messages) 
-        where TEndpointConnection : EndpointConnection;
+        where TProvider : IProvider;
 
-    public static class PostBox<TEndpointConnection>
-        where TEndpointConnection : EndpointConnection
+    public static class PostBox<TProvider>
+        where TProvider : IProvider
     {
-        public static Enqueue<TEndpointConnection> Enqueue { get; set; }
-        public static CommitWork<TEndpointConnection> CommitTransportConnection { get; set; }
+        public static Enqueue<TProvider> Enqueue { get; set; }
+        public static CommitWork<TProvider> CommitWork { get; set; }
 
-        public static Notify Drop = notification => 
-            PostBox.NotifyViaPost
-            (
-                notification, 
-                domainEvent => SubscriberMessages(new[] { domainEvent }, PostBox.SubscriberMessagesByNotificationList), 
-                Post
-            );
-
-        public static Post Post = messages => CommitTransportConnection(endpoint => Enqueue(endpoint, messages));
-
-        public static Func<IEnumerable<IDomainEvent>, List<SubscriberMessagesByNotification>, IEnumerable<SubscriberMessage>> SubscriberMessages = 
-            (notifications, subscriberMessagesByNotificationList) =>
-                notifications.SelectMany
-                (
-                    domainEvent => subscriberMessagesByNotificationList
-                        .SelectMany(subscriberMessagesByNotification => subscriberMessagesByNotification(domainEvent))
-                );
-    }
-
-    public static class PostBox
-    {
-        public static readonly List<SubscriberMessagesByNotification> SubscriberMessagesByNotificationList =
-            new List<SubscriberMessagesByNotification>()
-                .With(x => x.Add(e => Messages.PrepareMessages(e, EventStore.PublishersBySubscription.Keys)));
-
-        public static NotifyViaPost NotifyViaPost = (notification, subscriberMessagesByNotification, post) =>
-            post(subscriberMessagesByNotification(notification));
+        public static Notify Drop = 
+            subscriptions =>
+                notification => 
+                    Post(SubscriberMessages.By(notification, subscriptions));
+            
+        public static Post Post = messages => CommitWork(endpoint => Enqueue(endpoint, messages));
     }
 }
