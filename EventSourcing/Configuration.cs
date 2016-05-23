@@ -6,9 +6,18 @@
     public class EventStoreConfiguration
     {}
 
-    public class EventStoreConfiguration<TEventStore> : EventStoreConfiguration where TEventStore : class
-    {    }
+    /// <summary>
+    /// Placed holder class off which configurations for the event store can hang as extension methods
+    /// </summary>    
+    public class EventStoreConfiguration<TConstraint> : EventStoreConfiguration 
+        where TConstraint : class
+    {}
 
-    public class EventStoreConfiguration<TEventStore, TTransport> : EventStoreConfiguration<TEventStore> where TEventStore : class where TTransport : class
+    /// <summary>
+    /// Placed holder class off which configurations for the event store can hang as extension methods
+    /// </summary>    
+    public class EventStoreConfiguration<TConstraint1, TConstraint2> : EventStoreConfiguration<TConstraint1> 
+        where TConstraint1 : class 
+        where TConstraint2 : class
     {}
 }
