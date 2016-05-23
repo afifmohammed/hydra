@@ -46,6 +46,7 @@ namespace AdoNet
 
                 var rowCount = transaction.Connection.Execute(
                     sql: "UpsertPublisher",
+                    commandType: CommandType.StoredProcedure,
                     transaction: transaction,
                     param: new
                     {
@@ -66,12 +67,16 @@ namespace AdoNet
 
         public static Func<IEnumerable<Correlation>, int> PublisherVersionByContractAndCorrelations(IDbTransaction transaction)
         {
-            return correlations => transaction.Connection
-                .Query<int>(
-                    sql: @"GetPublisherVersion",
-                    transaction: transaction,
-                    param: correlations.AsPublisherNameAndCorrelation().As(x => new {Name = x.Item1, Correlation = x.Item2}))
-                .FirstOrDefault();
+            return correlations =>
+            {
+                return transaction.Connection
+                    .Query<int>(
+                        sql: "GetPublisherVersion",
+                        transaction: transaction,
+                        commandType: CommandType.StoredProcedure,
+                        param: correlations.AsPublisherNameAndCorrelation().As(x => new { Name = x.Item1, Correlation = x.Item2 }))
+                    .FirstOrDefault();
+            };
         }
 
         public static NotificationsByCorrelations NotificationsByCorrelations(IDbTransaction transaction)
