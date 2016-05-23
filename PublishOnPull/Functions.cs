@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using EventSourcing;
 
-namespace Polling
+namespace PublishOnPull
 {
     public static class Functions
     {

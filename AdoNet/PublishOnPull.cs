@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using EventSourcing;
-using Polling;
+using PublishOnPull;
 
 namespace AdoNet
 {
-    public static class Polling<TEventStoreConnectionString, TStateConnectionString>
+    public static class PublishOnPullFromSqlEventStore<TEventStoreConnectionString, TStateConnectionString>
         where TEventStoreConnectionString : class
         where TStateConnectionString : class
     {
@@ -22,7 +22,7 @@ namespace AdoNet
 
         public static void Handler(IReadOnlyCollection<Subscription> subscriptions)
         {
-            Polling.Functions.Handle
+            PublishOnPull.Functions.Handle
             (
                 CommitState,
                 CommitStream,

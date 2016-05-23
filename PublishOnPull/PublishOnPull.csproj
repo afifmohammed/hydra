@@ -7,8 +7,8 @@
     <ProjectGuid>{CDDCEFE4-144A-40FE-8F95-D22B50283267}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Polling</RootNamespace>
-    <AssemblyName>Polling</AssemblyName>
+    <RootNamespace>PublishOnPull</RootNamespace>
+    <AssemblyName>PublishOnPull</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

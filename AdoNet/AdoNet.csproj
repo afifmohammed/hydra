@@ -52,7 +52,7 @@
   <ItemGroup>
     <Compile Include="Configuration.cs" />
     <Compile Include="ConnectionString.cs" />
-    <Compile Include="Polling.cs" />
+    <Compile Include="PublishOnPull.cs" />
     <Compile Include="SqlEventStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers.cs" />
@@ -62,9 +62,9 @@
       <Project>{E6E5141E-A6AC-434A-9697-784811570ECB}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Polling\Polling.csproj">
+    <ProjectReference Include="..\PublishOnPull\PublishOnPull.csproj">
       <Project>{CDDCEFE4-144A-40FE-8F95-D22B50283267}</Project>
-      <Name>Polling</Name>
+      <Name>PublishOnPull</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

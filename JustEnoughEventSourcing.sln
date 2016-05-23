@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "EventSourcing\Core.csproj", "{E6E5141E-A6AC-434A-9697-784811570ECB}"
 EndProject
@@ -27,7 +27,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestPipeline", "RequestP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerializedInvocation", "SerializedInvocation\SerializedInvocation.csproj", "{9B9F6273-3B0F-477C-AD7C-1E56CC213A5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polling", "Polling\Polling.csproj", "{CDDCEFE4-144A-40FE-8F95-D22B50283267}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PublishOnPull", "PublishOnPull\PublishOnPull.csproj", "{CDDCEFE4-144A-40FE-8F95-D22B50283267}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

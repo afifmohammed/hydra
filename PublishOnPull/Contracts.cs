@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using EventSourcing;
 
-namespace Polling
+namespace PublishOnPull
 {
     public class NoEventId : EventId { }
 
