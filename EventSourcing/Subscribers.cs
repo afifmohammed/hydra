@@ -72,12 +72,27 @@ namespace EventSourcing
         TLeftProvider leftProvider,
         TRightProvider rightProvider);
 
-    public class PublishersBySubscription : Dictionary<Subscription, Publisher>
-    { }
+    public class PublishersBySubscription : Dictionary<Subscription, Publisher>, IDisposable
+    {
+        public void Dispose()
+        {
+            this.Clear();
+        }
+    }
 
-    public class ExportersBySubscription<TProvider> : Dictionary<Subscription, Exporter<TProvider>>
-    { }
+    public class ExportersBySubscription<TProvider> : Dictionary<Subscription, Exporter<TProvider>>, IDisposable
+    {
+        public void Dispose()
+        {
+            this.Clear();
+        }
+    }
 
-    public class IntegratorsBySubscription<TLeftProvider, TRightProvider> : Dictionary<Subscription, Integrator<TLeftProvider, TRightProvider>>
-    { }
+    public class IntegratorsBySubscription<TLeftProvider, TRightProvider> : Dictionary<Subscription, Integrator<TLeftProvider, TRightProvider>>, IDisposable
+    {
+        public void Dispose()
+        {
+            this.Clear();
+        }
+    }
 }

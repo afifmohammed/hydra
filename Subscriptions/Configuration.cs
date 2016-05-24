@@ -10,8 +10,6 @@ using Requests;
 
 namespace Subscriptions
 {
-    public class AvailableSubscriptions { }
-
     public class SubscriberPipeline
     {
         public static Func<IEnumerable<Subscription>> GetSubscriptions = () => Request<Subscription>.By(new AvailableSubscriptions());

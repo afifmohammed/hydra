@@ -10,8 +10,8 @@ namespace PublisherHost
     {
         static void Main(string[] args)
         {
-           new EventStoreConfiguration()             
-                .ConfigureEventStoreConnection<EventStoreConnectionString>()                
+            new EventStoreConfiguration()
+                .ConfigureEventStoreConnection<EventStoreConnectionString>()
                 .ConfigurePublishers()
                 .ConfigurePushNotifications()
                 .ConfigureTransport<EventStoreTransportConnectionString>();

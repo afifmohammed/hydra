@@ -5,14 +5,23 @@ using AdoNet;
 using EventSourcing;
 using Hangfire;
 using Hangfire.SqlServer;
-using Newtonsoft.Json;
 using Requests;
-using Subscriptions;
 
 namespace SerializedInvocation
 {
     public static class HangfireConfiguration
     {
+        public static EventStoreConfiguration ConfigureMessageHandler(this EventStoreConfiguration config)
+        {
+            JsonMessageHandler.HandleInstance =
+                m =>
+                {
+                    foreach (var subscriber in Request<Subscriber>.By(new ConfiguredSubscriber()))
+                        subscriber(m);
+                };
+            return config;
+        }
+
         public static EventStoreConfiguration ConfigureTransport<THangfireConnectionStringName>(
             this EventStoreConfiguration config)
             where THangfireConnectionStringName : class
@@ -56,7 +65,5 @@ namespace SerializedInvocation
                 BackgroundJob.Enqueue(() => JsonMessageHandler.Handle(message));
             }
         }
-
-
     }
 }

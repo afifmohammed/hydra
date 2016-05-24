@@ -9,7 +9,7 @@ namespace EventSourcing
         Func<DateTimeOffset> clock,
         TProvider provider);
 
-    public static class ExporterStore<TExportProvider, TEventStoreProvider> 
+    public static class ExporterStore<TEventStoreProvider, TExportProvider> 
         where TExportProvider : IProvider
         where TEventStoreProvider : IProvider
     {

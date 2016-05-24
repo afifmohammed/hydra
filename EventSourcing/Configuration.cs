@@ -20,4 +20,8 @@
         where TConstraint1 : class 
         where TConstraint2 : class
     {}
+
+    public sealed class ConfiguredSubscriber { }
+
+    public sealed class AvailableSubscriptions { }
 }
