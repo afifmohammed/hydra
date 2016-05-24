@@ -7,8 +7,8 @@
     <ProjectGuid>{900B7A11-306E-46ED-9267-552BB7840BC1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RequestPipeline</RootNamespace>
-    <AssemblyName>RequesetPipeline</AssemblyName>
+    <RootNamespace>Hydra.RequestPipeline</RootNamespace>
+    <AssemblyName>Hydra.RequesetPipeline</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

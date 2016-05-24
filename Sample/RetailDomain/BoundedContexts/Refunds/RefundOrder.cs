@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using EventSourcing;
-using RequestPipeline;
+using Hydra.Core;
+using Hydra.Core.FluentInterfaces;
+using Hydra.RequestPipeline;
 using RetailDomain.Ops;
 using RetailDomain.Risk;
 using RetailDomain.Sales;

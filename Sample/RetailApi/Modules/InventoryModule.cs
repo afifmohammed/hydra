@@ -1,6 +1,6 @@
-﻿using Nancy;
+﻿using Hydra.Subscriptions;
+using Nancy;
 using RetailDomain.Inventory;
-using Subscriptions;
 
 namespace WebApi.Modules
 {

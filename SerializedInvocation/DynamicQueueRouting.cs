@@ -2,7 +2,7 @@
 using Hangfire.Common;
 using Hangfire.States;
 
-namespace SerializedInvocation
+namespace Hydra.SerializedInvocation
 {
     public class UseQueueFromParameterAttribute : JobFilterAttribute, IElectStateFilter
     {

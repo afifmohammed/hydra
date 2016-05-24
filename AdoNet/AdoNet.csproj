@@ -7,8 +7,8 @@
     <ProjectGuid>{223A1668-8FC2-4399-9047-287B9DBF2636}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AdoNet</RootNamespace>
-    <AssemblyName>AdoNet</AssemblyName>
+    <RootNamespace>Hydra.AdoNet</RootNamespace>
+    <AssemblyName>Hydra.AdoNet</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using EventSourcing;
+using Hydra.Core;
+using Hydra.Core.FluentInterfaces.Subscribers;
 
 namespace Tests
 {

@@ -4,10 +4,6 @@ using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Data;
 using System.Linq;
-using AdoNet;
-using EventSourcing;
-using RequestPipeline;
-using Requests;
 
 namespace WebApi
 {

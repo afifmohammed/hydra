@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Requests;
+using Hydra.Requests;
 using Xunit;
 
 namespace Tests

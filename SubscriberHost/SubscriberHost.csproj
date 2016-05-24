@@ -7,8 +7,8 @@
     <ProjectGuid>{0249FC85-834C-489C-8C74-E008AB9C5DE7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SubscriberHost</RootNamespace>
-    <AssemblyName>SubscriberHost</AssemblyName>
+    <RootNamespace>Hydra.SubscriberHost</RootNamespace>
+    <AssemblyName>Hydra.SubscriberHost</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

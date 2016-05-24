@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Requests
+namespace Hydra.Requests
 {
     struct TypeContract
     {

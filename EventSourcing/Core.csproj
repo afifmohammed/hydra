@@ -7,8 +7,8 @@
     <ProjectGuid>{E6E5141E-A6AC-434A-9697-784811570ECB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EventSourcing</RootNamespace>
-    <AssemblyName>EventSourcing</AssemblyName>
+    <RootNamespace>Hydra.Core</RootNamespace>
+    <AssemblyName>Hydra.Core</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>

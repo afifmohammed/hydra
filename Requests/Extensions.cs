@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Requests
+namespace Hydra.Requests
 {
     public static class Return
     {

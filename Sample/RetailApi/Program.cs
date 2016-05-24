@@ -1,11 +1,11 @@
 ﻿using System;
-using EventSourcing;
+using Hydra.Core;
+using Hydra.SerializedInvocation;
+using Hydra.Subscriptions;
 using Nancy;
 using Nancy.Hosting.Self;
 using RetailDomain.Inventory;
 using RetailDomain.Refunds;
-using SerializedInvocation;
-using Subscriptions;
 
 namespace WebApi
 {

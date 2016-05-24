@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using RequestPipeline;
-using EventSourcing;
+using Hydra.Core;
+using Hydra.RequestPipeline;
 using RetailDomain.Inventory;
 using Xunit;
 

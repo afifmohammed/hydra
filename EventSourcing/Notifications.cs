@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EventSourcing
+namespace Hydra.Core
 {
     public interface IDomainEvent : ICorrelated
     {}

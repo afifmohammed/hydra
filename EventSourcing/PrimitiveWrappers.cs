@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace EventSourcing
+namespace Hydra.Core
 {
     public interface Unit<out TValue>
     {

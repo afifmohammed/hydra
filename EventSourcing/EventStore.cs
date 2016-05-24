@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace EventSourcing
+namespace Hydra.Core
 {
     public delegate Func<IEnumerable<Correlation>, int> PublisherVersionByCorrelationsFunction<in TProvider>(
         TProvider provider) 

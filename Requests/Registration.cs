@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Requests
+namespace Hydra.Requests
 {
     public class RequestsRegistration<TProvider> where TProvider : IDisposable
     {

@@ -1,4 +1,4 @@
-﻿namespace EventSourcing
+﻿namespace Hydra.Core
 {
     public interface IProvider { }
     

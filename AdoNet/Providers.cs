@@ -2,9 +2,9 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Transactions;
-using EventSourcing;
+using Hydra.Core;
 
-namespace AdoNet
+namespace Hydra.AdoNet
 {
     public class AdoNetTransactionScopeProvider : Unit<TransactionScope>, IDisposable, IProvider
     {

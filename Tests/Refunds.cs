@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using EventSourcing;
-using RequestPipeline;
+using Hydra.Core;
+using Hydra.RequestPipeline;
 using Xunit;
 using RetailDomain.Refunds;
 using RetailDomain.Risk;

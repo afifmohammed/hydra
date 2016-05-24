@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Newtonsoft.Json;
 
-namespace EventSourcing
+namespace Hydra.Core
 {
     public interface ICorrelated
     {

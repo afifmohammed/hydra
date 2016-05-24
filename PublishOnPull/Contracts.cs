@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using EventSourcing;
+using Hydra.Core;
 
-namespace PublishOnPull
+namespace Hydra.PublishOnPull
 {
     public class NoEventId : EventId { }
 

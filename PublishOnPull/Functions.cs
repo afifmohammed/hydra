@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using EventSourcing;
+using Hydra.Core;
 
-namespace PublishOnPull
+namespace Hydra.PublishOnPull
 {
     public static class Functions
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace EventSourcing
+namespace Hydra.Core
 {
     public struct Subscription
     {

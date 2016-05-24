@@ -1,10 +1,10 @@
-﻿using EventSourcing;
+﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System;
 using System.Linq;
+using System.Net;
+using Hydra.Core;
 
-namespace RequestPipeline
+namespace Hydra.RequestPipeline
 {
     public interface IRequest<TResult>        
     { }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace EventSourcing
+namespace Hydra.Core.FluentInterfaces.Subscribers
 {
     public interface ConsumerContractSubscriptions<TSubscriberDataContract, TEndpoint1, TEndpoint2> :
         ConsumerSubscriptions<TEndpoint1, TEndpoint2>,

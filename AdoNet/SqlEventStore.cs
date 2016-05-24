@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Dapper;
-using EventSourcing;
+using Hydra.Core;
 using Newtonsoft.Json;
 
-namespace AdoNet
+namespace Hydra.AdoNet
 {
     public static class SqlEventStore
     {

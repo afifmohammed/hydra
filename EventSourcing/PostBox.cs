@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace EventSourcing
+namespace Hydra.Core
 {
     public delegate Action<IEnumerable<IDomainEvent>> Notify(Func<IEnumerable<Subscription>> subscriptions);
 

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using EventSourcing;
-using Requests;
+using Hydra.Core;
+using Hydra.Requests;
 
-namespace RequestPipeline
+namespace Hydra.RequestPipeline
 {
     public static class Request
     {

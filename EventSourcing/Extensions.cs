@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace EventSourcing
+namespace Hydra.Core
 {
     public static class Extensions
     {

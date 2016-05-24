@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using EventSourcing;
-using PublishOnPull;
+using Hydra.Core;
+using Hydra.PublishOnPull;
 
-namespace AdoNet
+namespace Hydra.AdoNet
 {
     public static class PublishOnPullFromSqlEventStore<TEventStoreConnectionString, TStateConnectionString>
         where TEventStoreConnectionString : class

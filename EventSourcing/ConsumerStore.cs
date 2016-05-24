@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EventSourcing
+namespace Hydra.Core
 {
     public delegate void Handler<TProvider>(
         SubscriberMessage messageToConsumer,

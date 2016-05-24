@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using EventSourcing;
-using Requests;
+using Hydra.Core;
+using Hydra.Requests;
 
-namespace RequestPipeline
+namespace Hydra.RequestPipeline
 {
     public delegate Response<TReturn> Dispatch<in TRequest, TReturn>(TRequest request) where TRequest : IRequest<TReturn>, ICorrelated where TReturn : class;
 

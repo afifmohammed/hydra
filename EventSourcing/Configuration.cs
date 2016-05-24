@@ -1,4 +1,4 @@
-﻿namespace EventSourcing
+﻿namespace Hydra.Core
 {
     /// <summary>
     /// Placed holder class off which configurations for the event store can hang as extension methods

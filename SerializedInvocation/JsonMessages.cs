@@ -1,8 +1,8 @@
 using System;
-using EventSourcing;
+using Hydra.Core;
 using Newtonsoft.Json;
 
-namespace SerializedInvocation
+namespace Hydra.SerializedInvocation
 {
     public static class JsonMessageHandler
     {

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AdoNet;
-using EventSourcing;
 using Hangfire;
 using Hangfire.SqlServer;
-using Requests;
+using Hydra.AdoNet;
+using Hydra.Core;
+using Hydra.Requests;
 
-namespace SerializedInvocation
+namespace Hydra.SerializedInvocation
 {
     public static class HangfireConfiguration
     {

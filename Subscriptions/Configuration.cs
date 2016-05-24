@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using AdoNet;
-using EventSourcing;
-using RequestPipeline;
-using Requests;
+using Hydra.AdoNet;
+using Hydra.Core;
+using Hydra.Core.FluentInterfaces;
+using Hydra.RequestPipeline;
+using Hydra.Requests;
 
-namespace Subscriptions
+namespace Hydra.Subscriptions
 {
     public class SubscriberPipeline
     {

@@ -1,7 +1,6 @@
-﻿using System.Linq;
-using EventSourcing;
+﻿using Hydra.Core;
 
-namespace AdoNet
+namespace Hydra.AdoNet
 {
     public static class SqlStoreConfiguration
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Configuration;
 
-namespace AdoNet
+namespace Hydra.AdoNet
 { 
     public static class ConnectionString
     {

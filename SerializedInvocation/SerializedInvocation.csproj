@@ -7,8 +7,8 @@
     <ProjectGuid>{9B9F6273-3B0F-477C-AD7C-1E56CC213A5E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SerializedInvocation</RootNamespace>
-    <AssemblyName>SerializedInvocation</AssemblyName>
+    <RootNamespace>Hydra.SerializedInvocation</RootNamespace>
+    <AssemblyName>Hydra.SerializedInvocation</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -1,8 +1,8 @@
-﻿using AdoNet;
-using System;
-using EventSourcing;
+﻿using System;
 using Hangfire;
-using SerializedInvocation;
+using Hydra.AdoNet;
+using Hydra.Core;
+using Hydra.SerializedInvocation;
 
 namespace PublisherHost
 {

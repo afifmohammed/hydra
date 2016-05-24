@@ -7,8 +7,8 @@
     <ProjectGuid>{BB656F99-93E3-4E86-AE6E-532C7BC1F5D9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Subscriptions</RootNamespace>
-    <AssemblyName>Subscriptions</AssemblyName>
+    <RootNamespace>Hydra.Subscriptions</RootNamespace>
+    <AssemblyName>Hydra.Subscriptions</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using EventSourcing;
+using Hydra.Core;
 
 namespace RetailDomain.Risk
 {
