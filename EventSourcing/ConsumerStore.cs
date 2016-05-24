@@ -13,22 +13,23 @@ namespace EventSourcing
         where TExportProvider : IProvider
         where TEventStoreProvider : IProvider
     {
-        public static ExportersBySubscription<TExportProvider> ExportersBySubscription { get; set; }
         public static CommitWork<TExportProvider> CommitExportProvider { get; set; }
         public static CommitWork<TEventStoreProvider> CommitEventStoreProvider { get; set; }
         public static NotificationsByCorrelationsFunction<TEventStoreProvider> NotificationsByCorrelationsFunction { get; set; }
 
-        public static Subscriber Subscriber = message => 
-            HandleAndCommit
-            (
-                message,
-                ExportersBySubscription,
-                Handle,
-                NotificationsByCorrelationsFunction,
-                CommitExportProvider,
-                CommitEventStoreProvider,
-                () => DateTimeOffset.Now
-            );
+        public static Func<ExportersBySubscription<TExportProvider>, Subscriber> Subscriber = 
+            exportersBySubscription => 
+                message => 
+                    HandleAndCommit
+                    (
+                        message,
+                        exportersBySubscription,
+                        Handle,
+                        NotificationsByCorrelationsFunction,
+                        CommitExportProvider,
+                        CommitEventStoreProvider,
+                        () => DateTimeOffset.Now
+                    );
 
         internal static void HandleAndCommit(
             SubscriberMessage message,

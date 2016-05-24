@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AdoNet;
 using EventSourcing;
 using Hangfire;
 using Hangfire.SqlServer;
 using Newtonsoft.Json;
+using Requests;
+using Subscriptions;
 
 namespace SerializedInvocation
 {
@@ -21,6 +24,16 @@ namespace SerializedInvocation
             PostBox<AdoNetTransactionScopeProvider>.Enqueue = Enqueue;
 
             return config;
+        }
+
+        public static BackgroundJobServerOptions QueuePerSubscriber(this BackgroundJobServerOptions options)
+        {
+            options.Queues =
+                Request<Subscription>.By(new AvailableSubscriptions())
+                    .Select(x => x.NotificationContract.Value.ToLower())
+                    .ToArray();
+
+            return options;
         }
 
         static void Initialize<THangfireConnectionStringName>()
@@ -43,5 +56,7 @@ namespace SerializedInvocation
                 BackgroundJob.Enqueue(() => JsonMessageHandler.Handle(message));
             }
         }
+
+
     }
 }

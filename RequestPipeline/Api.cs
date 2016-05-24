@@ -21,7 +21,7 @@ namespace RequestPipeline
                 input,
                 request =>
                 {
-                    PostBox<TProvider>.Drop(getSubscriptions)(new Placed<TRequest> {Command = request});
+                    PostBox<TProvider>.Drop(getSubscriptions)(new [] { new Placed<TRequest> { Command = request } });
                     return Enumerable.Empty<Unit>();
                 });
     }

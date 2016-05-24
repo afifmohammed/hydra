@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace EventSourcing
 {
-    public delegate Action<IDomainEvent> Notify(Func<IEnumerable<Subscription>> subscriptions);
+    public delegate Action<IEnumerable<IDomainEvent>> Notify(Func<IEnumerable<Subscription>> subscriptions);
 
     public delegate void Post(IEnumerable<SubscriberMessage> messages);
 
@@ -20,8 +21,8 @@ namespace EventSourcing
 
         public static Notify Drop = 
             getSubscriptions =>
-                notification => 
-                    Post(SubscriberMessages.By(notification, getSubscriptions()));
+                notifications => 
+                    Post(notifications.SelectMany(notification => SubscriberMessages.By(notification, getSubscriptions())));
             
         public static Post Post = messages => CommitWork(provider => Enqueue(provider, messages));
     }

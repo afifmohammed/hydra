@@ -48,12 +48,12 @@ namespace EventSourcing
             };
         }
 
-        public static Action<TNotification> BuildIntegrator<TConsumerData, TNotification, TProvider1, TProvider2>(
-            Action<TConsumerData, TNotification, TProvider1, TProvider2> consumer,
+        public static Action<TNotification> BuildIntegrator<TConsumerData, TNotification, TLeftProvider, TRightProvider>(
+            Action<TConsumerData, TNotification, TLeftProvider, TRightProvider> consumer,
             IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByConsumerDataContract,
             NotificationsByCorrelations notificationsByCorrelations,
-            TProvider1 provider1,
-            TProvider2 provider2,
+            TLeftProvider leftProvider,
+            TRightProvider rightProvider,
             IDictionary<TypeContract, Func<TConsumerData, JsonContent, TConsumerData>> consumerDataMappersByNotificationContract,
             Func<DateTimeOffset> clock)
             where TConsumerData : new()
@@ -74,8 +74,8 @@ namespace EventSourcing
                         new TConsumerData()
                     ),
                     notification,
-                    provider1,
-                    provider2
+                    leftProvider,
+                    rightProvider
                 );
             };
         }

@@ -65,12 +65,12 @@ namespace EventSourcing
         Func<DateTimeOffset> clock,
         TProvider provider);
 
-    public delegate void Integrator<in TProvider1, in TProvider2>(
+    public delegate void Integrator<in TLeftProvider, in TRightProvider>(
         IDomainEvent notification,
         NotificationsByCorrelations queryNotificationsByCorrelations,
         Func<DateTimeOffset> clock,
-        TProvider1 provider1,
-        TProvider2 provider2);
+        TLeftProvider leftProvider,
+        TRightProvider rightProvider);
 
     public class PublishersBySubscription : Dictionary<Subscription, Publisher>
     { }
@@ -78,6 +78,6 @@ namespace EventSourcing
     public class ExportersBySubscription<TProvider> : Dictionary<Subscription, Exporter<TProvider>>
     { }
 
-    public class IntegratorsBySubscription<TProvider1, TProvider2> : Dictionary<Subscription, Integrator<TProvider1, TProvider2>>
+    public class IntegratorsBySubscription<TLeftProvider, TRightProvider> : Dictionary<Subscription, Integrator<TLeftProvider, TRightProvider>>
     { }
 }

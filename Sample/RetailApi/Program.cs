@@ -5,6 +5,7 @@ using Nancy.Hosting.Self;
 using RetailDomain.Inventory;
 using RetailDomain.Refunds;
 using SerializedInvocation;
+using Subscriptions;
 
 namespace WebApi
 {
@@ -13,10 +14,11 @@ namespace WebApi
         static void Main(string[] args)
         {
             new EventStoreConfiguration()
-                 .ConfigureTransport<EventStoreTransportConnectionString>()
-                 .ConfigureSubscriptions(
+                .ConfigureTransport<EventStoreTransportConnectionString>()
+                .ConfigureSubscriptions(
                     InventoryItemStockHandler.Subscriptions(),
                     RefundProductOrderHandler.Subscriptions());
+                 
 
             var uri = new Uri("http://localhost:3785");
 

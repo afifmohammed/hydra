@@ -1,4 +1,5 @@
-﻿using EventSourcing;
+﻿using System.Linq;
+using EventSourcing;
 
 namespace AdoNet
 {
@@ -21,16 +22,16 @@ namespace AdoNet
             return config;
         }
 
-        public static EventStoreConfiguration<TEventStoreConnectionStringName> ConfigurePublishingNotifications<TEventStoreConnectionStringName>(this EventStoreConfiguration<TEventStoreConnectionStringName> config)
+        public static EventStoreConfiguration<TEventStoreConnectionStringName> ConfigurePushNotifications<TEventStoreConnectionStringName>(this EventStoreConfiguration<TEventStoreConnectionStringName> config)
             where TEventStoreConnectionStringName : class
         {
-            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.Post = PostBox<AdoNetTransactionScopeProvider>.Post;
+            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.Notify = PostBox<AdoNetTransactionScopeProvider>.Drop;
             return config;
         }
 
-        public static EventStoreConfiguration<TEventStore> ConfigureEventStoreConnection<TEventStore>(this EventStoreConfiguration config) where TEventStore : class
+        public static EventStoreConfiguration<TEventStoreConnectionStringName> ConfigureEventStoreConnection<TEventStoreConnectionStringName>(this EventStoreConfiguration config) where TEventStoreConnectionStringName : class
         {
-            return new EventStoreConfiguration<TEventStore>();
+            return new EventStoreConfiguration<TEventStoreConnectionStringName>();
         }
     }
 }

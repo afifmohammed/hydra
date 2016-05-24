@@ -114,6 +114,10 @@
       <Project>{9B9F6273-3B0F-477C-AD7C-1E56CC213A5E}</Project>
       <Name>SerializedInvocation</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Subscriptions\Subscriptions.csproj">
+      <Project>{bb656f99-93e3-4e86-ae6e-532c7bc1f5d9}</Project>
+      <Name>Subscriptions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RetailDomain\RetailDomain.csproj">
       <Project>{d7a08a88-5a12-4053-bb27-09593dc7debe}</Project>
       <Name>RetailDomain</Name>

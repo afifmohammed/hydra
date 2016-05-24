@@ -25,30 +25,35 @@ namespace EventSourcing
         public static PublisherVersionByCorrelationsFunction<TProvider> PublisherVersionByCorrelationsFunction { get; set; }
         public static SaveNotificationsByPublisherAndVersionAction<TProvider> SaveNotificationsByPublisherAndVersionAction { get; set; }
         public static CommitWork<TProvider> CommitEventStoreWork { get; set; }
-        public static Post Post = messages => { };
 
-        public static Subscriber Subscriber = message => 
-            HandleAndCommitAndPost
-            (
-                message, 
-                EventStore.PublishersBySubscription,
-                NotificationsByCorrelationsFunction,
-                PublisherVersionByCorrelationsFunction,
-                SaveNotificationsByPublisherAndVersionAction,
-                CommitEventStoreWork, 
-                Post
-            );
+        public static Notify Notify = getSubscriptions => messages => { };
+
+        public static Func<PublishersBySubscription, Func<IEnumerable<Subscription>>, Subscriber> Subscriber =
+            (publishersBySubscription, getSubscriptions) =>
+                message => 
+                    HandleAndCommitAndPost
+                    (
+                        getSubscriptions,
+                        message, 
+                        publishersBySubscription,
+                        NotificationsByCorrelationsFunction,
+                        PublisherVersionByCorrelationsFunction,
+                        SaveNotificationsByPublisherAndVersionAction,
+                        CommitEventStoreWork, 
+                        Notify
+                    );
 
         internal static void HandleAndCommitAndPost(
+            Func<IEnumerable<Subscription>> getSubscriptions,
             SubscriberMessage message,
             PublishersBySubscription publishersBySubscription,
             NotificationsByCorrelationsFunction<TProvider> notificationsByCorrelationsFunction,
             PublisherVersionByCorrelationsFunction<TProvider> publisherVersionByCorrelationsFunction,
             SaveNotificationsByPublisherAndVersionAction<TProvider> saveNotificationsByPublisherAndVersionAction,
             CommitWork<TProvider> commitWork, 
-            Post post)
+            Notify notify)
         {
-            var list = new List<SubscriberMessage>();
+            var list = new List<IDomainEvent>();
 
             commitWork(provider =>
             {
@@ -62,7 +67,7 @@ namespace EventSourcing
                     messages => list.AddRange(messages));
             });
 
-            post(list);
+            notify(getSubscriptions)(list);
         }
 
         internal static void Handle(
@@ -72,7 +77,7 @@ namespace EventSourcing
             Func<IEnumerable<Correlation>, int> publisherVersionByPublisherDataContractCorrelations,
             Func<DateTimeOffset> clock,
             Action<NotificationsByPublisherAndVersion> saveNotificationsByPublisherAndVersion,
-            Action<IEnumerable<SubscriberMessage>> notify)
+            Action<IEnumerable<IDomainEvent>> notify)
         {
             var publisher = publishersBySubscription[message.Subscription];
 
@@ -87,34 +92,7 @@ namespace EventSourcing
 
             saveNotificationsByPublisherAndVersion(notificationsByPublisherAndVersion);
 
-            notify(notificationsByPublisher
-                .Notifications
-                .SelectMany(n => SubscriberMessages.By(n.Item1, publishersBySubscription.Keys))
-                .ToArray());
+            notify(notificationsByPublisher.Notifications.Select(x => x.Item1));
         }
     }
-
-    public static class EventStore
-    {
-        static EventStore()
-        {
-            PublishersBySubscription = new PublishersBySubscription();
-        }
-
-        public static PublishersBySubscription PublishersBySubscription { get; set; }
-
-        public static void Register(params PublishersBySubscription[][] subscriptions)
-        {
-            PublishersBySubscription = PublishersBySubscription ?? new PublishersBySubscription();
-
-            foreach (var kvp in subscriptions
-                .SelectMany(x => x)
-                .SelectMany(subscription => subscription))
-            {
-                PublishersBySubscription.Add(kvp.Key, kvp.Value);
-            }
-        }
-    }
-
-
 }

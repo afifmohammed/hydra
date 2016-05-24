@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A0E76561-ABD7-4739-8D82-BEE6F2AD8EBC}</ProjectGuid>
+    <ProjectGuid>{BB656F99-93E3-4E86-AE6E-532C7BC1F5D9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EventSourcing</RootNamespace>
-    <AssemblyName>FluentApi</AssemblyName>
+    <RootNamespace>Subscriptions</RootNamespace>
+    <AssemblyName>Subscriptions</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -40,19 +40,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FluentInterfaces\Publishers.cs" />
-    <Compile Include="FluentInterfaces\Subscribers\OneEndpoint.cs" />
-    <Compile Include="FluentInterfaces\Subscribers\TwoEndpoints.cs" />
+    <Compile Include="Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AdoNet\AdoNet.csproj">
+      <Project>{223A1668-8FC2-4399-9047-287B9DBF2636}</Project>
+      <Name>AdoNet</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EventSourcing\Core.csproj">
       <Project>{E6E5141E-A6AC-434A-9697-784811570ECB}</Project>
       <Name>Core</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
+    <ProjectReference Include="..\FluentApi\FluentApi.csproj">
+      <Project>{A0E76561-ABD7-4739-8D82-BEE6F2AD8EBC}</Project>
+      <Name>FluentApi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RequestPipeline\RequestPipeline.csproj">
+      <Project>{900B7A11-306E-46ED-9267-552BB7840BC1}</Project>
+      <Name>RequestPipeline</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Requests\Requests.csproj">
+      <Project>{EB7A999C-A296-4051-854A-41E5FFABA4D5}</Project>
+      <Name>Requests</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

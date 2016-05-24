@@ -15,7 +15,6 @@ namespace Requests
         public RequestsRegistration<TProvider> Register<TInput, TOutput>(
             Func<TInput, TProvider, TOutput> function,
             Func<Func<TInput, TProvider, TOutput>, Func<TInput, TProvider, IEnumerable<TOutput>>> list)
-            where TOutput : class
         {
             RequestHandlers.Routes.Add(Function.ToKvp(list(function), ProvideProvider));
             return this;
@@ -23,7 +22,6 @@ namespace Requests
 
         public RequestsRegistration<TProvider> Register<TInput, TOutput>(
             Func<TInput, TProvider, IEnumerable<TOutput>> function)
-            where TOutput : class
         {
             RequestHandlers.Routes.Add(Function.ToKvp(function, ProvideProvider));
             return this;
@@ -31,7 +29,6 @@ namespace Requests
 
         Func<TInput, IEnumerable<TResult>> ProvideProvider<TInput, TResult>(
             Func<TInput, TProvider, IEnumerable<TResult>> query)
-            where TResult : class
         {
             return input =>
             {

@@ -1,10 +1,7 @@
 ﻿using AdoNet;
 using System;
-using System.Linq;
 using EventSourcing;
 using Hangfire;
-using RetailDomain.Inventory;
-using RetailDomain.Refunds;
 using SerializedInvocation;
 
 namespace PublisherHost
@@ -16,17 +13,10 @@ namespace PublisherHost
            new EventStoreConfiguration()             
                 .ConfigureEventStoreConnection<EventStoreConnectionString>()                
                 .ConfigurePublishers()
-                .ConfigurePublishingNotifications()
-                .ConfigureTransport<EventStoreTransportConnectionString>()
-                .ConfigureSubscriptions(
-                    InventoryItemStockHandler.Subscriptions(),
-                    RefundProductOrderHandler.Subscriptions());
+                .ConfigurePushNotifications()
+                .ConfigureTransport<EventStoreTransportConnectionString>();
 
-
-            var options = new BackgroundJobServerOptions
-            {
-                Queues = EventStore.PublishersBySubscription.Keys.Select(x => x.SubscriberDataContract.Value.ToLower()).ToArray()
-            };
+            var options = new BackgroundJobServerOptions().With(x => x.QueuePerSubscriber());
 
             using (new BackgroundJobServer(options))
             {
