@@ -15,11 +15,11 @@ namespace Hydra.Subscriptions
     {
         public static Func<IEnumerable<Subscription>> GetSubscriptions = () => Request<Subscription>.By(new AvailableSubscriptions());
 
-        public static Response<Unit> Dispatch<TCommand>(TCommand command) where TCommand : IRequest<Unit>, ICorrelated
+        public static Response<Unit> Dispatch<TRequest>(TRequest command) where TRequest : IRequest<Unit>, ICorrelated
         {
             var subscriptions = new Lazy<IReadOnlyCollection<Subscription>>(() => new List<Subscription>(GetSubscriptions()).AsReadOnly());
 
-            return RequestPipeline<AdoNetTransactionScopeProvider>.Dispatch<TCommand>(() => subscriptions.Value)(command);
+            return RequestPipeline<AdoNetTransactionScopeProvider>.Place<TRequest>(() => subscriptions.Value)(command);
         }
     }
 

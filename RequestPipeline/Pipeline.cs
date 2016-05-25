@@ -13,24 +13,24 @@ namespace Hydra.RequestPipeline
         where TRequest : IRequest<TResult>, ICorrelated
         where TResult : class
     {
-        public static Dispatch<TRequest, TResult> Dispatch = input =>
+        public static Dispatch<TRequest, TResult> Dispatch = request =>
             DispatchThroughPipeline(
-                input,
-                request => Request<bool>.By(new Authenticate<TRequest, TResult> { Request = request }).All(x => x),
-                request => Request<bool>.By(new Authorise<TRequest, TResult> { Request = request }).All(x => x),
-                request => Request<IEnumerable<KeyValuePair<string, string>>>.By(new Validate<TRequest, TResult> { Request = request }).SelectMany(x => x),
-                request => Request<TResult>.By(request));
+                request,
+                input => Request<bool>.By(new Authenticate<TRequest, TResult> { Request = input }).All(x => x),
+                input => Request<bool>.By(new Authorise<TRequest, TResult> { Request = input }).All(x => x),
+                input => Request<IEnumerable<KeyValuePair<string, string>>>.By(new Validate<TRequest, TResult> { Request = input }).SelectMany(x => x),
+                input => Request<TResult>.By(input));
 
         public static Response<TResult> DispatchThroughPipeline(
-            TRequest input,
-            Func<TRequest, IEnumerable<TResult>> dispatch)
+            TRequest request,
+            Func<TRequest, IEnumerable<TResult>> dispatcher)
         {
             return DispatchThroughPipeline(
-                input,
-                request => Request<bool>.By(new Authenticate<TRequest, TResult> { Request = request }).All(x => x),
-                request => Request<bool>.By(new Authorise<TRequest, TResult> { Request = request }).All(x => x),
-                request => Request<IEnumerable<KeyValuePair<string, string>>>.By(new Validate<TRequest, TResult> { Request = request }).SelectMany(x => x),
-                dispatch);
+                request,
+                input => Request<bool>.By(new Authenticate<TRequest, TResult> { Request = input }).All(x => x),
+                input => Request<bool>.By(new Authorise<TRequest, TResult> { Request = input }).All(x => x),
+                input => Request<IEnumerable<KeyValuePair<string, string>>>.By(new Validate<TRequest, TResult> { Request = input }).SelectMany(x => x),
+                dispatcher);
         }
 
         public static Response<TResult> DispatchThroughPipeline(
@@ -38,7 +38,7 @@ namespace Hydra.RequestPipeline
             Func<TRequest, bool> authenticate,
             Func<TRequest, bool> authorise,
             Func<TRequest, IEnumerable<KeyValuePair<string, string>>> validator,
-            Func<TRequest, IEnumerable<TResult>> dispatch) 
+            Func<TRequest, IEnumerable<TResult>> dispatcher) 
         {
             if (!authenticate(request))
                 return new Response<TResult>
@@ -64,7 +64,7 @@ namespace Hydra.RequestPipeline
                     : HttpStatusCode.Accepted);
 
             if (response.Status == HttpStatusCode.Accepted)
-                return response.With(x => x.Result = dispatch(request));
+                return response.With(x => x.Result = dispatcher(request));
 
             return response;
         }
