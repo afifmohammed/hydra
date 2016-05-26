@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using Hydra.AdoNet;
+using Hydra.Configuration;
 using Hydra.Core;
 using Hydra.Core.FluentInterfaces;
 using Hydra.RequestPipeline;

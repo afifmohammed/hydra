@@ -68,9 +68,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EventSourcing\Core.csproj">
-      <Project>{e6e5141e-a6ac-434a-9697-784811570ecb}</Project>
-      <Name>Core</Name>
+    <ProjectReference Include="..\Contracts\Contracts.csproj">
+      <Project>{D2396379-DD06-41A6-9BFC-55AF3C2289A2}</Project>
+      <Name>Contracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\FluentApi\FluentApi.csproj">
       <Project>{a0e76561-abd7-4739-8d82-bee6f2ad8ebc}</Project>

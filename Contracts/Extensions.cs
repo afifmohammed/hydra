@@ -8,6 +8,15 @@ namespace Hydra.Core
 {
     public static class Extensions
     {
+        public static IEnumerable<SubscriberMessage> SubscriberMessages(
+            this INotification notification,
+            IEnumerable<Subscription> subscriptions)
+        {
+            return subscriptions
+                    .Where(subscription => subscription.NotificationContract.Equals(new TypeContract(notification)))
+                    .Select(subscription => new SubscriberMessage { Notification = notification, Subscription = subscription });
+        }
+
         public static IEnumerable<Correlation> Correlations(this IDomainEvent notification)
         {
             return notification.Correlations.Select(c => new Correlation

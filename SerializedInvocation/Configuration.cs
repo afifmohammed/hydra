@@ -4,6 +4,7 @@ using System.Linq;
 using Hangfire;
 using Hangfire.SqlServer;
 using Hydra.AdoNet;
+using Hydra.Configuration;
 using Hydra.Core;
 using Hydra.Requests;
 

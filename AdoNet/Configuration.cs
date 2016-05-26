@@ -1,4 +1,5 @@
-﻿using Hydra.Core;
+﻿using Hydra.Configuration;
+using Hydra.Core;
 using Hydra.Requests;
 
 namespace Hydra.AdoNet

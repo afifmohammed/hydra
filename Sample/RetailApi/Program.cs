@@ -1,5 +1,5 @@
 ﻿using System;
-using Hydra.Core;
+using Hydra.Configuration;
 using Hydra.SerializedInvocation;
 using Hydra.Subscriptions;
 using Nancy;

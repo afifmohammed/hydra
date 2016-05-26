@@ -67,6 +67,14 @@
       <Project>{223a1668-8fc2-4399-9047-287b9dbf2636}</Project>
       <Name>AdoNet</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Configuration\Configuration.csproj">
+      <Project>{D89C6BA8-8A9B-4278-AC17-42B1476E47D4}</Project>
+      <Name>Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Contracts\Contracts.csproj">
+      <Project>{d2396379-dd06-41a6-9bfc-55af3c2289a2}</Project>
+      <Name>Contracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EventSourcing\Core.csproj">
       <Project>{e6e5141e-a6ac-434a-9697-784811570ecb}</Project>
       <Name>Core</Name>

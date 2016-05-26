@@ -2,7 +2,7 @@
 
 namespace Hydra.Core
 {
-    public delegate void Handler<TProvider>(
+    delegate void Handler<TProvider>(
         SubscriberMessage messageToConsumer,
         ExportersBySubscription<TProvider> exportersBySubscription,
         NotificationsByCorrelations notificationsByCorrelations,

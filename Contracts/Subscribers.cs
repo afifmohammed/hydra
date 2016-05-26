@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Hydra.Core
 {
@@ -41,15 +40,6 @@ namespace Hydra.Core
     {
         public Subscription Subscription { get; set; }
         public INotification Notification { get; set; }
-    }
-
-    public static class SubscriberMessages
-    {
-        public static Func<INotification, IEnumerable<Subscription>, IEnumerable<SubscriberMessage>> By =
-            (notification, subscriptions) =>
-                subscriptions
-                    .Where(subscription => subscription.NotificationContract.Equals(new TypeContract(notification)))
-                    .Select(subscription => new SubscriberMessage { Notification = notification, Subscription = subscription });
     }
 
     public delegate void Subscriber(SubscriberMessage message);

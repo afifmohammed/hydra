@@ -4,21 +4,6 @@ using System.Linq;
 
 namespace Hydra.Core
 {
-    public delegate Func<IEnumerable<Correlation>, int> PublisherVersionByCorrelationsFunction<in TProvider>(
-        TProvider provider) 
-        where TProvider : IProvider;
-
-    public delegate IEnumerable<SerializedNotification> NotificationsByCorrelations(
-        IEnumerable<Correlation> correlation);
-
-    public delegate NotificationsByCorrelations NotificationsByCorrelationsFunction<in TProvider>(
-        TProvider provider) 
-        where TProvider : IProvider;
-
-    public delegate Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersionAction<in TProvider>(
-        TProvider provider) 
-        where TProvider : IProvider;
-
     public static class EventStore<TProvider> where TProvider : IProvider
     {
         public static NotificationsByCorrelationsFunction<TProvider> NotificationsByCorrelationsFunction { get; set; }

@@ -1,6 +1,7 @@
 ﻿using System;
 using Hangfire;
 using Hydra.AdoNet;
+using Hydra.Configuration;
 using Hydra.Core;
 using Hydra.SerializedInvocation;
 

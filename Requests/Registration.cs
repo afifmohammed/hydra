@@ -17,11 +17,28 @@ namespace Hydra.Requests
             _providerFactory = providerFactory;
         }
 
+        public RequestsRegistration<TProvider> RegisterRequest<TInput, TOutput>(
+            Func<TInput, TProvider, TOutput> function,
+            Func<Func<TInput, TProvider, TOutput>, Func<TInput, TProvider, IEnumerable<TOutput>>> list)
+            where TInput : IRequest<TOutput>
+        {
+            Register(function, list);
+            return this;
+        }
+
         public RequestsRegistration<TProvider> Register<TInput, TOutput>(
             Func<TInput, TProvider, TOutput> function,
             Func<Func<TInput, TProvider, TOutput>, Func<TInput, TProvider, IEnumerable<TOutput>>> list)
         {
             RequestHandlers.Routes.Add(Function.ToKvp(list(function), ProvideProvider));
+            return this;
+        }
+
+        public RequestsRegistration<TProvider> RegisterRequest<TInput, TOutput>(
+            Func<TInput, TProvider, IEnumerable<TOutput>> function)
+            where TInput : IRequest<TOutput>
+        {
+            Register(function);
             return this;
         }
 

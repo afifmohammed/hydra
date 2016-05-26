@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Hydra.Configuration;
 using Hydra.Core;
 using Hydra.Requests;
 

@@ -29,7 +29,7 @@ namespace Hydra.AdoNet
                 LastSeenFunction,
                 RecentNotificationsFunction,
                 subscriptions.Select(x => x.NotificationContract),
-                notifications => PostBox<AdoNetTransactionScopeProvider>.Post(notifications.SelectMany(notification => SubscriberMessages.By(notification, subscriptions))),
+                notifications => PostBox<AdoNetTransactionScopeProvider>.Post(notifications.SelectMany(notification => notification.SubscriberMessages(subscriptions))),
                 RecordLastSeenFunction
             );
         }
