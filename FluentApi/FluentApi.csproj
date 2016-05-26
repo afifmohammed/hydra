@@ -45,8 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FluentInterfaces\Publishers.cs" />
-    <Compile Include="FluentInterfaces\Subscribers\OneEndpoint.cs" />
-    <Compile Include="FluentInterfaces\Subscribers\TwoEndpoints.cs" />
+    <Compile Include="FluentInterfaces\Exporters.cs" />
+    <Compile Include="FluentInterfaces\Integrators.cs" />
     <Compile Include="Functions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

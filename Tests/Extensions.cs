@@ -1,42 +1,56 @@
 using System;
+using System.Activities.Tracking;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Hydra.Core;
-using Hydra.Core.FluentInterfaces.Subscribers;
+using Hydra.Core.FluentInterfaces;
 
 namespace Tests
 {
     static class Extensions
     {
-        public static ConsumerContractSubscriptions<TSubscriberDataContract, TProvider> Notify<TSubscriberDataContract, TProvider>(
-            this ConsumerContractSubscriptions<TSubscriberDataContract, TProvider> consumerContractSubscriptions,
-            IDomainEvent notification,
-            TProvider provider) 
-            where TSubscriberDataContract : new()
+        public static Func<TypeContract, IEnumerable<Action<INotification, TProvider>>> Given<TProvider>(
+            this ExportersBySubscription<TProvider> subscriptions,
+            params IDomainEvent[] given)
             where TProvider : IProvider
         {
-            consumerContractSubscriptions
-                .ExportersBySubscription[new Subscription(notificationContract: new TypeContract(notification), subscriberDataContract: new TypeContract(typeof (TSubscriberDataContract)))]
-                (
-                    notification, 
-                    NotificationsByCorrelations(), 
-                    () => DateTimeOffset.Now, 
-                    provider
-                );
-            return consumerContractSubscriptions;
+            return n => subscriptions
+                .Where(p => p.Key.NotificationContract.Equals(n))
+                .Select(p => p.Value)
+                .Select<Exporter<TProvider>, Action<INotification, TProvider>>(exporter =>
+                    (notification, provider) =>
+                            exporter(
+                                notification,
+                                NotificationsByCorrelations(given),
+                                () => DateTimeOffset.Now,
+                                provider));
         }
 
-        public static Func<INotification, IEnumerable<Func<INotification, NotificationsByPublisher>>> Given(
+        public static void Notify<TProvider>(
+            this Func<TypeContract, IEnumerable<Action<INotification, TProvider>>> consumerContractSubscriptions,
+            IDomainEvent notification,
+            TProvider provider)
+            where TProvider : IProvider
+        {
+            foreach (var action in consumerContractSubscriptions(notification.Contract()))
+            {
+                action(notification, provider);
+            }
+        }
+
+        public static Func<TypeContract, IEnumerable<Func<INotification, NotificationsByPublisher>>> Given(
             this PublishersBySubscription subscriptions,
             params IDomainEvent[] given)
         {
-            return n => subscriptions
-                .Where(p => p.Key.NotificationContract.Equals(n.Contract())).Select(p => p.Value)
+            return contract => subscriptions
+                .Where(p => p.Key.NotificationContract.Equals(contract))
+                .Select(p => p.Value)
                 .Select<Publisher, Func<INotification, NotificationsByPublisher>>
                 (
-                    function =>
+                    publisher =>
                         notification =>
-                            function(
+                            publisher(
                                 notification,
                                 NotificationsByCorrelations(given),
                                 () => DateTimeOffset.Now)
@@ -44,12 +58,34 @@ namespace Tests
 
         }
 
-        public static Lazy<IEnumerable<NotificationsByPublisher>> Notify<TNotification>(this
-            Func<INotification, IEnumerable<Func<INotification, NotificationsByPublisher>>> publishers,
+        public static ConsumerContractSubscriptions<TSubscriberDataContract, TProvider> Notify<TSubscriberDataContract, TProvider>(
+            this ConsumerContractSubscriptions<TSubscriberDataContract, TProvider> consumerContractSubscriptions,
+            IDomainEvent notification,
+            TProvider provider)
+            where TSubscriberDataContract : new()
+            where TProvider : IProvider
+        {
+            var subscription = new Subscription(
+                notificationContract: new TypeContract(notification),
+                subscriberDataContract: new TypeContract(typeof(TSubscriberDataContract)));
+
+            consumerContractSubscriptions
+                .ExportersBySubscription[subscription]
+                (
+                    notification,
+                    NotificationsByCorrelations(),
+                    () => DateTimeOffset.Now,
+                    provider
+                );
+            return consumerContractSubscriptions;
+        }
+
+        public static Lazy<IEnumerable<NotificationsByPublisher>> Notify<TNotification>(
+            this Func<TypeContract, IEnumerable<Func<INotification, NotificationsByPublisher>>> publishers,
             TNotification notification)
             where TNotification : INotification
         {
-            return new Lazy<IEnumerable<NotificationsByPublisher>>(() => publishers(notification)
+            return new Lazy<IEnumerable<NotificationsByPublisher>>(() => publishers(notification.Contract())
                 .Select(x => x(notification)));
         }
 

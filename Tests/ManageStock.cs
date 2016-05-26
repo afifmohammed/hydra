@@ -15,11 +15,17 @@ namespace Tests
         {
             var store = new InMemoryView<InventoryItemStockView>();
             InventoryItemStockViewBuilder.Subscriptions()
-                .Notify(new InventoryItemCreated {Id = "1"}, store)
-                .Notify(new ItemsCheckedInToInventory { Id = "1", Count = 10 }, store)
-                .Notify(new ItemsCheckedInToInventory { Id = "2", Count = 10 }, store);
+                .ExportersBySubscription
+                .Given(
+                    new InventoryItemCreated { Id = "1" },
+                    new ItemsCheckedInToInventory { Id = "1", Count = 10 },
+                    new ItemsCheckedInToInventory { Id = "1", Count = 30 },
+                    new InventoryItemCreated { Id = "2" },
+                    new ItemsCheckedInToInventory { Id = "2", Count = 3 },
+                    new ItemsCheckedInToInventory { Id = "1", Count = 50 })
+                .Notify(new ItemsCheckedInToInventory { Id = "1", Count = 7 }, store);
             
-            Assert.Equal(10, store["1"].Count);
+            Assert.Equal(97, store["1"].Count);
         }
     }
 
