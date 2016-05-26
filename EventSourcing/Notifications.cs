@@ -3,8 +3,10 @@ using System.Collections.Generic;
 
 namespace Hydra.Core
 {
-    public interface IDomainEvent : ICorrelated
-    {}
+    public interface INotification : ICorrelated { }
+
+    public interface IDomainEvent : INotification
+    { }
 
     public struct SerializedNotification
     {

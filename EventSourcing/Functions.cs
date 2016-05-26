@@ -88,7 +88,7 @@ namespace Hydra.Core
             IDictionary<TypeContract, Func<TPublisherData, JsonContent, TPublisherData>> publisherDataMappersByNotificationContract,
             Func<DateTimeOffset> clock)
             where TPublisherData : new()
-            where TNotification : IDomainEvent
+            where TNotification : INotification
         {
             return notification =>
             {
@@ -232,7 +232,7 @@ namespace Hydra.Core
         public static IEnumerable<Correlation> HandlerDataCorrelationsBy<TNotification>(
             IEnumerable<CorrelationMap> handlerDataCorrelationMaps,
             TNotification notification) 
-            where TNotification : IDomainEvent
+            where TNotification : INotification
         {
             return handlerDataCorrelationMaps
                 .Where(m => m.NotificationContract.Equals(typeof(TNotification).Contract()))

@@ -25,13 +25,13 @@ namespace Tests
             return consumerContractSubscriptions;
         }
 
-        public static Func<IDomainEvent, IEnumerable<Func<IDomainEvent, NotificationsByPublisher>>> Given(
+        public static Func<INotification, IEnumerable<Func<INotification, NotificationsByPublisher>>> Given(
             this PublishersBySubscription subscriptions,
             params IDomainEvent[] given)
         {
             return n => subscriptions
                 .Where(p => p.Key.NotificationContract.Equals(n.Contract())).Select(p => p.Value)
-                .Select<Publisher, Func<IDomainEvent, NotificationsByPublisher>>
+                .Select<Publisher, Func<INotification, NotificationsByPublisher>>
                 (
                     function =>
                         notification =>
@@ -44,9 +44,9 @@ namespace Tests
         }
 
         public static Lazy<IEnumerable<NotificationsByPublisher>> Notify<TNotification>(this
-            Func<IDomainEvent, IEnumerable<Func<IDomainEvent, NotificationsByPublisher>>> publishers,
+            Func<INotification, IEnumerable<Func<INotification, NotificationsByPublisher>>> publishers,
             TNotification notification)
-            where TNotification : IDomainEvent
+            where TNotification : INotification
         {
             return new Lazy<IEnumerable<NotificationsByPublisher>>(() => publishers(notification)
                 .Select(x => x(notification)));

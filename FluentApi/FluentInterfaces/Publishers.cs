@@ -10,7 +10,7 @@ namespace Hydra.Core.FluentInterfaces
         PublisherContractSubscriptions<TSubscriberDataContract>, 
         Then<TSubscriberDataContract, TNotification>
         where TSubscriberDataContract : new()
-        where TNotification : IDomainEvent
+        where TNotification : INotification
     {
         CorrelationMap<TSubscriberDataContract, TNotification> Correlate(
             Expression<Func<TNotification, object>> left, 
@@ -44,12 +44,12 @@ namespace Hydra.Core.FluentInterfaces
             where TNotification : IDomainEvent;
 
         CorrelationMap<TSubscriberDataContract, TNotification> When<TNotification>() 
-            where TNotification : IDomainEvent;
+            where TNotification : INotification;
     }
 
     public interface Then<TSubscriberDataContract, out TNotification>
         where TSubscriberDataContract : new()
-        where TNotification : IDomainEvent
+        where TNotification : INotification
     {
         PublisherContractSubscriptions<TSubscriberDataContract> Then(
             Func<TSubscriberDataContract, TNotification, IEnumerable<IDomainEvent>> handler);
@@ -85,7 +85,7 @@ namespace Hydra.Core.FluentInterfaces
         }
 
         public CorrelationMap<TSubscriberDataContract, TNotification> When<TNotification>() 
-            where TNotification : IDomainEvent
+            where TNotification : INotification
         {
             return new PublisherCorrelationMap<TSubscriberDataContract, TNotification>
             (
@@ -98,7 +98,7 @@ namespace Hydra.Core.FluentInterfaces
 
     class PublisherCorrelationMap<TSubscriberDataContract, TNotification> : CorrelationMap<TSubscriberDataContract, TNotification>
         where TSubscriberDataContract : new()
-        where TNotification : IDomainEvent
+        where TNotification : INotification
     {
         readonly List<KeyValuePair<TypeContract, CorrelationMap>> _publisherDataContractMaps;
         readonly List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> _publisherDataMappers;
@@ -143,7 +143,7 @@ namespace Hydra.Core.FluentInterfaces
         }
 
         public CorrelationMap<TSubscriberDataContract, TNotification1> When<TNotification1>() 
-            where TNotification1 : IDomainEvent
+            where TNotification1 : INotification
         {
             return new PublisherCorrelationMap<TSubscriberDataContract, TNotification1>(
                 _publisherDataContractMaps,

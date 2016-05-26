@@ -29,7 +29,8 @@ namespace Hydra.RequestPipeline
         public TRequest Request { get; set; }
     }
 
-    public class Placed<TCommand> : IDomainEvent where TCommand : IRequest<Unit>, ICorrelated
+    public class Placed<TCommand> : INotification 
+        where TCommand : IRequest<Unit>, ICorrelated
     {
         public TCommand Command { get; set; }
         public IEnumerable<KeyValuePair<string, object>> Correlations => Command.Correlations;

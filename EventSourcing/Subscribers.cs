@@ -40,12 +40,12 @@ namespace Hydra.Core
     public class SubscriberMessage
     {
         public Subscription Subscription { get; set; }
-        public IDomainEvent Notification { get; set; }
+        public INotification Notification { get; set; }
     }
 
     public static class SubscriberMessages
     {
-        public static Func<IDomainEvent, IEnumerable<Subscription>, IEnumerable<SubscriberMessage>> By =
+        public static Func<INotification, IEnumerable<Subscription>, IEnumerable<SubscriberMessage>> By =
             (notification, subscriptions) =>
                 subscriptions
                     .Where(subscription => subscription.NotificationContract.Equals(new TypeContract(notification)))
@@ -55,12 +55,12 @@ namespace Hydra.Core
     public delegate void Subscriber(SubscriberMessage message);
 
     public delegate NotificationsByPublisher Publisher(
-        IDomainEvent notification,
+        INotification notification,
         NotificationsByCorrelations queryNotificationsByCorrelations,
         Func<DateTimeOffset> clock);
 
     public delegate void Exporter<in TProvider>(
-        IDomainEvent notification,
+        INotification notification,
         NotificationsByCorrelations queryNotificationsByCorrelations,
         Func<DateTimeOffset> clock,
         TProvider provider);

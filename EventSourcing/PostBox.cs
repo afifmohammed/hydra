@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Hydra.Core
 {
-    public delegate Action<IEnumerable<IDomainEvent>> Notify(Func<IEnumerable<Subscription>> subscriptions);
+    public delegate Action<IEnumerable<INotification>> Notify(Func<IEnumerable<Subscription>> subscriptions);
 
     public delegate void Post(IEnumerable<SubscriberMessage> messages);
 
