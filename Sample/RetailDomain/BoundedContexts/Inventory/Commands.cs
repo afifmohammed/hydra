@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Hydra.Core;
-using Hydra.RequestPipeline;
+using Hydra.Requests;
 
 namespace RetailDomain.Inventory
 {

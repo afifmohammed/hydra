@@ -5,7 +5,7 @@ namespace Hydra.PublishOnPull
 {
     public class NoEventId : EventId { }
 
-    public class EventId : Unit<long>
+    public class EventId : Wrapper<long>
     {
         public long Value
         {
@@ -13,7 +13,7 @@ namespace Hydra.PublishOnPull
         }
     }
 
-    public class EventName : Unit<string>
+    public class EventName : Wrapper<string>
     {
         public string Value
         {

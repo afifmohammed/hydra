@@ -3,6 +3,11 @@ using System.Collections.Generic;
 
 namespace Hydra.Requests
 {
+    public sealed class Unit { }
+
+    public interface IRequest<TResult>
+    { }
+
     public class RequestsRegistration<TProvider> where TProvider : IDisposable
     {
         readonly Func<TProvider> _providerFactory;

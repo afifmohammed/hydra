@@ -54,7 +54,7 @@ namespace Hydra.Subscriptions
             return configuration;
         }
 
-        class Disposable<T> : Unit<T>, IDisposable
+        class Disposable<T> : Wrapper<T>, IDisposable
         {
             public Disposable(T instance)
             {

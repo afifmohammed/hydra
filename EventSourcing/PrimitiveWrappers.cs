@@ -3,12 +3,12 @@ using Newtonsoft.Json;
 
 namespace Hydra.Core
 {
-    public interface Unit<out TValue>
+    public interface Wrapper<out TValue>
     {
         TValue Value { get; }
     }
 
-    public struct JsonContent : Unit<string>
+    public struct JsonContent : Wrapper<string>
     {
         public JsonContent(object obj)
         {
@@ -39,7 +39,7 @@ namespace Hydra.Core
         }
     }
 
-    public struct Version : Unit<int>
+    public struct Version : Wrapper<int>
     {
         public Version(int value)
         {
@@ -48,7 +48,7 @@ namespace Hydra.Core
         public int Value { get; set; }
     }
 
-    public struct TypeContract : Unit<string>
+    public struct TypeContract : Wrapper<string>
     {
         public TypeContract(Type t)
         {

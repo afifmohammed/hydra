@@ -3,14 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Hydra.Core;
+using Hydra.Requests;
 
 namespace Hydra.RequestPipeline
 {
-    public interface IRequest<TResult>        
-    { }
-
-    public sealed class Unit { }
-        
     public class Authenticate<TRequest, TResult> : IRequest<bool> 
         where TRequest : IRequest<TResult>
     {

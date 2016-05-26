@@ -6,7 +6,7 @@ using Hydra.Core;
 
 namespace Hydra.AdoNet
 {
-    public class AdoNetTransactionScopeProvider : Unit<TransactionScope>, IDisposable, IProvider
+    public class AdoNetTransactionScopeProvider : Wrapper<TransactionScope>, IDisposable, IProvider
     {
         public AdoNetTransactionScopeProvider()
         {
@@ -33,7 +33,7 @@ namespace Hydra.AdoNet
         public TransactionScope Value { get; }
     }
 
-    public class AdoNetTransactionProvider<TConnectionStringName> : Unit<IDbTransaction>, IDisposable, IProvider
+    public class AdoNetTransactionProvider<TConnectionStringName> : Wrapper<IDbTransaction>, IDisposable, IProvider
         where TConnectionStringName : class
     {
         public AdoNetTransactionProvider(Func<string, string> getConnectionString)
@@ -69,7 +69,7 @@ namespace Hydra.AdoNet
         }
     }
 
-    public class AdoNetConnectionProvider<TConnectionStringName> : Unit<IDbConnection>, IDisposable, IProvider
+    public class AdoNetConnectionProvider<TConnectionStringName> : Wrapper<IDbConnection>, IDisposable, IProvider
         where TConnectionStringName : class
     {
         public AdoNetConnectionProvider(Func<string, string> getConnectionString)
