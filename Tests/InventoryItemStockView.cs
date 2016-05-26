@@ -1,6 +1,4 @@
-﻿using System;
-using System.Activities.Expressions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Hydra.Core;
 using Hydra.Core.FluentInterfaces.Subscribers;
 using RetailDomain.Inventory;
