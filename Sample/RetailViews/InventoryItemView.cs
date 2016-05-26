@@ -1,7 +1,7 @@
 ﻿using Hydra.AdoNet;
 using Hydra.Core.FluentInterfaces;
 using RetailDomain.Inventory;
-
+using DapperExtensions;
 namespace RetailViews
 {
     public class InventoryItemStockView
@@ -17,47 +17,47 @@ namespace RetailViews
         public static ConsumerContractSubscriptions<InventoryItemStockView, AdoNetTransactionProvider<TConnectionStringName>> Subscriptions()
         {
             return new Denormalizer<InventoryItemStockView, TConnectionStringName>()
-                .When<InventoryItemCreated>()
+                .When<InventoryItemCreated>(Map)
                     .Correlate(x => x.Id, x => x.Sku)
                     .Then(Handle)
-                .When<InventoryItemDeactivated>()
+                .When<InventoryItemDeactivated>(Map)
                     .Correlate(x => x.Id, x => x.Sku)
                     .Then(Handle)
-                .When<InventoryItemStockLimitChanged>()
+                .When<InventoryItemStockLimitChanged>(Map)
                     .Correlate(x => x.Id, x => x.Sku)
                     .Then(Handle)
-                .When<ItemsCheckedInToInventory>()
+                .When<ItemsCheckedInToInventory>(Map)
                     .Correlate(x => x.Id, x => x.Sku)
                     .Then(Handle)
-                .When<ItemsRemovedFromInventory>()
+                .When<ItemsRemovedFromInventory>(Map)
                     .Correlate(x => x.Id, x => x.Sku)
                     .Then(Handle);
 
         }
 
-        private static void Handle(InventoryItemStockView arg1, ItemsRemovedFromInventory arg2, AdoNetTransactionProvider<TConnectionStringName> arg3)
+        private static void Handle(InventoryItemStockView view, ItemsRemovedFromInventory notification, AdoNetTransactionProvider<TConnectionStringName> provider)
         {
-            
+            provider.Value.Connection.Update(Map(notification, view), provider.Value);
         }
 
-        private static void Handle(InventoryItemStockView arg1, ItemsCheckedInToInventory arg2, AdoNetTransactionProvider<TConnectionStringName> arg3)
+        private static void Handle(InventoryItemStockView view, ItemsCheckedInToInventory notification, AdoNetTransactionProvider<TConnectionStringName> provider)
         {
-            
+            provider.Value.Connection.Update(Map(notification, view), provider.Value);
         }
 
-        private static void Handle(InventoryItemStockView arg1, InventoryItemStockLimitChanged arg2, AdoNetTransactionProvider<TConnectionStringName> arg3)
+        private static void Handle(InventoryItemStockView view, InventoryItemStockLimitChanged notification, AdoNetTransactionProvider<TConnectionStringName> provider)
         {
-            
+            provider.Value.Connection.Update(Map(notification, view), provider.Value);
         }
 
-        private static void Handle(InventoryItemStockView arg1, InventoryItemDeactivated arg2, AdoNetTransactionProvider<TConnectionStringName> arg3)
+        private static void Handle(InventoryItemStockView view, InventoryItemDeactivated notification, AdoNetTransactionProvider<TConnectionStringName> provider)
         {
-            
+            provider.Value.Connection.Update(Map(notification, view), provider.Value);
         }
 
-        private static void Handle(InventoryItemStockView arg1, InventoryItemCreated inventoryItemCreated, AdoNetTransactionProvider<TConnectionStringName> arg3)
+        private static void Handle(InventoryItemStockView view, InventoryItemCreated notification, AdoNetTransactionProvider<TConnectionStringName> provider)
         {
-            
+            provider.Value.Connection.Update(Map(notification, view), provider.Value);
         }
 
 
