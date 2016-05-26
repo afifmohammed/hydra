@@ -48,7 +48,7 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="Correlations.cs" />
     <Compile Include="EventStore.cs" />
-    <Compile Include="PostBox.cs" />
+    <Compile Include="PublishingEvents.cs" />
     <Compile Include="PrimitiveWrappers.cs" />
     <Compile Include="Functions.cs" />
     <Compile Include="Extensions.cs" />
