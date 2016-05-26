@@ -9,9 +9,11 @@ namespace Hydra.Core.FluentInterfaces.Subscribers
         ConsumerSubscriptions<TProvider>,
         When<TSubscriberContract, TProvider>
         where TSubscriberContract : new()
+        where TProvider : IProvider
     { }
 
     public interface ConsumerSubscriptions<TProvider>
+        where TProvider : IProvider
     {
         ExportersBySubscription<TProvider> ExportersBySubscription { get; }
     }
@@ -22,6 +24,7 @@ namespace Hydra.Core.FluentInterfaces.Subscribers
         Then<TSubscriberDataContract, TNotification, TProvider>
         where TSubscriberDataContract : new()
         where TNotification : IDomainEvent
+        where TProvider : IProvider
     {
         CorrelationMap<TSubscriberDataContract, TNotification, TProvider> Correlate(
             Expression<Func<TNotification, object>> left, 
@@ -30,6 +33,7 @@ namespace Hydra.Core.FluentInterfaces.Subscribers
 
     public interface Given<TSubscriberDataContract, TProvider>
         where TSubscriberDataContract : new()
+        where TProvider : IProvider
     {
         CorrelationMap<TSubscriberDataContract, TNotification, TProvider> Given<TNotification>(
             Func<TNotification, TSubscriberDataContract, TSubscriberDataContract> mapper) 
@@ -38,6 +42,7 @@ namespace Hydra.Core.FluentInterfaces.Subscribers
 
     public interface When<TSubscriberDataContract, TProvider>
         where TSubscriberDataContract : new()
+        where TProvider : IProvider
     {
         CorrelationMap<TSubscriberDataContract, TNotification, TProvider> When<TNotification>(
             Func<TNotification, TSubscriberDataContract, TSubscriberDataContract> mapper) 
@@ -50,6 +55,7 @@ namespace Hydra.Core.FluentInterfaces.Subscribers
     public interface Then<TSubscriberDataContract, out TNotification, TProvider>
         where TSubscriberDataContract : new()
         where TNotification : IDomainEvent
+        where TProvider : IProvider
     {
         ConsumerContractSubscriptions<TSubscriberDataContract, TProvider> Then(
             Action<TSubscriberDataContract, TNotification, TProvider> handler);
@@ -59,6 +65,7 @@ namespace Hydra.Core.FluentInterfaces.Subscribers
         Given<TSubscriberDataContract, TProvider>,
         When<TSubscriberDataContract, TProvider>
         where TSubscriberDataContract : new()
+        where TProvider : IProvider
     {
         public CorrelationMap<TSubscriberDataContract, TNotification, TProvider> Given<TNotification>(
             Func<TNotification, TSubscriberDataContract, TSubscriberDataContract> mapper) 
@@ -99,6 +106,7 @@ namespace Hydra.Core.FluentInterfaces.Subscribers
     class ConsumerCorrelationMap<TSubscriberDataContract, TNotification, TProvider> : CorrelationMap<TSubscriberDataContract, TNotification, TProvider>
         where TSubscriberDataContract : new()
         where TNotification : IDomainEvent
+        where TProvider : IProvider
     {
         readonly List<KeyValuePair<TypeContract, CorrelationMap>> _subscriberDataContractMaps;
         readonly List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> _subscriberDataMappers;

@@ -7,7 +7,8 @@ namespace Hydra.Core
         ExportersBySubscription<TProvider> exportersBySubscription,
         NotificationsByCorrelations notificationsByCorrelations,
         Func<DateTimeOffset> clock,
-        TProvider provider);
+        TProvider provider)
+        where TProvider : IProvider;
 
     public static class ExporterStore<TEventStoreProvider, TExportProvider> 
         where TExportProvider : IProvider

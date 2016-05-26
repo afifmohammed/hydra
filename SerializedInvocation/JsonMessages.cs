@@ -50,7 +50,7 @@ namespace Hydra.SerializedInvocation
                 Subscription = (Subscription) JsonConvert.DeserializeObject(
                     message.Subscription.Value,
                     message.SubscriptionType),
-                Notification = (IDomainEvent) JsonConvert.DeserializeObject(
+                Notification = (INotification) JsonConvert.DeserializeObject(
                     message.NotificationContent.Value,
                     message.NotificationType)
             };

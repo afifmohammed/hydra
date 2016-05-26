@@ -13,6 +13,7 @@ namespace Tests
             IDomainEvent notification,
             TProvider provider) 
             where TSubscriberDataContract : new()
+            where TProvider : IProvider
         {
             consumerContractSubscriptions
                 .ExportersBySubscription[new Subscription(notificationContract: new TypeContract(notification), subscriberDataContract: new TypeContract(typeof (TSubscriberDataContract)))]

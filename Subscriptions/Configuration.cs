@@ -6,7 +6,6 @@ using System.Linq;
 using Hydra.AdoNet;
 using Hydra.Configuration;
 using Hydra.Core;
-using Hydra.Core.FluentInterfaces;
 using Hydra.RequestPipeline;
 using Hydra.Requests;
 
@@ -37,11 +36,20 @@ namespace Hydra.Subscriptions
             return configuration;
         }
 
-        public static EventStoreConfiguration ConfigureSubscriptions(this EventStoreConfiguration configuration, params PublisherSubscriptions[] subscriptions)
+        public static EventStoreConfiguration ConfigureSubscriptions(this EventStoreConfiguration configuration, params PublishersBySubscription[] subscriptions)
         {
             configuration.ConfigureSubscriptions(subscriptions
-                .SelectMany(x => x.PublisherBySubscription)
-                .Select(x => x.Key)
+                .SelectMany(x => x.Keys)
+                .ToArray());
+
+            return configuration;
+        }
+
+        public static EventStoreConfiguration ConfigureSubscriptions<TProvider>(this EventStoreConfiguration configuration, params ExportersBySubscription<TProvider>[] subscriptions) 
+            where TProvider : IProvider
+        {
+            configuration.ConfigureSubscriptions(subscriptions
+                .SelectMany(x => x.Keys)
                 .ToArray());
 
             return configuration;

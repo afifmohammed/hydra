@@ -1,10 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Activities.Expressions;
+using System.Collections.Generic;
+using Hydra.Core;
 using Hydra.Core.FluentInterfaces.Subscribers;
 using RetailDomain.Inventory;
 
 namespace Tests
 {
-    public class Denormalizer<TView> : ConsumerBuilder<TView, Dictionary<string, TView>> where TView : new()
+    public class InMemoryView<TView> : Dictionary<string, TView>, IProvider 
+        where TView : new()
+    { }
+    public class Denormalizer<TView> : ConsumerBuilder<TView, InMemoryView<TView>> where TView : new()
     { }
 
     public class InventoryItemStockView
@@ -17,7 +23,7 @@ namespace Tests
 
     public static class InventoryItemStockViewBuilder
     {
-        public static ConsumerContractSubscriptions<InventoryItemStockView, Dictionary<string, InventoryItemStockView>> Subscriptions()
+        public static ConsumerContractSubscriptions<InventoryItemStockView, InMemoryView<InventoryItemStockView>> Subscriptions()
         {
             return new Denormalizer<InventoryItemStockView>()
                 .When<InventoryItemCreated>()

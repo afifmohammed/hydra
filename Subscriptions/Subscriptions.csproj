@@ -56,10 +56,6 @@
       <Project>{d2396379-dd06-41a6-9bfc-55af3c2289a2}</Project>
       <Name>Contracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FluentApi\FluentApi.csproj">
-      <Project>{A0E76561-ABD7-4739-8D82-BEE6F2AD8EBC}</Project>
-      <Name>FluentApi</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RequestPipeline\RequestPipeline.csproj">
       <Project>{900B7A11-306E-46ED-9267-552BB7840BC1}</Project>
       <Name>RequestPipeline</Name>

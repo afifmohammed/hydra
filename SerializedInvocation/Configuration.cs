@@ -40,8 +40,10 @@ namespace Hydra.SerializedInvocation
         {
             options.Queues =
                 Request<Subscription>.By(new AvailableSubscriptions())
-                    .Select(x => x.NotificationContract.Value.ToLower())
+                    .Select(x => x.SubscriberDataContract.Value.ToLower())
                     .ToArray();
+
+            options.WorkerCount = 1;
 
             return options;
         }

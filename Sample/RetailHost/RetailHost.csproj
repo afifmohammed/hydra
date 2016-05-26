@@ -7,8 +7,8 @@
     <ProjectGuid>{351C9405-27A8-41AA-9171-6E306733A771}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PublisherHost</RootNamespace>
-    <AssemblyName>PublisherHost</AssemblyName>
+    <RootNamespace>RetailHost</RootNamespace>
+    <AssemblyName>RetailHost</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -90,6 +90,10 @@
     <ProjectReference Include="..\..\SerializedInvocation\SerializedInvocation.csproj">
       <Project>{9B9F6273-3B0F-477C-AD7C-1E56CC213A5E}</Project>
       <Name>SerializedInvocation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SubscriberHost\SubscriberHost.csproj">
+      <Project>{0249FC85-834C-489C-8C74-E008AB9C5DE7}</Project>
+      <Name>SubscriberHost</Name>
     </ProjectReference>
     <ProjectReference Include="..\RetailDomain\RetailDomain.csproj">
       <Project>{D7A08A88-5A12-4053-BB27-09593DC7DEBE}</Project>

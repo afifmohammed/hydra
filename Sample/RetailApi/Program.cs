@@ -16,8 +16,8 @@ namespace WebApi
             new EventStoreConfiguration()
                 .ConfigureTransport<EventStoreTransportConnectionString>()
                 .ConfigureSubscriptions(
-                    InventoryItemStockHandler.Subscriptions(),
-                    RefundProductOrderHandler.Subscriptions());
+                    InventoryItemStockHandler.Subscriptions().PublisherBySubscription,
+                    RefundProductOrderHandler.Subscriptions().PublisherBySubscription);
                  
 
             var uri = new Uri("http://localhost:3785");

@@ -13,7 +13,7 @@ namespace Tests
         [Fact]
         public void WhenCreatedAndStocked()
         {
-            var store = new Dictionary<string, InventoryItemStockView>();
+            var store = new InMemoryView<InventoryItemStockView>();
             InventoryItemStockViewBuilder.Subscriptions()
                 .Notify(new InventoryItemCreated {Id = "1"}, store)
                 .Notify(new ItemsCheckedInToInventory { Id = "1", Count = 10 }, store)

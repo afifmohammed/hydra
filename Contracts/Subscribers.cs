@@ -53,36 +53,36 @@ namespace Hydra.Core
         INotification notification,
         NotificationsByCorrelations queryNotificationsByCorrelations,
         Func<DateTimeOffset> clock,
-        TProvider provider);
+        TProvider provider)
+        where TProvider : IProvider;
 
     public delegate void Integrator<in TLeftProvider, in TRightProvider>(
         IDomainEvent notification,
         NotificationsByCorrelations queryNotificationsByCorrelations,
         Func<DateTimeOffset> clock,
         TLeftProvider leftProvider,
-        TRightProvider rightProvider);
+        TRightProvider rightProvider)
+        where TLeftProvider : IProvider
+        where TRightProvider : IProvider;
 
     public class PublishersBySubscription : Dictionary<Subscription, Publisher>, IDisposable
     {
         public void Dispose()
-        {
-            this.Clear();
-        }
+        {}
     }
 
     public class ExportersBySubscription<TProvider> : Dictionary<Subscription, Exporter<TProvider>>, IDisposable
+        where TProvider : IProvider
     {
         public void Dispose()
-        {
-            this.Clear();
-        }
+        {}
     }
 
     public class IntegratorsBySubscription<TLeftProvider, TRightProvider> : Dictionary<Subscription, Integrator<TLeftProvider, TRightProvider>>, IDisposable
+        where TLeftProvider : IProvider
+        where TRightProvider : IProvider
     {
         public void Dispose()
-        {
-            this.Clear();
-        }
+        {}
     }
 }
