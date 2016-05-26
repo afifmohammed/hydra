@@ -31,7 +31,7 @@ namespace Hydra.SerializedInvocation
             NotificationType = subscriberMessage.Notification.GetType();
             Subscription = new JsonContent(subscriberMessage.Subscription);
             SubscriptionType = subscriberMessage.Subscription.GetType();
-            HandlerAddress = subscriberMessage.Subscription.SubscriberDataContract.Value;
+            HandlerAddress = subscriberMessage.Subscription.SubscriberDataContract.Value.ToLower();
         }
 
         public string HandlerAddress { get; set; }
