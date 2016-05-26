@@ -26,32 +26,30 @@ namespace Hydra.Core
         public static SaveNotificationsByPublisherAndVersionAction<TProvider> SaveNotificationsByPublisherAndVersionAction { get; set; }
         public static CommitWork<TProvider> CommitEventStoreWork { get; set; }
 
-        public static Notify Notify = getSubscriptions => messages => { };
+        public static Action<IEnumerable<IDomainEvent>> Publish = events => { };
 
-        public static Func<PublishersBySubscription, Func<IEnumerable<Subscription>>, Subscriber> Subscriber =
-            (publishersBySubscription, getSubscriptions) =>
+        public static Func<PublishersBySubscription, Subscriber> Subscriber =
+            publishersBySubscription =>
                 message => 
                     HandleAndCommitAndPost
                     (
-                        getSubscriptions,
                         message, 
                         publishersBySubscription,
                         NotificationsByCorrelationsFunction,
                         PublisherVersionByCorrelationsFunction,
                         SaveNotificationsByPublisherAndVersionAction,
                         CommitEventStoreWork, 
-                        Notify
+                        Publish
                     );
 
         internal static void HandleAndCommitAndPost(
-            Func<IEnumerable<Subscription>> getSubscriptions,
             SubscriberMessage message,
             PublishersBySubscription publishersBySubscription,
             NotificationsByCorrelationsFunction<TProvider> notificationsByCorrelationsFunction,
             PublisherVersionByCorrelationsFunction<TProvider> publisherVersionByCorrelationsFunction,
             SaveNotificationsByPublisherAndVersionAction<TProvider> saveNotificationsByPublisherAndVersionAction,
             CommitWork<TProvider> commitWork, 
-            Notify notify)
+            Action<IEnumerable<IDomainEvent>> publish)
         {
             var list = new List<IDomainEvent>();
 
@@ -67,7 +65,7 @@ namespace Hydra.Core
                     messages => list.AddRange(messages));
             });
 
-            notify(getSubscriptions)(list);
+            publish(list);
         }
 
         internal static void Handle(

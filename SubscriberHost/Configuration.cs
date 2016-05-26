@@ -8,37 +8,13 @@ namespace Hydra.SubscriberHost
 {
     public static class SubscriberHostConfiguration
     {
-        class PublisherConfigurator : IDisposable
-        {
-            public PublisherConfigurator(PublishersBySubscription publishers, Func<IEnumerable<Subscription>> getSubscriptions)
-            {
-                Publishers = publishers;
-                GetSubscriptions = getSubscriptions;
-            }
-
-            public readonly PublishersBySubscription Publishers;
-            public readonly Func<IEnumerable<Subscription>> GetSubscriptions;
-
-            public void Dispose()
-            {}
-        }
-
         public static EventStoreConfiguration<TEventStoreProvider> ConfigureSubscribers<TEventStoreProvider>(
             this EventStoreConfiguration<TEventStoreProvider> configuration,
             PublishersBySubscription subscribers)
             where TEventStoreProvider : class, IProvider
         {
-            return configuration.ConfigureSubscribers(subscribers, Enumerable.Empty<Subscription>);
-        }
-
-        public static EventStoreConfiguration<TEventStoreProvider> ConfigureSubscribers<TEventStoreProvider>(
-            this EventStoreConfiguration<TEventStoreProvider> configuration,
-            PublishersBySubscription subscribers,
-            Func<IEnumerable<Subscription>> getSubscriptions)
-            where TEventStoreProvider : class, IProvider
-        {
-            new RequestsRegistration<PublisherConfigurator>(() => new PublisherConfigurator(subscribers, getSubscriptions))
-                .Register<ConfiguredSubscriber, Subscriber>((input, provider) => EventStore<TEventStoreProvider>.Subscriber(provider.Publishers, provider.GetSubscriptions), Return.List);
+            new RequestsRegistration<PublishersBySubscription>(() => subscribers)
+                .Register<ConfiguredSubscriber, Subscriber>((input, provider) => EventStore<TEventStoreProvider>.Subscriber(provider), Return.List);
             return configuration;
         }
 

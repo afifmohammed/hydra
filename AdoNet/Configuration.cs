@@ -1,10 +1,12 @@
 ﻿using Hydra.Core;
+using Hydra.Requests;
 
 namespace Hydra.AdoNet
 {
     public static class SqlStoreConfiguration
     {
-        public static EventStoreConfiguration<TEventStoreConnectionStringName> ConfigurePublishers<TEventStoreConnectionStringName>(this EventStoreConfiguration<TEventStoreConnectionStringName> config)
+        public static EventStoreConfiguration<TEventStoreConnectionStringName> ConfigurePublishers<TEventStoreConnectionStringName>(
+            this EventStoreConfiguration<TEventStoreConnectionStringName> config)
             where TEventStoreConnectionStringName : class
         {
             EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.NotificationsByCorrelationsFunction =
@@ -21,14 +23,19 @@ namespace Hydra.AdoNet
             return config;
         }
 
-        public static EventStoreConfiguration<TEventStoreConnectionStringName> ConfigurePushNotifications<TEventStoreConnectionStringName>(this EventStoreConfiguration<TEventStoreConnectionStringName> config)
+        public static EventStoreConfiguration<TEventStoreConnectionStringName> ConfigurePushNotifications<TEventStoreConnectionStringName>(
+            this EventStoreConfiguration<TEventStoreConnectionStringName> config)
             where TEventStoreConnectionStringName : class
         {
-            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.Notify = PostBox<AdoNetTransactionScopeProvider>.Drop;
+            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.Publish = 
+                PostBox<AdoNetTransactionScopeProvider>.Drop(() => Request<Subscription>.By(new AvailableSubscriptions()));
+
             return config;
         }
 
-        public static EventStoreConfiguration<TEventStoreConnectionStringName> ConfigureEventStoreConnection<TEventStoreConnectionStringName>(this EventStoreConfiguration config) where TEventStoreConnectionStringName : class
+        public static EventStoreConfiguration<TEventStoreConnectionStringName> ConfigureEventStoreConnection<TEventStoreConnectionStringName>(
+            this EventStoreConfiguration config) 
+            where TEventStoreConnectionStringName : class
         {
             return new EventStoreConfiguration<TEventStoreConnectionStringName>();
         }
