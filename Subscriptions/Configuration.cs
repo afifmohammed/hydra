@@ -36,20 +36,10 @@ namespace Hydra.Subscriptions
             return configuration;
         }
 
-        public static EventStoreConfiguration ConfigureSubscriptions(this EventStoreConfiguration configuration, params PublishersBySubscription[] subscriptions)
+        public static EventStoreConfiguration ConfigureSubscriptions(this EventStoreConfiguration configuration, params IEnumerable<Subscription>[] subscriptions)
         {
             configuration.ConfigureSubscriptions(subscriptions
-                .SelectMany(x => x.Keys)
-                .ToArray());
-
-            return configuration;
-        }
-
-        public static EventStoreConfiguration ConfigureSubscriptions<TProvider>(this EventStoreConfiguration configuration, params ExportersBySubscription<TProvider>[] subscriptions) 
-            where TProvider : IProvider
-        {
-            configuration.ConfigureSubscriptions(subscriptions
-                .SelectMany(x => x.Keys)
+                .SelectMany(x => x)
                 .ToArray());
 
             return configuration;

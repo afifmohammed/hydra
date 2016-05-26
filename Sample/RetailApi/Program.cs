@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Hydra.Configuration;
 using Hydra.SerializedInvocation;
 using Hydra.Subscriptions;
@@ -16,9 +17,8 @@ namespace WebApi
             new EventStoreConfiguration()
                 .ConfigureTransport<EventStoreTransportConnectionString>()
                 .ConfigureSubscriptions(
-                    InventoryItemStockHandler.Subscriptions().PublisherBySubscription,
-                    RefundProductOrderHandler.Subscriptions().PublisherBySubscription);
-                 
+                    InventoryItemStockHandler.Subscriptions().PublisherBySubscription.Keys.AsEnumerable(),
+                    RefundProductOrderHandler.Subscriptions().PublisherBySubscription.Keys.AsEnumerable());
 
             var uri = new Uri("http://localhost:3785");
 

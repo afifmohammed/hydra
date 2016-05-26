@@ -15,7 +15,7 @@ namespace Hydra.SubscriberHost
             PublishersBySubscription subscribers)
             where TEventStoreConnectionStringName : class
         {
-            configuration.ConfigureSubscriptions(subscribers);
+            configuration.ConfigureSubscriptions(subscribers.Select(x => x.Key));
 
             new RequestsRegistration<PublishersBySubscription>(() => subscribers)
                 .Register<ConfiguredSubscriber, Subscriber>(
@@ -31,7 +31,7 @@ namespace Hydra.SubscriberHost
             where TEventStoreConnectionStringName : class 
             where TExportProvider : IProvider
         {
-            configuration.ConfigureSubscriptions(subscribers);
+            configuration.ConfigureSubscriptions(subscribers.Select(x => x.Key));
 
             new RequestsRegistration<ExportersBySubscription<TExportProvider>>(() => subscribers)
                 .Register<ConfiguredSubscriber, Subscriber>(
