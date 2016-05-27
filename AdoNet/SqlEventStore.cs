@@ -131,7 +131,7 @@ namespace Hydra.AdoNet
                 JsonConvert.SerializeObject(correlatedItems
                     .Select(x => new {x.PropertyName, x.PropertyValue})
                     .OrderBy(x => x.PropertyName)
-                    .ToDictionary(x => x.PropertyName, x => x.PropertyValue))
+                    .ToDictionary(x => x.PropertyName, x => x.PropertyValue.Value))
                 );
         }
 
