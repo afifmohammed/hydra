@@ -8,9 +8,9 @@ namespace Tests
 {
     public class RequestsDriveByDemo
     {
-        class Connection<T> : IDisposable
+        class InMemoryListProvider<T> : IDisposable
         {
-            public Connection(List<T> list)
+            public InMemoryListProvider(List<T> list)
             {
                 List = list;
             }
@@ -47,19 +47,19 @@ namespace Tests
             public int Length { get; set; }
         }
 
-        static IEnumerable<string> ByLength(WordsOfGivenLength query, Connection<string> connection)
+        static IEnumerable<string> ByLength(WordsOfGivenLength query, InMemoryListProvider<string> inMemoryListProvider)
         {
-            return connection.List.Where(x => x.Length == query.Length);
+            return inMemoryListProvider.List.Where(x => x.Length == query.Length);
         }
 
-        static IEnumerable<string> ByPrefix(WordsStartingWith query, Connection<string> connection)
+        static IEnumerable<string> ByPrefix(WordsStartingWith query, InMemoryListProvider<string> inMemoryListProvider)
         {
-            return connection.List.Where(x => x.StartsWith(query.Prefix));
+            return inMemoryListProvider.List.Where(x => x.StartsWith(query.Prefix));
         }
 
-        static Total TotalByLength(TotalWordsForGivenLength query, Connection<string> connection)
+        static Total TotalByLength(TotalWordsForGivenLength query, InMemoryListProvider<string> inMemoryListProvider)
         {
-            return new Total(ByLength(new WordsOfGivenLength { Length = query.Length }, connection).Count());
+            return new Total(ByLength(new WordsOfGivenLength { Length = query.Length }, inMemoryListProvider).Count());
         }
 
         [Fact]
@@ -68,11 +68,11 @@ namespace Tests
             var list = new[] { "gone", "gost", "goose", "guava" }.ToList();
             var anotherList = new[] { "great", "gofer" }.ToList();
 
-            new RequestsRegistration<Connection<string>>(() => new Connection<string>(list))
+            new RequestsRegistration<InMemoryListProvider<string>>(() => new InMemoryListProvider<string>(list))
                 .Register<WordsStartingWith, string>(ByPrefix)
                 .Register<WordsOfGivenLength, string>(ByLength);
 
-            new RequestsRegistration<Connection<string>>(() => new Connection<string>(anotherList))
+            new RequestsRegistration<InMemoryListProvider<string>>(() => new InMemoryListProvider<string>(anotherList))
                 .Register<WordsStartingWith, string>(ByPrefix)
                 .Register<TotalWordsForGivenLength, Total>(TotalByLength, Return.List);
 

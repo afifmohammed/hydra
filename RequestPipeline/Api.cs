@@ -23,7 +23,14 @@ namespace Hydra.RequestPipeline
                 request,
                 dispatcher:input =>
                 {
-                    PostBox<TProvider>.Drop(getSubscriptions)(new[] { new Event {Notification = new Placed<TRequest> { Command = input }, EventId = new NoEventId()} });
+                    var @event = new Event
+                    {
+                        Notification = new Placed<TRequest> {Command = input},
+                        EventId = new NoEventId()
+                    };
+
+                    PostBox<TProvider>.Drop(getSubscriptions)(new[] { @event });
+
                     return Enumerable.Empty<Unit>();
                 });
         }
