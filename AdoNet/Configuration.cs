@@ -1,4 +1,5 @@
-﻿using Hydra.Configuration;
+﻿using System.Linq;
+using Hydra.Configuration;
 using Hydra.Core;
 using Hydra.Requests;
 
@@ -28,8 +29,12 @@ namespace Hydra.AdoNet
             this EventStoreConfiguration<TEventStoreConnectionStringName> config)
             where TEventStoreConnectionStringName : class
         {
-            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.Publish = 
-                PostBox<AdoNetTransactionScopeProvider>.Drop(() => Request<Subscription>.By(new AvailableSubscriptions()));
+            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.Publish = domainEvents =>
+            {
+                PostBox<AdoNetTransactionScopeProvider>.Drop
+                    (() => Request<Subscription>.By(new AvailableSubscriptions()))
+                    (domainEvents.Select(x => new Event {Notification = x, EventId = new NoEventId()}));
+            };
 
             return config;
         }

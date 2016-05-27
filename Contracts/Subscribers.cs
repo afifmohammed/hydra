@@ -39,25 +39,25 @@ namespace Hydra.Core
     public class SubscriberMessage
     {
         public Subscription Subscription { get; set; }
-        public INotification Notification { get; set; }
+        public Event Event { get; set; }
     }
 
     public delegate void Subscriber(SubscriberMessage message);
 
     public delegate NotificationsByPublisher Publisher(
-        INotification notification,
+        Event @event,
         NotificationsByCorrelations queryNotificationsByCorrelations,
         Func<DateTimeOffset> clock);
 
     public delegate void Exporter<in TProvider>(
-        INotification notification,
+        Event @event,
         NotificationsByCorrelations queryNotificationsByCorrelations,
         Func<DateTimeOffset> clock,
         TProvider provider)
         where TProvider : IProvider;
 
     public delegate void Integrator<in TLeftProvider, in TRightProvider>(
-        IDomainEvent notification,
+        Event @event,
         NotificationsByCorrelations queryNotificationsByCorrelations,
         Func<DateTimeOffset> clock,
         TLeftProvider leftProvider,

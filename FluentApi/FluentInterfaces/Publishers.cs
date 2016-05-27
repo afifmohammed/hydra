@@ -157,15 +157,16 @@ namespace Hydra.Core.FluentInterfaces
             PublisherBySubscription.Add
             (
                 new Subscription(typeof(TNotification).Contract(), typeof(TSubscriberDataContract).Contract()),
-                (notification, queryNotificationsByCorrelations, clock) => Functions.BuildPublisher
-                                    (
-                                        handler,
-                                        _publisherDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => (IReadOnlyCollection<CorrelationMap>)x.Select(a => a.Value).ToList()),
-                                        queryNotificationsByCorrelations,
-                                        Extensions.Correlations,
-                                        _publisherDataMappers.ToDictionary(x => x.Key, x => x.Value),
-                                        clock
-                                    )((TNotification)notification)
+                (@event, queryNotificationsByCorrelations, clock) => 
+                    Functions.BuildPublisher
+                    (
+                        handler,
+                        _publisherDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => (IReadOnlyCollection<CorrelationMap>)x.Select(a => a.Value).ToList()),
+                        queryNotificationsByCorrelations,
+                        Extensions.Correlations,
+                        _publisherDataMappers.ToDictionary(x => x.Key, x => x.Value),
+                        clock
+                    )((TNotification)@event.Notification)
             );
 
             return this;

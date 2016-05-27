@@ -68,7 +68,7 @@ namespace Hydra.Core
 
             consumer
             (
-                message.Notification,
+                message.Event,
                 notificationsByCorrelations,
                 clock,
                 integrationProvider

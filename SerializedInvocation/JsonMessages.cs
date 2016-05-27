@@ -27,11 +27,12 @@ namespace Hydra.SerializedInvocation
 
         public JsonMessage(SubscriberMessage subscriberMessage)
         {
-            NotificationContent = new JsonContent(subscriberMessage.Notification);
-            NotificationType = subscriberMessage.Notification.GetType();
+            NotificationContent = new JsonContent(subscriberMessage.Event.Notification);
+            NotificationType = subscriberMessage.Event.Notification.GetType();
             Subscription = new JsonContent(subscriberMessage.Subscription);
             SubscriptionType = subscriberMessage.Subscription.GetType();
             HandlerAddress = subscriberMessage.Subscription.SubscriberDataContract.Value.ToLower();
+            EventId = subscriberMessage.Event.EventId;
         }
 
         public string HandlerAddress { get; set; }
@@ -39,6 +40,7 @@ namespace Hydra.SerializedInvocation
         public JsonContent NotificationContent { get; set; }
         public Type NotificationType { get; set; }
         public Type SubscriptionType { get; set; }
+        public EventId EventId { get; set; }
     }
 
     public static class JsonMessageConverter
@@ -50,9 +52,13 @@ namespace Hydra.SerializedInvocation
                 Subscription = (Subscription) JsonConvert.DeserializeObject(
                     message.Subscription.Value,
                     message.SubscriptionType),
-                Notification = (INotification) JsonConvert.DeserializeObject(
+                Event = new Event
+                {
+                    Notification = (INotification)JsonConvert.DeserializeObject(
                     message.NotificationContent.Value,
-                    message.NotificationType)
+                    message.NotificationType),
+                    EventId = message.EventId
+                }
             };
 
             return subscriberMessage;

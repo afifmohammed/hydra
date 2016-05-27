@@ -168,16 +168,17 @@ namespace Hydra.Core.FluentInterfaces
             IntegratorBySubscription.Add
             (
                 new Subscription(typeof(TNotification).Contract(), typeof(TSubscriberDataContract).Contract()),
-                (notification, queryNotificationsByCorrelations, clock, endpoint1, endpoint2) => Functions.BuildIntegrator
-                                    (
-                                        handler,
-                                        _subscriberDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => (IReadOnlyCollection<CorrelationMap>)x.Select(a => a.Value).ToList()),
-                                        queryNotificationsByCorrelations,
-                                        endpoint1,
-                                        endpoint2,
-                                        _subscriberDataMappers.ToDictionary(x => x.Key, x => x.Value),
-                                        clock
-                                    )((TNotification)notification)
+                (@event, queryNotificationsByCorrelations, clock, endpoint1, endpoint2) => 
+                    Functions.BuildIntegrator
+                    (
+                        handler,
+                        _subscriberDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => (IReadOnlyCollection<CorrelationMap>)x.Select(a => a.Value).ToList()),
+                        queryNotificationsByCorrelations,
+                        endpoint1,
+                        endpoint2,
+                        _subscriberDataMappers.ToDictionary(x => x.Key, x => x.Value),
+                        clock
+                    )((TNotification)@event.Notification)
             );
 
             return this;

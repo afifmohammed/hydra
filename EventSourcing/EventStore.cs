@@ -65,7 +65,7 @@ namespace Hydra.Core
             var publisher = publishersBySubscription[message.Subscription];
 
             var notificationsByPublisher = publisher(
-                message.Notification,
+                message.Event,
                 notificationsByCorrelations,
                 clock);
 

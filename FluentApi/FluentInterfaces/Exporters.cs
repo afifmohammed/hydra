@@ -161,15 +161,16 @@ namespace Hydra.Core.FluentInterfaces
             ExportersBySubscription.Add
             (
                 new Subscription(typeof(TNotification).Contract(), typeof(TSubscriberDataContract).Contract()),
-                (notification, queryNotificationsByCorrelations, clock, provider) => Functions.BuildExporter
-                                    (
-                                        handler,
-                                        _subscriberDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => (IReadOnlyCollection<CorrelationMap>) x.Select(a => a.Value).ToList()),
-                                        queryNotificationsByCorrelations,
-                                        provider,
-                                        _subscriberDataMappers.ToDictionary(x => x.Key, x => x.Value),
-                                        clock
-                                    )((TNotification)notification)
+                (@event, queryNotificationsByCorrelations, clock, provider) => 
+                    Functions.BuildExporter
+                    (
+                        handler,
+                        _subscriberDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => (IReadOnlyCollection<CorrelationMap>) x.Select(a => a.Value).ToList()),
+                        queryNotificationsByCorrelations,
+                        provider,
+                        _subscriberDataMappers.ToDictionary(x => x.Key, x => x.Value),
+                        clock
+                    )((TNotification)@event.Notification)
             );
 
             return this;

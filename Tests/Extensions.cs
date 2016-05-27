@@ -24,14 +24,16 @@ namespace Tests
             params IDomainEvent[] given)
             where TProvider : IProvider
         {
+            var list = given.AsEvents().ToList().AsReadOnly();
+
             return n => subscriptions
                 .Where(p => p.Key.NotificationContract.Equals(n))
                 .Select(p => p.Value)
                 .Select<Exporter<TProvider>, Action<INotification, TProvider>>(exporter =>
                     (notification, provider) =>
                             exporter(
-                                notification,
-                                NotificationsByCorrelations(given.AsEvents()),
+                                new Event { Notification = notification, EventId = list.Max(g => g.EventId).With(x => x.Value++) },
+                                NotificationsByCorrelations(list),
                                 () => DateTimeOffset.Now,
                                 provider));
         }
@@ -52,6 +54,8 @@ namespace Tests
             this PublishersBySubscription subscriptions,
             params IDomainEvent[] given)
         {
+            var list = given.AsEvents().ToList().AsReadOnly();
+
             return contract => subscriptions
                 .Where(p => p.Key.NotificationContract.Equals(contract))
                 .Select(p => p.Value)
@@ -60,8 +64,8 @@ namespace Tests
                     publisher =>
                         notification =>
                             publisher(
-                                notification,
-                                NotificationsByCorrelations(given.AsEvents()),
+                                new Event {Notification = notification, EventId = list.Max(g => g.EventId).With(x => x.Value++)}, 
+                                NotificationsByCorrelations(list),
                                 () => DateTimeOffset.Now)
                 );
 
@@ -69,7 +73,7 @@ namespace Tests
 
         public static ConsumerContractSubscriptions<TSubscriberDataContract, TProvider> Notify<TSubscriberDataContract, TProvider>(
             this ConsumerContractSubscriptions<TSubscriberDataContract, TProvider> consumerContractSubscriptions,
-            IDomainEvent notification,
+            Event notification,
             TProvider provider)
             where TSubscriberDataContract : new()
             where TProvider : IProvider

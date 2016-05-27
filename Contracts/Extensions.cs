@@ -9,12 +9,12 @@ namespace Hydra.Core
     public static class Extensions
     {
         public static IEnumerable<SubscriberMessage> SubscriberMessages(
-            this INotification notification,
+            this Event @event,
             IEnumerable<Subscription> subscriptions)
         {
             return subscriptions
-                    .Where(subscription => subscription.NotificationContract.Equals(new TypeContract(notification)))
-                    .Select(subscription => new SubscriberMessage { Notification = notification, Subscription = subscription });
+                    .Where(subscription => subscription.NotificationContract.Equals(new TypeContract(@event.Notification)))
+                    .Select(subscription => new SubscriberMessage { Event = @event, Subscription = subscription });
         }
 
         public static IEnumerable<Correlation> Correlations(this INotification notification)
