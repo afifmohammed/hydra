@@ -10,13 +10,17 @@ namespace Tests
     {
         public static IEnumerable<Event> AsEvents(this IDomainEvent[] events)
         {
-            var id = 0;
+            var id = new EventId();
 
-            return events.Select(domainEvent => new Event
+            return events.Select(domainEvent =>
             {
-                Notification = domainEvent,
-                EventId = new EventId {Value = id++}
-            });
+                id = id.Increment();
+                return new Event
+                {
+                    Notification = domainEvent,
+                    EventId = id
+                };
+            }).ToList();
         }
 
         public static Func<TypeContract, IEnumerable<Action<INotification, TProvider>>> Given<TProvider>(
@@ -32,7 +36,7 @@ namespace Tests
                 .Select<Exporter<TProvider>, Action<INotification, TProvider>>(exporter =>
                     (notification, provider) =>
                             exporter(
-                                new Event { Notification = notification, EventId = list.Max(g => g.EventId).With(x => x.Value++) },
+                                new Event { Notification = notification, EventId = list.OrderByDescending(g => g.EventId.Value).First().EventId.With(x => x.Increment()) },
                                 NotificationsByCorrelations(list),
                                 () => DateTimeOffset.Now,
                                 provider));
@@ -64,7 +68,7 @@ namespace Tests
                     publisher =>
                         notification =>
                             publisher(
-                                new Event {Notification = notification, EventId = list.Max(g => g.EventId).With(x => x.Value++)}, 
+                                new Event {Notification = notification, EventId = new EventId {Value = list.OrderByDescending(g => g.EventId.Value).First().EventId.Value + 1} }, 
                                 NotificationsByCorrelations(list),
                                 () => DateTimeOffset.Now)
                 );
@@ -145,6 +149,12 @@ namespace Tests
 
                 return list;
             };
+        }
+
+        static EventId Increment(this EventId eventId)
+        {
+            eventId.Value = eventId.Value + 1;
+            return eventId;
         }
     }
 }

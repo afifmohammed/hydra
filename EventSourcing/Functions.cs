@@ -82,7 +82,7 @@ namespace Hydra.Core
             };
         }
 
-        public static Func<TNotification, NotificationsByPublisher> BuildPublisher<TPublisherData, TNotification>(
+        public static Func<Event, NotificationsByPublisher> BuildPublisher<TPublisherData, TNotification>(
             Func<TPublisherData, TNotification, IEnumerable<IDomainEvent>> publisher,
             IDictionary<TypeContract, IReadOnlyCollection<CorrelationMap>> correlationMapsByPublisherDataContract,
             NotificationsByCorrelations notificationsByCorrelations,
@@ -92,9 +92,10 @@ namespace Hydra.Core
             where TPublisherData : new()
             where TNotification : INotification
         {
-            return notification =>
+            return @event =>
             {
                 var handlerDataCorrelationMaps = correlationMapsByPublisherDataContract[typeof(TPublisherData).Contract()];
+                var notificaion = (TNotification) @event.Notification;
                 return
                     new NotificationsByPublisher
                     {
@@ -103,13 +104,13 @@ namespace Hydra.Core
                             FoldHandlerData
                             (
                                 MapsWithMappers(handlerDataCorrelationMaps, publisherDataMappersByNotificationContract),
-                                HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification),
+                                HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notificaion),
                                 notificationsByCorrelations,
                                 publisherDataMappersByNotificationContract,
                                 new TPublisherData(),
-                                new NoEventId()
+                                @event.EventId
                             ),
-                            notification
+                            notificaion
                         ).Select
                         (
                             n => new Tuple<IDomainEvent, IEnumerable<Correlation>>
@@ -120,8 +121,8 @@ namespace Hydra.Core
                         ),
                         PublisherDataCorrelations = HandlerDataCorrelationsBy
                         (
-                            correlationMapsByPublisherDataContract[typeof (TPublisherData).Contract()], 
-                            notification
+                            correlationMapsByPublisherDataContract[typeof (TPublisherData).Contract()],
+                            notificaion
                         ),
                         When = clock()
                     };

@@ -166,7 +166,7 @@ namespace Hydra.Core.FluentInterfaces
                         Extensions.Correlations,
                         _publisherDataMappers.ToDictionary(x => x.Key, x => x.Value),
                         clock
-                    )((TNotification)@event.Notification)
+                    )(@event)
             );
 
             return this;
