@@ -4,7 +4,8 @@ using System.Collections.Generic;
 namespace Hydra.Core
 {
     public delegate IEnumerable<SerializedNotification> NotificationsByCorrelations(
-        IEnumerable<Correlation> correlation);
+        IEnumerable<Correlation> correlation,
+        EventId eventId);
 
     public delegate Func<IEnumerable<Correlation>, int> PublisherVersionByCorrelationsFunction<in TProvider>(
         TProvider provider)

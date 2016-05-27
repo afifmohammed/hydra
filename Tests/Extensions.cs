@@ -1,8 +1,6 @@
 using System;
-using System.Activities.Tracking;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Hydra.Core;
 using Hydra.Core.FluentInterfaces;
 
@@ -10,6 +8,17 @@ namespace Tests
 {
     static class Extensions
     {
+        public static IEnumerable<Event> AsEvents(this IDomainEvent[] events)
+        {
+            var id = 0;
+
+            return events.Select(domainEvent => new Event
+            {
+                Notification = domainEvent,
+                EventId = new EventId {Value = id++}
+            });
+        }
+
         public static Func<TypeContract, IEnumerable<Action<INotification, TProvider>>> Given<TProvider>(
             this ExportersBySubscription<TProvider> subscriptions,
             params IDomainEvent[] given)
@@ -22,7 +31,7 @@ namespace Tests
                     (notification, provider) =>
                             exporter(
                                 notification,
-                                NotificationsByCorrelations(given),
+                                NotificationsByCorrelations(given.AsEvents()),
                                 () => DateTimeOffset.Now,
                                 provider));
         }
@@ -52,7 +61,7 @@ namespace Tests
                         notification =>
                             publisher(
                                 notification,
-                                NotificationsByCorrelations(given),
+                                NotificationsByCorrelations(given.AsEvents()),
                                 () => DateTimeOffset.Now)
                 );
 
@@ -73,7 +82,7 @@ namespace Tests
                 .ExportersBySubscription[subscription]
                 (
                     notification,
-                    NotificationsByCorrelations(),
+                    NotificationsByCorrelations(new Event[] {}),
                     () => DateTimeOffset.Now,
                     provider
                 );
@@ -89,21 +98,49 @@ namespace Tests
                 .Select(x => x(notification)));
         }
 
-        static NotificationsByCorrelations NotificationsByCorrelations(params IDomainEvent[] notifications)
+        static NotificationsByCorrelations NotificationsByCorrelations(IEnumerable<Event> notifications)
         {
-            return correlations => notifications
-            .Select(n => new
+            return (correlations, eventId) =>
             {
-                Notification = new SerializedNotification
-                {
-                    Contract = n.Contract(),
-                    JsonContent = new JsonContent(n)
-                },
-                Correlations = n.Correlations()
-            })
-            .Where(n => correlations.Any(c => c.Contract.Value.Equals(n.Notification.Contract.Value)))
-            .Where(n => correlations.Any(c => n.Correlations.Any(nc => nc.Contract.Value.Equals(c.Contract.Value) && nc.PropertyName.Equals(c.PropertyName) && nc.PropertyValue.Value.Equals(c.PropertyValue.Value))))
-            .Select(x => x.Notification);
+                var cs = correlations
+                    .Select(c => new {Contract = c.Contract.Value, c.PropertyName, PropertyValue = c.PropertyValue.Value})
+                    .ToList();
+
+                var one = notifications
+                    .Select(@event => new
+                    {
+                        Notification = new SerializedNotification
+                        {
+                            Contract = @event.Notification.Contract(),
+                            JsonContent = new JsonContent(@event.Notification)
+                        },
+                        Correlations = @event.Notification.Correlations(),
+                        @event.EventId
+                    }).ToList();
+
+                one = one
+                    .Where(n => cs.Any(c => c.Contract.Equals(n.Notification.Contract.Value)))
+                    .ToList();
+
+                var two = one
+                    .Where(
+                        n =>
+                            cs.Any(
+                                c =>
+                                    n.Correlations.Any(
+                                        nc =>
+                                            nc.Contract.Value.Equals(c.Contract) &&
+                                            nc.PropertyName.Equals(c.PropertyName) &&
+                                            nc.PropertyValue.Value.Equals(c.PropertyValue)))).ToList();
+
+                var three = two
+                    .Where(n => eventId is NoEventId || n.EventId.Value < eventId.Value)
+                    .ToList();
+
+                var list = three.Select(n => n.Notification).ToList();
+
+                return list;
+            };
         }
     }
 }

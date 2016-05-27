@@ -3,16 +3,6 @@ using Hydra.Core;
 
 namespace Hydra.PublishOnPull
 {
-    public class NoEventId : EventId { }
-
-    public class EventId : Wrapper<long>
-    {
-        public long Value
-        {
-            get;set;
-        }
-    }
-
     public class EventName : Wrapper<string>
     {
         public string Value

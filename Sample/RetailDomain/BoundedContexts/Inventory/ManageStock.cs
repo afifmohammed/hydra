@@ -39,6 +39,9 @@ namespace RetailDomain.Inventory
 
         public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, Placed<ChangeInventoryItemStockLimit> e)
         {
+            if (string.IsNullOrEmpty(d.Sku))
+                throw new EventualConsistencyException<InventoryItemCreated>();
+
             if (!d.IsActive)
                 return new[] { new InventoryItemActionInvalid { Action = "CheckIn", Id = e.Command.Id, Reason = "ItemInActive" } };
 
@@ -47,6 +50,9 @@ namespace RetailDomain.Inventory
 
         public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, Placed<CheckInItems> e)
         {
+            if (string.IsNullOrEmpty(d.Sku))
+                throw new EventualConsistencyException<InventoryItemCreated>();
+
             if (!d.IsActive)
                 return new[] { new InventoryItemActionInvalid { Action = "CheckIn", Id = e.Command.Id, Reason = "ItemInActive" } };
 
@@ -58,6 +64,9 @@ namespace RetailDomain.Inventory
 
         public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, Placed<RemoveInventoryItems> e)
         {
+            if (string.IsNullOrEmpty(d.Sku))
+                throw new EventualConsistencyException<InventoryItemCreated>();
+
             if (!d.IsActive)
                 return new[] { new InventoryItemActionInvalid { Action = "CheckOut", Id = e.Command.Id, Reason = "ItemInActive" } };
 
@@ -69,6 +78,9 @@ namespace RetailDomain.Inventory
 
         public static IEnumerable<IDomainEvent> Handle(InventoryItemStockData d, Placed<DeactivateInventoryItem> e)
         {
+            if (string.IsNullOrEmpty(d.Sku))
+                throw new EventualConsistencyException<InventoryItemCreated>();
+
             if (!d.IsActive)
                 return new[] { new JustSpinningMyWheels() };
 

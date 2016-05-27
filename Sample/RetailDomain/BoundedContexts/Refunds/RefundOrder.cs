@@ -54,10 +54,10 @@ namespace RetailDomain.Refunds
         private static IEnumerable<IDomainEvent> Handle(RefundProductOrderData d, Placed<RefundProductOrder> e)
         {
             if (d.Product == null)
-                throw new CannotFindProductOnSale();
+                throw new EventualConsistencyException<ProductOnSale>();
 
             if (d.Policy == null)
-                throw new CannotFindProductPolicy();
+                throw new EventualConsistencyException<PolicyInPlace>();
 
             if (d.Customer?.CustomerMarkedAsFraud ?? false)
                 return new[] { new RefundRejected { OrderId = d.OrderId } };
@@ -105,9 +105,4 @@ namespace RetailDomain.Refunds
         public int? CoolingOffPeriodInDays { get; set; }
         public bool? RefundAllowed { get; set; }
     }
-
-    public class CannotFindProductPolicy : EventualConsistencyException { }
-    public class CannotFindProductOnSale : EventualConsistencyException { }
-    public class CannotFindOrderPlaced : EventualConsistencyException { }
-    public class EventualConsistencyException : Exception { }
 }

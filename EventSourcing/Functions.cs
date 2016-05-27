@@ -21,7 +21,7 @@ namespace Hydra.Core
 
         public static Action<TNotification> BuildExporter<TConsumerData, TNotification, TExportProvider>(
             Action<TConsumerData, TNotification, TExportProvider> consumer,
-            IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByConsumerDataContract,
+            IDictionary<TypeContract, IReadOnlyCollection<CorrelationMap>> correlationMapsByConsumerDataContract,
             NotificationsByCorrelations notificationsByCorrelations,
             TExportProvider exportProvider,
             IDictionary<TypeContract, Func<TConsumerData, JsonContent, TConsumerData>> consumerDataMappersByNotificationContract,
@@ -40,7 +40,8 @@ namespace Hydra.Core
                         HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification),
                         notificationsByCorrelations,
                         consumerDataMappersByNotificationContract,
-                        new TConsumerData()
+                        new TConsumerData(),
+                        new NoEventId()
                     ),
                     notification,
                     exportProvider
@@ -50,7 +51,7 @@ namespace Hydra.Core
 
         public static Action<TNotification> BuildIntegrator<TConsumerData, TNotification, TLeftProvider, TRightProvider>(
             Action<TConsumerData, TNotification, TLeftProvider, TRightProvider> consumer,
-            IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByConsumerDataContract,
+            IDictionary<TypeContract, IReadOnlyCollection<CorrelationMap>> correlationMapsByConsumerDataContract,
             NotificationsByCorrelations notificationsByCorrelations,
             TLeftProvider leftProvider,
             TRightProvider rightProvider,
@@ -71,7 +72,8 @@ namespace Hydra.Core
                         HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification),
                         notificationsByCorrelations,
                         consumerDataMappersByNotificationContract,
-                        new TConsumerData()
+                        new TConsumerData(),
+                        new NoEventId()
                     ),
                     notification,
                     leftProvider,
@@ -82,7 +84,7 @@ namespace Hydra.Core
 
         public static Func<TNotification, NotificationsByPublisher> BuildPublisher<TPublisherData, TNotification>(
             Func<TPublisherData, TNotification, IEnumerable<IDomainEvent>> publisher,
-            IDictionary<TypeContract, IEnumerable<CorrelationMap>> correlationMapsByPublisherDataContract,
+            IDictionary<TypeContract, IReadOnlyCollection<CorrelationMap>> correlationMapsByPublisherDataContract,
             NotificationsByCorrelations notificationsByCorrelations,
             Func<IDomainEvent, IEnumerable<Correlation>> correlationsByNotification,
             IDictionary<TypeContract, Func<TPublisherData, JsonContent, TPublisherData>> publisherDataMappersByNotificationContract,
@@ -104,7 +106,8 @@ namespace Hydra.Core
                                 HandlerDataCorrelationsBy(handlerDataCorrelationMaps, notification),
                                 notificationsByCorrelations,
                                 publisherDataMappersByNotificationContract,
-                                new TPublisherData()
+                                new TPublisherData(),
+                                new NoEventId()
                             ),
                             notification
                         ).Select
@@ -125,8 +128,8 @@ namespace Hydra.Core
             };
         }
 
-        public static IEnumerable<CorrelationMap> MapsWithMappers<THandlerData>(
-            IEnumerable<CorrelationMap> handlerDataCorrelationMaps,
+        public static IReadOnlyCollection<CorrelationMap> MapsWithMappers<THandlerData>(
+            IReadOnlyCollection<CorrelationMap> handlerDataCorrelationMaps,
             IDictionary<TypeContract, Func<THandlerData, JsonContent, THandlerData>>
                 handlerDataMappersByNotificationContract)
         {
@@ -136,15 +139,16 @@ namespace Hydra.Core
                     mapper => handlerDataMappersByNotificationContract
                         .Keys
                         .Any(notificationContract => notificationContract.Equals(mapper.NotificationContract))
-                );
+                ).ToList().AsReadOnly();
         }
 
         public static THandlerData FoldHandlerData<THandlerData>(
-            IEnumerable<CorrelationMap> handlerDataCorrelationMaps,
+            IReadOnlyCollection<CorrelationMap> handlerDataCorrelationMaps,
             IEnumerable<Correlation> handlerDataCorrelations,
             NotificationsByCorrelations notificationsByCorrelations,
             IDictionary<TypeContract, Func<THandlerData, JsonContent, THandlerData>> handlerDataMappersByNotificationContract,
-            THandlerData handlerData)
+            THandlerData handlerData,
+            EventId eventId)
         {
             if (!handlerDataCorrelationMaps.Any())
                 return handlerData;
@@ -153,12 +157,12 @@ namespace Hydra.Core
             (
                 handlerDataCorrelationMaps: handlerDataCorrelationMaps,
                 handlerDataCorrelations: handlerDataCorrelations
-            );
+            ).ToList();
 
             if (!correlations.Any())
                 return handlerData;
 
-            var notifications = notificationsByCorrelations(correlations);
+            var notifications = notificationsByCorrelations(correlations, eventId).ToList();
 
             if (!notifications.Any())
                 return handlerData;
@@ -190,7 +194,8 @@ namespace Hydra.Core
                 HandlerDataCorrelationsByHandlerData(unEvaluatedMaps, handlerData),
                 notificationsByCorrelations,
                 handlerDataMappersByNotificationContract,
-                handlerData
+                handlerData,
+                new NoEventId()
             );
         }
 

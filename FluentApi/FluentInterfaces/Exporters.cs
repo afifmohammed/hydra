@@ -164,7 +164,7 @@ namespace Hydra.Core.FluentInterfaces
                 (notification, queryNotificationsByCorrelations, clock, provider) => Functions.BuildExporter
                                     (
                                         handler,
-                                        _subscriberDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => x.Select(a => a.Value)),
+                                        _subscriberDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => (IReadOnlyCollection<CorrelationMap>) x.Select(a => a.Value).ToList()),
                                         queryNotificationsByCorrelations,
                                         provider,
                                         _subscriberDataMappers.ToDictionary(x => x.Key, x => x.Value),

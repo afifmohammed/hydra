@@ -3,6 +3,26 @@ using System.Collections.Generic;
 
 namespace Hydra.Core
 {
+    public class EventualConsistencyException<TEvent> : Exception
+        where TEvent : IDomainEvent
+    { }
+
+    public class NoEventId : EventId { }
+
+    public class Event
+    {
+        public EventId EventId { get; set; }
+        public INotification Notification { get; set; }
+    }
+
+    public class EventId : Wrapper<long>
+    {
+        public long Value
+        {
+            get; set;
+        }
+    }
+
     public interface INotification : ICorrelated { }
 
     public interface IDomainEvent : INotification

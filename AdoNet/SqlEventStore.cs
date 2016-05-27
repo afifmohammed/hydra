@@ -81,11 +81,11 @@ namespace Hydra.AdoNet
 
         public static NotificationsByCorrelations NotificationsByCorrelations(IDbTransaction transaction)
         {
-            return correlations => transaction.Connection
+            return (correlations, eventId) => transaction.Connection
                 .Query<dynamic>(
                     sql: "GetEventsWithCorrelations",
                     transaction: transaction,
-                    param:  new { tvpEvents = correlations.AsTvp() },
+                    param:  new { eventId = eventId.Value, tvpEvents = correlations.AsTvp() },
                     commandType:CommandType.StoredProcedure)
                 .Select(x => new SerializedNotification
                 {

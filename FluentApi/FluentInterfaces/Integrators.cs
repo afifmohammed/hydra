@@ -171,7 +171,7 @@ namespace Hydra.Core.FluentInterfaces
                 (notification, queryNotificationsByCorrelations, clock, endpoint1, endpoint2) => Functions.BuildIntegrator
                                     (
                                         handler,
-                                        _subscriberDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => x.Select(a => a.Value)),
+                                        _subscriberDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => (IReadOnlyCollection<CorrelationMap>)x.Select(a => a.Value).ToList()),
                                         queryNotificationsByCorrelations,
                                         endpoint1,
                                         endpoint2,

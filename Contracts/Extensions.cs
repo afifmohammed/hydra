@@ -17,7 +17,7 @@ namespace Hydra.Core
                     .Select(subscription => new SubscriberMessage { Notification = notification, Subscription = subscription });
         }
 
-        public static IEnumerable<Correlation> Correlations(this IDomainEvent notification)
+        public static IEnumerable<Correlation> Correlations(this INotification notification)
         {
             return notification.Correlations.Select(c => new Correlation
             {

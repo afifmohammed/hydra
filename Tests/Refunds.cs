@@ -65,7 +65,7 @@ namespace Tests
         [Fact]
         public void PublisherThrowsAnExceptionWhenDataNotAvailable()
         {
-            Assert.Throws<CannotFindProductOnSale>(() => _notificationsByPublisher
+            Assert.Throws<EventualConsistencyException<ProductOnSale>>(() => _notificationsByPublisher
                 .Value
                 .SelectMany(n => n.Notifications)
                 .Select(n => n.Item1)
@@ -93,7 +93,7 @@ namespace Tests
         [Fact]
         public void PublisherThrowsAnExceptionWhenDataNotAvailable()
         {
-            Assert.Throws<CannotFindProductPolicy>(() => _notificationsByPublisher
+            Assert.Throws<EventualConsistencyException<PolicyInPlace>>(() => _notificationsByPublisher
                 .Value
                 .SelectMany(n => n.Notifications)
                 .Select(n => n.Item1)
