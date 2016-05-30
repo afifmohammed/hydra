@@ -55,8 +55,8 @@
       <Project>{d2396379-dd06-41a6-9bfc-55af3c2289a2}</Project>
       <Name>Contracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EventSourcing\Subscribers.csproj">
-      <Project>{E6E5141E-A6AC-434A-9697-784811570ECB}</Project>
+    <ProjectReference Include="..\Subscribers\Subscribers.csproj">
+      <Project>{e6e5141e-a6ac-434a-9697-784811570ecb}</Project>
       <Name>Subscribers</Name>
     </ProjectReference>
   </ItemGroup>

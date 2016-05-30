@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Hydra.Core;
 
-namespace Hydra.PublishOnPull
+namespace Hydra.Notifier
 {
     public static class Functions
     {

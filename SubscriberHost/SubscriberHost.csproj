@@ -73,10 +73,6 @@
       <Project>{D2396379-DD06-41A6-9BFC-55AF3C2289A2}</Project>
       <Name>Contracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EventSourcing\Subscribers.csproj">
-      <Project>{E6E5141E-A6AC-434A-9697-784811570ECB}</Project>
-      <Name>Subscribers</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Requests\Requests.csproj">
       <Project>{eb7a999c-a296-4051-854a-41e5ffaba4d5}</Project>
       <Name>Requests</Name>
@@ -84,6 +80,10 @@
     <ProjectReference Include="..\SerializedInvocation\SerializedInvocation.csproj">
       <Project>{9b9f6273-3b0f-477c-ad7c-1e56cc213a5e}</Project>
       <Name>SerializedInvocation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Subscribers\Subscribers.csproj">
+      <Project>{e6e5141e-a6ac-434a-9697-784811570ecb}</Project>
+      <Name>Subscribers</Name>
     </ProjectReference>
     <ProjectReference Include="..\Subscriptions\Subscriptions.csproj">
       <Project>{bb656f99-93e3-4e86-ae6e-532c7bc1f5d9}</Project>

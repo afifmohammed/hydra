@@ -7,8 +7,8 @@
     <ProjectGuid>{CDDCEFE4-144A-40FE-8F95-D22B50283267}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Hydra.PublishOnPull</RootNamespace>
-    <AssemblyName>Hydra.PublishOnPull</AssemblyName>
+    <RootNamespace>Hydra.Notifier</RootNamespace>
+    <AssemblyName>Hydra.Notifier</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

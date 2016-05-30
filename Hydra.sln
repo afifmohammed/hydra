@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subscribers", "EventSourcing\Subscribers.csproj", "{E6E5141E-A6AC-434A-9697-784811570ECB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{FDE98AB9-264E-41D5-A1A0-271A5099C931}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{81BD1E16-8A64-40DF-BF41-31BD3F3C8F4C}"
@@ -23,8 +21,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestPipeline", "RequestP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerializedInvocation", "SerializedInvocation\SerializedInvocation.csproj", "{9B9F6273-3B0F-477C-AD7C-1E56CC213A5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PublishOnPull", "PublishOnPull\PublishOnPull.csproj", "{CDDCEFE4-144A-40FE-8F95-D22B50283267}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subscriptions", "Subscriptions\Subscriptions.csproj", "{BB656F99-93E3-4E86-AE6E-532C7BC1F5D9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetailApi", "Sample\RetailApi\RetailApi.csproj", "{F8A5A9AD-F680-46F4-806F-653E7E51A030}"
@@ -39,16 +35,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetailHost", "Sample\Retail
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetailViews", "Sample\RetailViews\RetailViews.csproj", "{6F7991E8-0FE4-492E-AC01-E40353E5FEF5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifier", "Notifier\Notifier.csproj", "{CDDCEFE4-144A-40FE-8F95-D22B50283267}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subscribers", "Subscribers\Subscribers.csproj", "{E6E5141E-A6AC-434A-9697-784811570ECB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E6E5141E-A6AC-434A-9697-784811570ECB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E6E5141E-A6AC-434A-9697-784811570ECB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E6E5141E-A6AC-434A-9697-784811570ECB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E6E5141E-A6AC-434A-9697-784811570ECB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FDE98AB9-264E-41D5-A1A0-271A5099C931}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FDE98AB9-264E-41D5-A1A0-271A5099C931}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDE98AB9-264E-41D5-A1A0-271A5099C931}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -81,10 +77,6 @@ Global
 		{9B9F6273-3B0F-477C-AD7C-1E56CC213A5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B9F6273-3B0F-477C-AD7C-1E56CC213A5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B9F6273-3B0F-477C-AD7C-1E56CC213A5E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CDDCEFE4-144A-40FE-8F95-D22B50283267}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CDDCEFE4-144A-40FE-8F95-D22B50283267}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CDDCEFE4-144A-40FE-8F95-D22B50283267}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CDDCEFE4-144A-40FE-8F95-D22B50283267}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BB656F99-93E3-4E86-AE6E-532C7BC1F5D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BB656F99-93E3-4E86-AE6E-532C7BC1F5D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB656F99-93E3-4E86-AE6E-532C7BC1F5D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -113,6 +105,14 @@ Global
 		{6F7991E8-0FE4-492E-AC01-E40353E5FEF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F7991E8-0FE4-492E-AC01-E40353E5FEF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F7991E8-0FE4-492E-AC01-E40353E5FEF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDDCEFE4-144A-40FE-8F95-D22B50283267}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDDCEFE4-144A-40FE-8F95-D22B50283267}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDDCEFE4-144A-40FE-8F95-D22B50283267}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDDCEFE4-144A-40FE-8F95-D22B50283267}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6E5141E-A6AC-434A-9697-784811570ECB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6E5141E-A6AC-434A-9697-784811570ECB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6E5141E-A6AC-434A-9697-784811570ECB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6E5141E-A6AC-434A-9697-784811570ECB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Hydra.Core;
 
-namespace Hydra.PublishOnPull
+namespace Hydra.Notifier
 {
     public class EventName : Wrapper<string>
     {
