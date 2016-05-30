@@ -49,12 +49,12 @@ namespace Hydra.Core
         NotificationsByCorrelations queryNotificationsByCorrelations,
         Func<DateTimeOffset> clock);
 
-    public delegate void Projector<in TProvider>(
+    public delegate void Projector<in TUowProvider>(
         Event @event,
         NotificationsByCorrelations queryNotificationsByCorrelations,
         Func<DateTimeOffset> clock,
-        TProvider provider)
-        where TProvider : IProvider;
+        TUowProvider provider)
+        where TUowProvider : IUowProvider;
 
     public delegate void Connecter<in TLeftProvider, in TRightProvider>(
         Event @event,
@@ -62,8 +62,8 @@ namespace Hydra.Core
         Func<DateTimeOffset> clock,
         TLeftProvider leftProvider,
         TRightProvider rightProvider)
-        where TLeftProvider : IProvider
-        where TRightProvider : IProvider;
+        where TLeftProvider : IUowProvider
+        where TRightProvider : IUowProvider;
 
     public class PublishersBySubscription : Dictionary<Subscription, Publisher>, IDisposable
     {
@@ -71,16 +71,16 @@ namespace Hydra.Core
         {}
     }
 
-    public class ProjectorsBySubscription<TProvider> : Dictionary<Subscription, Projector<TProvider>>, IDisposable
-        where TProvider : IProvider
+    public class ProjectorsBySubscription<TUowProvider> : Dictionary<Subscription, Projector<TUowProvider>>, IDisposable
+        where TUowProvider : IUowProvider
     {
         public void Dispose()
         {}
     }
 
     public class ConnectersBySubscription<TLeftProvider, TRightProvider> : Dictionary<Subscription, Connecter<TLeftProvider, TRightProvider>>, IDisposable
-        where TLeftProvider : IProvider
-        where TRightProvider : IProvider
+        where TLeftProvider : IUowProvider
+        where TRightProvider : IUowProvider
     {
         public void Dispose()
         {}

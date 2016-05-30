@@ -15,8 +15,8 @@ namespace Hydra.PublishOnPull
             IEnumerable<TypeContract> contracts,
             Action<IEnumerable<IDomainEvent>> publish,
             Func<TStateProvider, RecordLastSeen> recordLastSeenFunction) 
-            where TStreamProvider : IProvider
-            where TStateProvider : IProvider
+            where TStreamProvider : IUowProvider
+            where TStateProvider : IUowProvider
         {
             commitState
             (

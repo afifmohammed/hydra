@@ -17,17 +17,17 @@ namespace Hydra.AdoNet
             this EventStoreConfiguration<TEventStoreConnectionStringName> config)
             where TEventStoreConnectionStringName : class
         {
-            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.NotificationsByCorrelationsFunction =
+            EventStore<AdoNetTransactionUowProvider<TEventStoreConnectionStringName>>.NotificationsByCorrelationsFunction =
                 t => SqlEventStore.NotificationsByCorrelations(t.Value);
 
-            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.PublisherVersionByCorrelationsFunction =
+            EventStore<AdoNetTransactionUowProvider<TEventStoreConnectionStringName>>.PublisherVersionByCorrelationsFunction =
                 t => SqlEventStore.PublisherVersionByContractAndCorrelations(t.Value);
 
-            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.SaveNotificationsByPublisherAndVersionAction =
+            EventStore<AdoNetTransactionUowProvider<TEventStoreConnectionStringName>>.SaveNotificationsByPublisherAndVersionAction =
                 t => SqlEventStore.SaveNotificationsByPublisherAndVersion(t.Value);
 
-            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.CommitEventStoreWork =
-                AdoNetTransactionProvider<TEventStoreConnectionStringName>.CommitWork(ConnectionString.ByName);
+            EventStore<AdoNetTransactionUowProvider<TEventStoreConnectionStringName>>.CommitEventStoreWork =
+                AdoNetTransactionUowProvider<TEventStoreConnectionStringName>.CommitWork(ConnectionString.ByName);
             return config;
         }
 
@@ -35,9 +35,9 @@ namespace Hydra.AdoNet
             this EventStoreConfiguration<TEventStoreConnectionStringName> config)
             where TEventStoreConnectionStringName : class
         {
-            EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.Publish = domainEvents =>
+            EventStore<AdoNetTransactionUowProvider<TEventStoreConnectionStringName>>.Publish = domainEvents =>
             {
-                PostBox<AdoNetTransactionScopeProvider>.Drop
+                PostBox<AdoNetTransactionScopeUowProvider>.Drop
                     (() => Request<Subscription>.By(new RegisteredSubscriptions()))
                     (domainEvents.Select(x => new Event {Notification = x, EventId = new NoEventId()}));
             };

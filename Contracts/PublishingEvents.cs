@@ -7,8 +7,8 @@ namespace Hydra.Core
 
     public delegate void Post(IEnumerable<SubscriberMessage> messages);
 
-    public delegate void Enqueue<in TProvider>(
-        TProvider provider,
+    public delegate void Enqueue<in TUowProvider>(
+        TUowProvider provider,
         IEnumerable<SubscriberMessage> messages)
-        where TProvider : IProvider;
+        where TUowProvider : IUowProvider;
 }

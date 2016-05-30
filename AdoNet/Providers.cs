@@ -6,9 +6,9 @@ using Hydra.Core;
 
 namespace Hydra.AdoNet
 {
-    public class AdoNetTransactionScopeProvider : Wrapper<TransactionScope>, IDisposable, IProvider
+    public class AdoNetTransactionScopeUowProvider : Wrapper<TransactionScope>, IDisposable, IUowProvider
     {
-        public AdoNetTransactionScopeProvider()
+        public AdoNetTransactionScopeUowProvider()
         {
             Value = new TransactionScope();
         }
@@ -18,11 +18,11 @@ namespace Hydra.AdoNet
             Value.Dispose();
         }
 
-        public static CommitWork<AdoNetTransactionScopeProvider> Commit()
+        public static CommitWork<AdoNetTransactionScopeUowProvider> Commit()
         {
             return work =>
             {
-                using (var scope = new AdoNetTransactionScopeProvider())
+                using (var scope = new AdoNetTransactionScopeUowProvider())
                 {
                     work(scope);
                     scope.Value.Complete();
@@ -33,10 +33,10 @@ namespace Hydra.AdoNet
         public TransactionScope Value { get; }
     }
 
-    public class AdoNetTransactionProvider<TConnectionStringName> : Wrapper<IDbTransaction>, IDisposable, IProvider
+    public class AdoNetTransactionUowProvider<TConnectionStringName> : Wrapper<IDbTransaction>, IDisposable, IUowProvider
         where TConnectionStringName : class
     {
-        public AdoNetTransactionProvider(Func<string, string> getConnectionString)
+        public AdoNetTransactionUowProvider(Func<string, string> getConnectionString)
         {
             Value = Transaction(getConnectionString(typeof(TConnectionStringName).FriendlyName()));
         }
@@ -56,11 +56,11 @@ namespace Hydra.AdoNet
             Value.Dispose();
         }
 
-        public static CommitWork<AdoNetTransactionProvider<TConnectionStringName>> CommitWork(Func<string, string> getConnectionString)
+        public static CommitWork<AdoNetTransactionUowProvider<TConnectionStringName>> CommitWork(Func<string, string> getConnectionString)
         {
             return doWork =>
             {
-                using (var t = new AdoNetTransactionProvider<TConnectionStringName>(getConnectionString))
+                using (var t = new AdoNetTransactionUowProvider<TConnectionStringName>(getConnectionString))
                 {
                     doWork(t);
                     t.Value.Commit();
@@ -69,10 +69,10 @@ namespace Hydra.AdoNet
         }
     }
 
-    public class AdoNetConnectionProvider<TConnectionStringName> : Wrapper<IDbConnection>, IDisposable, IProvider
+    public class AdoNetConnectionUowProvider<TConnectionStringName> : Wrapper<IDbConnection>, IDisposable, IUowProvider
         where TConnectionStringName : class
     {
-        public AdoNetConnectionProvider(Func<string, string> getConnectionString)
+        public AdoNetConnectionUowProvider(Func<string, string> getConnectionString)
         {
             Value = Connection(getConnectionString(typeof(TConnectionStringName).FriendlyName()));
         }
@@ -90,11 +90,11 @@ namespace Hydra.AdoNet
             Value?.Dispose();
         }
 
-        public static CommitWork<AdoNetConnectionProvider<TConnectionStringName>> CommitWork(Func<string, string> getConnectionString)
+        public static CommitWork<AdoNetConnectionUowProvider<TConnectionStringName>> CommitWork(Func<string, string> getConnectionString)
         {
             return doWork =>
             {
-                using (var t = new AdoNetConnectionProvider<TConnectionStringName>(getConnectionString))
+                using (var t = new AdoNetConnectionUowProvider<TConnectionStringName>(getConnectionString))
                 {
                     doWork(t);                    
                 }

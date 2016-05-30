@@ -3,23 +3,23 @@ using Hydra.Core;
 
 namespace Hydra.Subscribers
 {
-    delegate void Handler<TProvider>(
+    delegate void Handler<TUowProvider>(
         SubscriberMessage messageToConsumer,
-        ProjectorsBySubscription<TProvider> projectorsBySubscription,
+        ProjectorsBySubscription<TUowProvider> projectorsBySubscription,
         NotificationsByCorrelations notificationsByCorrelations,
         Func<DateTimeOffset> clock,
-        TProvider provider)
-        where TProvider : IProvider;
+        TUowProvider provider)
+        where TUowProvider : IUowProvider;
 
-    public static class ExporterStore<TEventStoreProvider, TExportProvider> 
-        where TExportProvider : IProvider
-        where TEventStoreProvider : IProvider
+    public static class ProjectorStore<TEventStoreUowProvider, TProjectorUowProvider> 
+        where TProjectorUowProvider : IUowProvider
+        where TEventStoreUowProvider : IUowProvider
     {
-        public static CommitWork<TExportProvider> CommitExportProvider { get; set; }
-        public static CommitWork<TEventStoreProvider> CommitEventStoreProvider { get; set; }
-        public static NotificationsByCorrelationsFunction<TEventStoreProvider> NotificationsByCorrelationsFunction { get; set; }
+        public static CommitWork<TProjectorUowProvider> CommitExportProvider { get; set; }
+        public static CommitWork<TEventStoreUowProvider> CommitEventStoreProvider { get; set; }
+        public static NotificationsByCorrelationsFunction<TEventStoreUowProvider> NotificationsByCorrelationsFunction { get; set; }
 
-        public static Func<ProjectorsBySubscription<TExportProvider>, Subscriber> Subscriber = 
+        public static Func<ProjectorsBySubscription<TProjectorUowProvider>, Subscriber> Subscriber = 
             exportersBySubscription => 
                 message => 
                     HandleAndCommit
@@ -35,11 +35,11 @@ namespace Hydra.Subscribers
 
         internal static void HandleAndCommit(
             SubscriberMessage message,
-            ProjectorsBySubscription<TExportProvider> projectorsBySubscription,
-            Handler<TExportProvider> handler,
-            NotificationsByCorrelationsFunction<TEventStoreProvider> notificationsByCorrelationsFunction,
-            CommitWork<TExportProvider> commitExportProvider,
-            CommitWork<TEventStoreProvider> commitEventStoreProvider,
+            ProjectorsBySubscription<TProjectorUowProvider> projectorsBySubscription,
+            Handler<TProjectorUowProvider> handler,
+            NotificationsByCorrelationsFunction<TEventStoreUowProvider> notificationsByCorrelationsFunction,
+            CommitWork<TProjectorUowProvider> commitExportProvider,
+            CommitWork<TEventStoreUowProvider> commitEventStoreProvider,
             Func<DateTimeOffset> clock)
         {
             commitExportProvider
@@ -60,10 +60,10 @@ namespace Hydra.Subscribers
 
         internal static void Handle(
             SubscriberMessage message,
-            ProjectorsBySubscription<TExportProvider> projectorsBySubscription,
+            ProjectorsBySubscription<TProjectorUowProvider> projectorsBySubscription,
             NotificationsByCorrelations notificationsByCorrelations,
             Func<DateTimeOffset> clock,
-            TExportProvider integrationProvider)
+            TProjectorUowProvider integrationProvider)
         {
             var consumer = projectorsBySubscription[message.Subscription];
 

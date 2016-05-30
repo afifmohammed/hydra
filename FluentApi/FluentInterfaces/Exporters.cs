@@ -6,158 +6,158 @@ using Hydra.Subscribers;
 
 namespace Hydra.Core.FluentInterfaces
 {
-    public interface ConsumerContractSubscriptions<TSubscriberContract, TProvider> :
-        ConsumerSubscriptions<TProvider>,
-        When<TSubscriberContract, TProvider>
+    public interface ConsumerContractSubscriptions<TSubscriberContract, TUowProvider> :
+        ConsumerSubscriptions<TUowProvider>,
+        When<TSubscriberContract, TUowProvider>
         where TSubscriberContract : new()
-        where TProvider : IProvider
+        where TUowProvider : IUowProvider
     { }
 
-    public interface ConsumerSubscriptions<TProvider>
-        where TProvider : IProvider
+    public interface ConsumerSubscriptions<TUowProvider>
+        where TUowProvider : IUowProvider
     {
-        ProjectorsBySubscription<TProvider> ProjectorsBySubscription { get; }
+        ProjectorsBySubscription<TUowProvider> ProjectorsBySubscription { get; }
     }
 
-    public interface CorrelationMap<TSubscriberDataContract, TNotification, TProvider> :
-        Given<TSubscriberDataContract, TProvider>,
-        ConsumerContractSubscriptions<TSubscriberDataContract, TProvider>,
-        Then<TSubscriberDataContract, TNotification, TProvider>
+    public interface CorrelationMap<TSubscriberDataContract, TNotification, TUowProvider> :
+        Given<TSubscriberDataContract, TUowProvider>,
+        ConsumerContractSubscriptions<TSubscriberDataContract, TUowProvider>,
+        Then<TSubscriberDataContract, TNotification, TUowProvider>
         where TSubscriberDataContract : new()
         where TNotification : IDomainEvent
-        where TProvider : IProvider
+        where TUowProvider : IUowProvider
     {
-        CorrelationMap<TSubscriberDataContract, TNotification, TProvider> Correlate(
+        CorrelationMap<TSubscriberDataContract, TNotification, TUowProvider> Correlate(
             Expression<Func<TNotification, object>> left, 
             Expression<Func<TSubscriberDataContract, object>> right);
     }
 
-    public interface Given<TSubscriberDataContract, TProvider>
+    public interface Given<TSubscriberDataContract, TUowProvider>
         where TSubscriberDataContract : new()
-        where TProvider : IProvider
+        where TUowProvider : IUowProvider
     {
-        CorrelationMap<TSubscriberDataContract, TNotification, TProvider> Given<TNotification>(
+        CorrelationMap<TSubscriberDataContract, TNotification, TUowProvider> Given<TNotification>(
             Func<TNotification, TSubscriberDataContract, TSubscriberDataContract> mapper) 
             where TNotification : IDomainEvent;
     }
 
-    public interface When<TSubscriberDataContract, TProvider>
+    public interface When<TSubscriberDataContract, TUowProvider>
         where TSubscriberDataContract : new()
-        where TProvider : IProvider
+        where TUowProvider : IUowProvider
     {
-        CorrelationMap<TSubscriberDataContract, TNotification, TProvider> When<TNotification>(
+        CorrelationMap<TSubscriberDataContract, TNotification, TUowProvider> When<TNotification>(
             Func<TNotification, TSubscriberDataContract, TSubscriberDataContract> mapper) 
             where TNotification : IDomainEvent;
 
-        CorrelationMap<TSubscriberDataContract, TNotification, TProvider> When<TNotification>() 
+        CorrelationMap<TSubscriberDataContract, TNotification, TUowProvider> When<TNotification>() 
             where TNotification : IDomainEvent;
     }
 
-    public interface Then<TSubscriberDataContract, out TNotification, TProvider>
+    public interface Then<TSubscriberDataContract, out TNotification, TUowProvider>
         where TSubscriberDataContract : new()
         where TNotification : IDomainEvent
-        where TProvider : IProvider
+        where TUowProvider : IUowProvider
     {
-        ConsumerContractSubscriptions<TSubscriberDataContract, TProvider> Then(
-            Action<TSubscriberDataContract, TNotification, TProvider> handler);
+        ConsumerContractSubscriptions<TSubscriberDataContract, TUowProvider> Then(
+            Action<TSubscriberDataContract, TNotification, TUowProvider> handler);
     }
 
-    public class ConsumerBuilder<TSubscriberDataContract, TProvider> :
-        Given<TSubscriberDataContract, TProvider>,
-        When<TSubscriberDataContract, TProvider>
+    public class ConsumerBuilder<TSubscriberDataContract, TUowProvider> :
+        Given<TSubscriberDataContract, TUowProvider>,
+        When<TSubscriberDataContract, TUowProvider>
         where TSubscriberDataContract : new()
-        where TProvider : IProvider
+        where TUowProvider : IUowProvider
     {
-        public CorrelationMap<TSubscriberDataContract, TNotification, TProvider> Given<TNotification>(
+        public CorrelationMap<TSubscriberDataContract, TNotification, TUowProvider> Given<TNotification>(
             Func<TNotification, TSubscriberDataContract, TSubscriberDataContract> mapper) 
             where TNotification : IDomainEvent
         {
-            return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification, TProvider>
+            return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification, TUowProvider>
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
                 new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> { Type<TSubscriberDataContract>.Maps(mapper) },
-                new ProjectorsBySubscription<TProvider>()
+                new ProjectorsBySubscription<TUowProvider>()
             );
         }
 
-        public CorrelationMap<TSubscriberDataContract, TNotification, TProvider> When<TNotification>(
+        public CorrelationMap<TSubscriberDataContract, TNotification, TUowProvider> When<TNotification>(
             Func<TNotification, TSubscriberDataContract, TSubscriberDataContract> mapper) 
             where TNotification : IDomainEvent
         {
-            return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification, TProvider>
+            return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification, TUowProvider>
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
                 new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> { Type<TSubscriberDataContract>.Maps(mapper) },
-                new ProjectorsBySubscription<TProvider>()
+                new ProjectorsBySubscription<TUowProvider>()
             );
         }
 
-        public CorrelationMap<TSubscriberDataContract, TNotification, TProvider> When<TNotification>()
+        public CorrelationMap<TSubscriberDataContract, TNotification, TUowProvider> When<TNotification>()
             where TNotification : IDomainEvent
         {
-            return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification, TProvider>
+            return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification, TUowProvider>
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
                 new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>>(),
-                new ProjectorsBySubscription<TProvider>()
+                new ProjectorsBySubscription<TUowProvider>()
             );
         }
     }
 
-    class ConsumerCorrelationMap<TSubscriberDataContract, TNotification, TProvider> : CorrelationMap<TSubscriberDataContract, TNotification, TProvider>
+    class ConsumerCorrelationMap<TSubscriberDataContract, TNotification, TUowProvider> : CorrelationMap<TSubscriberDataContract, TNotification, TUowProvider>
         where TSubscriberDataContract : new()
         where TNotification : IDomainEvent
-        where TProvider : IProvider
+        where TUowProvider : IUowProvider
     {
         readonly List<KeyValuePair<TypeContract, CorrelationMap>> _subscriberDataContractMaps;
         readonly List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> _subscriberDataMappers;
-        public ProjectorsBySubscription<TProvider> ProjectorsBySubscription { get; }
+        public ProjectorsBySubscription<TUowProvider> ProjectorsBySubscription { get; }
 
         public ConsumerCorrelationMap(
             List<KeyValuePair<TypeContract, CorrelationMap>> maps,
             List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> mappers,
-            ProjectorsBySubscription<TProvider> projectorsByNotificationContract)
+            ProjectorsBySubscription<TUowProvider> projectorsByNotificationContract)
         {
             _subscriberDataContractMaps = maps ?? new List<KeyValuePair<TypeContract, CorrelationMap>>();
 
             _subscriberDataMappers = mappers 
                 ?? new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>>();
 
-            ProjectorsBySubscription = projectorsByNotificationContract ?? new ProjectorsBySubscription<TProvider>();
+            ProjectorsBySubscription = projectorsByNotificationContract ?? new ProjectorsBySubscription<TUowProvider>();
         }
 
-        public CorrelationMap<TSubscriberDataContract, TNotification1, TProvider> Given<TNotification1>(
+        public CorrelationMap<TSubscriberDataContract, TNotification1, TUowProvider> Given<TNotification1>(
             Func<TNotification1, TSubscriberDataContract, TSubscriberDataContract> mapper) 
             where TNotification1 : IDomainEvent
         {
             _subscriberDataMappers.Add(Type<TSubscriberDataContract>.Maps(mapper));
 
-            return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification1, TProvider>(
+            return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification1, TUowProvider>(
                 _subscriberDataContractMaps, 
                 _subscriberDataMappers, 
                 ProjectorsBySubscription);
         }
 
-        public CorrelationMap<TSubscriberDataContract, TNotification1, TProvider> When<TNotification1>(
+        public CorrelationMap<TSubscriberDataContract, TNotification1, TUowProvider> When<TNotification1>(
             Func<TNotification1, TSubscriberDataContract, TSubscriberDataContract> mapper) 
             where TNotification1 : IDomainEvent
         {
             _subscriberDataMappers.Add(Type<TSubscriberDataContract>.Maps(mapper));
 
-            return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification1, TProvider>(
+            return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification1, TUowProvider>(
                 _subscriberDataContractMaps, 
                 _subscriberDataMappers, 
                 ProjectorsBySubscription);
         }
 
-        public CorrelationMap<TSubscriberDataContract, TNotification1, TProvider> When<TNotification1>()
+        public CorrelationMap<TSubscriberDataContract, TNotification1, TUowProvider> When<TNotification1>()
             where TNotification1 : IDomainEvent
         {
             return When<TNotification1>((e, d) => d);
         }
 
-        public ConsumerContractSubscriptions<TSubscriberDataContract, TProvider> Then(
-            Action<TSubscriberDataContract, TNotification, TProvider> handler)
+        public ConsumerContractSubscriptions<TSubscriberDataContract, TUowProvider> Then(
+            Action<TSubscriberDataContract, TNotification, TUowProvider> handler)
         {
             ProjectorsBySubscription.Add
             (
@@ -177,7 +177,7 @@ namespace Hydra.Core.FluentInterfaces
             return this;
         }
 
-        public CorrelationMap<TSubscriberDataContract, TNotification, TProvider> Correlate(
+        public CorrelationMap<TSubscriberDataContract, TNotification, TUowProvider> Correlate(
             Expression<Func<TNotification, object>> left, 
             Expression<Func<TSubscriberDataContract, object>> right)
         {

@@ -5,12 +5,12 @@ using Hydra.Core;
 
 namespace Hydra.Subscribers
 {
-    public static class EventStore<TProvider> where TProvider : IProvider
+    public static class EventStore<TUowProvider> where TUowProvider : IUowProvider
     {
-        public static NotificationsByCorrelationsFunction<TProvider> NotificationsByCorrelationsFunction { get; set; }
-        public static PublisherVersionByCorrelationsFunction<TProvider> PublisherVersionByCorrelationsFunction { get; set; }
-        public static SaveNotificationsByPublisherAndVersionAction<TProvider> SaveNotificationsByPublisherAndVersionAction { get; set; }
-        public static CommitWork<TProvider> CommitEventStoreWork { get; set; }
+        public static NotificationsByCorrelationsFunction<TUowProvider> NotificationsByCorrelationsFunction { get; set; }
+        public static PublisherVersionByCorrelationsFunction<TUowProvider> PublisherVersionByCorrelationsFunction { get; set; }
+        public static SaveNotificationsByPublisherAndVersionAction<TUowProvider> SaveNotificationsByPublisherAndVersionAction { get; set; }
+        public static CommitWork<TUowProvider> CommitEventStoreWork { get; set; }
 
         public static Action<IEnumerable<IDomainEvent>> Publish = events => { };
 
@@ -31,10 +31,10 @@ namespace Hydra.Subscribers
         internal static void HandleAndCommitAndPost(
             SubscriberMessage message,
             PublishersBySubscription publishersBySubscription,
-            NotificationsByCorrelationsFunction<TProvider> notificationsByCorrelationsFunction,
-            PublisherVersionByCorrelationsFunction<TProvider> publisherVersionByCorrelationsFunction,
-            SaveNotificationsByPublisherAndVersionAction<TProvider> saveNotificationsByPublisherAndVersionAction,
-            CommitWork<TProvider> commitWork, 
+            NotificationsByCorrelationsFunction<TUowProvider> notificationsByCorrelationsFunction,
+            PublisherVersionByCorrelationsFunction<TUowProvider> publisherVersionByCorrelationsFunction,
+            SaveNotificationsByPublisherAndVersionAction<TUowProvider> saveNotificationsByPublisherAndVersionAction,
+            CommitWork<TUowProvider> commitWork, 
             Action<IEnumerable<IDomainEvent>> publish)
         {
             var list = new List<IDomainEvent>();

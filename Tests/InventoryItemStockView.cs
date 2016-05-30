@@ -5,7 +5,7 @@ using RetailDomain.Inventory;
 
 namespace Tests
 {
-    public class InMemoryView<TView> : Dictionary<string, TView>, IProvider 
+    public class InMemoryView<TView> : Dictionary<string, TView>, IUowProvider 
         where TView : new()
     { }
     public class Denormalizer<TView> : ConsumerBuilder<TView, InMemoryView<TView>> where TView : new()

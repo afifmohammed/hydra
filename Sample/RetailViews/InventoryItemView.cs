@@ -14,7 +14,7 @@ namespace RetailViews
 
     public static class InventoryItemStockViewBuilder<TConnectionStringName> where TConnectionStringName : class
     {
-        public static ConsumerContractSubscriptions<InventoryItemStockView, AdoNetTransactionProvider<TConnectionStringName>> Subscriptions()
+        public static ConsumerContractSubscriptions<InventoryItemStockView, AdoNetTransactionUowProvider<TConnectionStringName>> Subscriptions()
         {
             return new Denormalizer<InventoryItemStockView, TConnectionStringName>()
                 .When<InventoryItemCreated>(Map)
@@ -35,29 +35,29 @@ namespace RetailViews
 
         }
 
-        private static void Handle(InventoryItemStockView view, ItemsRemovedFromInventory notification, AdoNetTransactionProvider<TConnectionStringName> provider)
+        private static void Handle(InventoryItemStockView view, ItemsRemovedFromInventory notification, AdoNetTransactionUowProvider<TConnectionStringName> uowProvider)
         {
-            provider.Value.Connection.Update(Map(notification, view), provider.Value);
+            uowProvider.Value.Connection.Update(Map(notification, view), uowProvider.Value);
         }
 
-        private static void Handle(InventoryItemStockView view, ItemsCheckedInToInventory notification, AdoNetTransactionProvider<TConnectionStringName> provider)
+        private static void Handle(InventoryItemStockView view, ItemsCheckedInToInventory notification, AdoNetTransactionUowProvider<TConnectionStringName> uowProvider)
         {
-            provider.Value.Connection.Update(Map(notification, view), provider.Value);
+            uowProvider.Value.Connection.Update(Map(notification, view), uowProvider.Value);
         }
 
-        private static void Handle(InventoryItemStockView view, InventoryItemStockLimitChanged notification, AdoNetTransactionProvider<TConnectionStringName> provider)
+        private static void Handle(InventoryItemStockView view, InventoryItemStockLimitChanged notification, AdoNetTransactionUowProvider<TConnectionStringName> uowProvider)
         {
-            provider.Value.Connection.Update(Map(notification, view), provider.Value);
+            uowProvider.Value.Connection.Update(Map(notification, view), uowProvider.Value);
         }
 
-        private static void Handle(InventoryItemStockView view, InventoryItemDeactivated notification, AdoNetTransactionProvider<TConnectionStringName> provider)
+        private static void Handle(InventoryItemStockView view, InventoryItemDeactivated notification, AdoNetTransactionUowProvider<TConnectionStringName> uowProvider)
         {
-            provider.Value.Connection.Update(Map(notification, view), provider.Value);
+            uowProvider.Value.Connection.Update(Map(notification, view), uowProvider.Value);
         }
 
-        private static void Handle(InventoryItemStockView view, InventoryItemCreated notification, AdoNetTransactionProvider<TConnectionStringName> provider)
+        private static void Handle(InventoryItemStockView view, InventoryItemCreated notification, AdoNetTransactionUowProvider<TConnectionStringName> uowProvider)
         {
-            provider.Value.Connection.Update(Map(notification, view), provider.Value);
+            uowProvider.Value.Connection.Update(Map(notification, view), uowProvider.Value);
         }
 
 

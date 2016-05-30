@@ -15,7 +15,7 @@ namespace WebApi
     {
         public static Response<Unit> Dispatch<TRequest>(TRequest command) where TRequest : IRequest<Unit>, ICorrelated
         {
-            return SubscriptionDispatcher<AdoNetTransactionScopeProvider>.Dispatch(command);
+            return SubscriptionDispatcher<AdoNetTransactionScopeUowProvider>.Dispatch(command);
         }
     }
 }

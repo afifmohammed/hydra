@@ -23,17 +23,17 @@ namespace Tests
             }).ToList();
         }
 
-        public static Func<TypeContract, IEnumerable<Action<INotification, TProvider>>> Given<TProvider>(
-            this ProjectorsBySubscription<TProvider> subscriptions,
+        public static Func<TypeContract, IEnumerable<Action<INotification, TUowProvider>>> Given<TUowProvider>(
+            this ProjectorsBySubscription<TUowProvider> subscriptions,
             params IDomainEvent[] given)
-            where TProvider : IProvider
+            where TUowProvider : IUowProvider
         {
             var list = given.AsEvents().ToList().AsReadOnly();
 
             return n => subscriptions
                 .Where(p => p.Key.NotificationContract.Equals(n))
                 .Select(p => p.Value)
-                .Select<Projector<TProvider>, Action<INotification, TProvider>>(exporter =>
+                .Select<Projector<TUowProvider>, Action<INotification, TUowProvider>>(exporter =>
                     (notification, provider) =>
                             exporter(
                                 new Event { Notification = notification, EventId = list.OrderByDescending(g => g.EventId.Value).First().EventId.With(x => x.Increment()) },
@@ -42,11 +42,11 @@ namespace Tests
                                 provider));
         }
 
-        public static void Notify<TProvider>(
-            this Func<TypeContract, IEnumerable<Action<INotification, TProvider>>> consumerContractSubscriptions,
+        public static void Notify<TUowProvider>(
+            this Func<TypeContract, IEnumerable<Action<INotification, TUowProvider>>> consumerContractSubscriptions,
             IDomainEvent notification,
-            TProvider provider)
-            where TProvider : IProvider
+            TUowProvider provider)
+            where TUowProvider : IUowProvider
         {
             foreach (var action in consumerContractSubscriptions(notification.Contract()))
             {
@@ -75,12 +75,12 @@ namespace Tests
 
         }
 
-        public static ConsumerContractSubscriptions<TSubscriberDataContract, TProvider> Notify<TSubscriberDataContract, TProvider>(
-            this ConsumerContractSubscriptions<TSubscriberDataContract, TProvider> consumerContractSubscriptions,
+        public static ConsumerContractSubscriptions<TSubscriberDataContract, TUowProvider> Notify<TSubscriberDataContract, TUowProvider>(
+            this ConsumerContractSubscriptions<TSubscriberDataContract, TUowProvider> consumerContractSubscriptions,
             Event notification,
-            TProvider provider)
+            TUowProvider provider)
             where TSubscriberDataContract : new()
-            where TProvider : IProvider
+            where TUowProvider : IUowProvider
         {
             var subscription = new Subscription(
                 notificationContract: new TypeContract(notification),

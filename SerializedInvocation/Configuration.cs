@@ -30,9 +30,9 @@ namespace Hydra.SerializedInvocation
         {
             Initialize<THangfireConnectionStringName>();
 
-            PostBox<AdoNetTransactionScopeProvider>.CommitWork = AdoNetTransactionScopeProvider.Commit();
+            PostBox<AdoNetTransactionScopeUowProvider>.CommitWork = AdoNetTransactionScopeUowProvider.Commit();
 
-            PostBox<AdoNetTransactionScopeProvider>.Enqueue = Enqueue;
+            PostBox<AdoNetTransactionScopeUowProvider>.Enqueue = Enqueue;
 
             return config;
         }
@@ -61,7 +61,7 @@ namespace Hydra.SerializedInvocation
                 });
         }
 
-        static void Enqueue(AdoNetTransactionScopeProvider provider, IEnumerable<SubscriberMessage> messages)
+        static void Enqueue(AdoNetTransactionScopeUowProvider uowProvider, IEnumerable<SubscriberMessage> messages)
         {
             foreach (var subscriberMessage in messages)
             {

@@ -8,11 +8,11 @@ using Hydra.Requests;
 
 namespace Hydra.Subscriptions
 {
-    public static class PostBox<TQueueProvider>
-        where TQueueProvider : IProvider
+    public static class PostBox<TQueueUowProvider>
+        where TQueueUowProvider : IUowProvider
     {
-        public static Enqueue<TQueueProvider> Enqueue { get; set; }
-        public static CommitWork<TQueueProvider> CommitWork { get; set; }
+        public static Enqueue<TQueueUowProvider> Enqueue { get; set; }
+        public static CommitWork<TQueueUowProvider> CommitWork { get; set; }
 
         public static Notify Drop =
             getSubscriptions =>
@@ -22,7 +22,7 @@ namespace Hydra.Subscriptions
         public static Post Post = messages => CommitWork(provider => Enqueue(provider, messages));
     }
 
-    public class SubscriptionDispatcher<TQueueProvider> where TQueueProvider : IProvider
+    public class SubscriptionDispatcher<TQueueUowProvider> where TQueueUowProvider : IUowProvider
     {
         public static Func<IEnumerable<Subscription>> GetSubscriptions = () => Request<Subscription>.By(new RegisteredSubscriptions());
 
@@ -40,7 +40,7 @@ namespace Hydra.Subscriptions
                         EventId = new NoEventId()
                     };
 
-                    PostBox<TQueueProvider>.Drop(() => subscriptions.Value)(new[] { @event });
+                    PostBox<TQueueUowProvider>.Drop(() => subscriptions.Value)(new[] { @event });
 
                     return Enumerable.Empty<Unit>();
                 });

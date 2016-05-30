@@ -10,13 +10,13 @@ namespace Hydra.Core.FluentInterfaces
         ConsumerSubscriptions<TEndpoint1, TEndpoint2>,
         When<TSubscriberDataContract, TEndpoint1, TEndpoint2>
         where TSubscriberDataContract : new()
-        where TEndpoint1 : IProvider
-        where TEndpoint2 : IProvider
+        where TEndpoint1 : IUowProvider
+        where TEndpoint2 : IUowProvider
     { }
 
     public interface ConsumerSubscriptions<TEndpoint1, TEndpoint2>
-        where TEndpoint1 : IProvider
-        where TEndpoint2 : IProvider
+        where TEndpoint1 : IUowProvider
+        where TEndpoint2 : IUowProvider
     {
         ConnectersBySubscription<TEndpoint1, TEndpoint2> ConnecterBySubscription { get; }
     }
@@ -27,8 +27,8 @@ namespace Hydra.Core.FluentInterfaces
         Then<TSubscriberDataContract, TNotification, TEndpoint1, TEndpoint2>
         where TSubscriberDataContract : new()
         where TNotification : IDomainEvent
-        where TEndpoint1 : IProvider
-        where TEndpoint2 : IProvider
+        where TEndpoint1 : IUowProvider
+        where TEndpoint2 : IUowProvider
     {
         CorrelationMap<TSubscriberDataContract, TNotification, TEndpoint1, TEndpoint2> Correlate(
             Expression<Func<TNotification, object>> left, 
@@ -37,8 +37,8 @@ namespace Hydra.Core.FluentInterfaces
 
     public interface Given<TSubscriberDataContract, TEndpoint1, TEndpoint2>
         where TSubscriberDataContract : new()
-        where TEndpoint1 : IProvider
-        where TEndpoint2 : IProvider
+        where TEndpoint1 : IUowProvider
+        where TEndpoint2 : IUowProvider
     {
         CorrelationMap<TSubscriberDataContract, TNotification, TEndpoint1, TEndpoint2> Given<TNotification>(
             Func<TNotification, TSubscriberDataContract, TSubscriberDataContract> mapper) 
@@ -47,8 +47,8 @@ namespace Hydra.Core.FluentInterfaces
 
     public interface When<TSubscriberDataContract, TEndpoint1, TEndpoint2>
         where TSubscriberDataContract : new()
-        where TEndpoint1 : IProvider
-        where TEndpoint2 : IProvider
+        where TEndpoint1 : IUowProvider
+        where TEndpoint2 : IUowProvider
     {
         CorrelationMap<TSubscriberDataContract, TNotification, TEndpoint1, TEndpoint2> When<TNotification>(
             Func<TNotification, TSubscriberDataContract, TSubscriberDataContract> mapper) 
@@ -60,8 +60,8 @@ namespace Hydra.Core.FluentInterfaces
 
     public interface Then<TSubscriberDataContract, out TNotification, TEndpoint1, TEndpoint2>
         where TSubscriberDataContract : new()
-        where TEndpoint1 : IProvider
-        where TEndpoint2 : IProvider
+        where TEndpoint1 : IUowProvider
+        where TEndpoint2 : IUowProvider
         where TNotification : IDomainEvent
     {
         ConsumerContractSubscriptions<TSubscriberDataContract, TEndpoint1, TEndpoint2> Then(
@@ -72,8 +72,8 @@ namespace Hydra.Core.FluentInterfaces
         Given<TSubscriberDataContract, TEndpoint1, TEndpoint2>,
         When<TSubscriberDataContract, TEndpoint1, TEndpoint2>
         where TSubscriberDataContract : new()
-        where TEndpoint1 : IProvider
-        where TEndpoint2 : IProvider
+        where TEndpoint1 : IUowProvider
+        where TEndpoint2 : IUowProvider
     {
         public CorrelationMap<TSubscriberDataContract, TNotification, TEndpoint1, TEndpoint2> Given<TNotification>(
             Func<TNotification, TSubscriberDataContract, TSubscriberDataContract> mapper) 
@@ -115,8 +115,8 @@ namespace Hydra.Core.FluentInterfaces
         CorrelationMap<TSubscriberDataContract, TNotification, TEndpoint1, TEndpoint2>
         where TSubscriberDataContract : new()
         where TNotification : IDomainEvent
-        where TEndpoint1 : IProvider
-        where TEndpoint2 : IProvider
+        where TEndpoint1 : IUowProvider
+        where TEndpoint2 : IUowProvider
     {
         readonly List<KeyValuePair<TypeContract, CorrelationMap>> _subscriberDataContractMaps;
         readonly List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> _subscriberDataMappers;

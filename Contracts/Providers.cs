@@ -1,8 +1,8 @@
 ﻿namespace Hydra.Core
 {
-    public interface IProvider { }
+    public interface IUowProvider { }
     
-    public delegate void DoWork<in TProvider>(TProvider provider) where TProvider : IProvider;
+    public delegate void DoWork<in TUowProvider>(TUowProvider provider) where TUowProvider : IUowProvider;
 
-    public delegate void CommitWork<out TProvider>(DoWork<TProvider> work) where TProvider : IProvider;
+    public delegate void CommitWork<out TUowProvider>(DoWork<TUowProvider> work) where TUowProvider : IUowProvider;
 }

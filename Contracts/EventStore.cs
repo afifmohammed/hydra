@@ -7,15 +7,15 @@ namespace Hydra.Core
         IEnumerable<Correlation> correlation,
         EventId eventId);
 
-    public delegate Func<IEnumerable<Correlation>, int> PublisherVersionByCorrelationsFunction<in TProvider>(
-        TProvider provider)
-        where TProvider : IProvider;
+    public delegate Func<IEnumerable<Correlation>, int> PublisherVersionByCorrelationsFunction<in TUowProvider>(
+        TUowProvider provider)
+        where TUowProvider : IUowProvider;
 
-    public delegate NotificationsByCorrelations NotificationsByCorrelationsFunction<in TProvider>(
-        TProvider provider)
-        where TProvider : IProvider;
+    public delegate NotificationsByCorrelations NotificationsByCorrelationsFunction<in TUowProvider>(
+        TUowProvider provider)
+        where TUowProvider : IUowProvider;
 
-    public delegate Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersionAction<in TProvider>(
-        TProvider provider)
-        where TProvider : IProvider;
+    public delegate Action<NotificationsByPublisherAndVersion> SaveNotificationsByPublisherAndVersionAction<in TUowProvider>(
+        TUowProvider provider)
+        where TUowProvider : IUowProvider;
 }

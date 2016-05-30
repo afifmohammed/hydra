@@ -50,10 +50,6 @@
       <Project>{D2396379-DD06-41A6-9BFC-55AF3C2289A2}</Project>
       <Name>Contracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EventSourcing\Subscribers.csproj">
-      <Project>{E6E5141E-A6AC-434A-9697-784811570ECB}</Project>
-      <Name>Subscribers</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Requests\Requests.csproj">
       <Project>{EB7A999C-A296-4051-854A-41E5FFABA4D5}</Project>
       <Name>Requests</Name>

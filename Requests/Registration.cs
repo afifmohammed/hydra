@@ -8,49 +8,49 @@ namespace Hydra.Requests
     public interface IRequest<TResult>
     { }
 
-    public class RequestsRegistration<TProvider> where TProvider : IDisposable
+    public class RequestsRegistration<TUowProvider> where TUowProvider : IDisposable
     {
-        readonly Func<TProvider> _providerFactory;
+        readonly Func<TUowProvider> _providerFactory;
 
-        public RequestsRegistration(Func<TProvider> providerFactory)
+        public RequestsRegistration(Func<TUowProvider> providerFactory)
         {
             _providerFactory = providerFactory;
         }
 
-        public RequestsRegistration<TProvider> RegisterRequest<TInput, TOutput>(
-            Func<TInput, TProvider, TOutput> function,
-            Func<Func<TInput, TProvider, TOutput>, Func<TInput, TProvider, IEnumerable<TOutput>>> list)
+        public RequestsRegistration<TUowProvider> RegisterRequest<TInput, TOutput>(
+            Func<TInput, TUowProvider, TOutput> function,
+            Func<Func<TInput, TUowProvider, TOutput>, Func<TInput, TUowProvider, IEnumerable<TOutput>>> list)
             where TInput : IRequest<TOutput>
         {
             Register(function, list);
             return this;
         }
 
-        public RequestsRegistration<TProvider> Register<TInput, TOutput>(
-            Func<TInput, TProvider, TOutput> function,
-            Func<Func<TInput, TProvider, TOutput>, Func<TInput, TProvider, IEnumerable<TOutput>>> list)
+        public RequestsRegistration<TUowProvider> Register<TInput, TOutput>(
+            Func<TInput, TUowProvider, TOutput> function,
+            Func<Func<TInput, TUowProvider, TOutput>, Func<TInput, TUowProvider, IEnumerable<TOutput>>> list)
         {
             RequestHandlers.Routes.Add(Function.ToKvp(list(function), ProvideProvider));
             return this;
         }
 
-        public RequestsRegistration<TProvider> RegisterRequest<TInput, TOutput>(
-            Func<TInput, TProvider, IEnumerable<TOutput>> function)
+        public RequestsRegistration<TUowProvider> RegisterRequest<TInput, TOutput>(
+            Func<TInput, TUowProvider, IEnumerable<TOutput>> function)
             where TInput : IRequest<TOutput>
         {
             Register(function);
             return this;
         }
 
-        public RequestsRegistration<TProvider> Register<TInput, TOutput>(
-            Func<TInput, TProvider, IEnumerable<TOutput>> function)
+        public RequestsRegistration<TUowProvider> Register<TInput, TOutput>(
+            Func<TInput, TUowProvider, IEnumerable<TOutput>> function)
         {
             RequestHandlers.Routes.Add(Function.ToKvp(function, ProvideProvider));
             return this;
         }
 
         Func<TInput, IEnumerable<TResult>> ProvideProvider<TInput, TResult>(
-            Func<TInput, TProvider, IEnumerable<TResult>> query)
+            Func<TInput, TUowProvider, IEnumerable<TResult>> query)
         {
             return input =>
             {
