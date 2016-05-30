@@ -32,7 +32,7 @@ namespace Hydra.AdoNet
             EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.Publish = domainEvents =>
             {
                 PostBox<AdoNetTransactionScopeProvider>.Drop
-                    (() => Request<Subscription>.By(new AvailableSubscriptions()))
+                    (() => Request<Subscription>.By(new RegisteredSubscriptions()))
                     (domainEvents.Select(x => new Event {Notification = x, EventId = new NoEventId()}));
             };
 

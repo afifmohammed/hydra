@@ -17,7 +17,7 @@ namespace Hydra.SerializedInvocation
             JsonMessageHandler.HandleInstance =
                 m =>
                 {
-                    foreach (var subscriber in Request<Subscriber>.By(new ConfiguredSubscriber()))
+                    foreach (var subscriber in Request<Subscriber>.By(new ConfiguredSubscribers()))
                         subscriber(m);
                 };
             return config;
@@ -39,7 +39,7 @@ namespace Hydra.SerializedInvocation
         public static BackgroundJobServerOptions QueuePerSubscriber(this BackgroundJobServerOptions options)
         {
             options.Queues =
-                Request<Subscription>.By(new AvailableSubscriptions())
+                Request<Subscription>.By(new RegisteredSubscriptions())
                     .Select(x => x.SubscriberDataContract.Value.ToLower())
                     .ToArray();
 

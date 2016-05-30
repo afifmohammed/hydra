@@ -18,7 +18,7 @@ namespace Hydra.SubscriberHost
             configuration.ConfigureSubscriptions(subscribers.Select(x => x.Key));
 
             new RequestsRegistration<PublishersBySubscription>(() => subscribers)
-                .Register<ConfiguredSubscriber, Subscriber>(
+                .Register<ConfiguredSubscribers, Subscriber>(
                     (input, provider) => EventStore<AdoNetTransactionProvider<TEventStoreConnectionStringName>>.Subscriber(provider), 
                     Return.List);
 
@@ -34,7 +34,7 @@ namespace Hydra.SubscriberHost
             configuration.ConfigureSubscriptions(subscribers.Select(x => x.Key));
 
             new RequestsRegistration<ProjectorsBySubscription<TExportProvider>>(() => subscribers)
-                .Register<ConfiguredSubscriber, Subscriber>(
+                .Register<ConfiguredSubscribers, Subscriber>(
                     (input, provider) => ExporterStore<AdoNetConnectionProvider<TEventStoreConnectionStringName>, TExportProvider>.Subscriber(provider), 
                     Return.List);
 
@@ -47,7 +47,7 @@ namespace Hydra.SubscriberHost
         {
             return new HangfireSubscriberHost<TEventStoreConnectionStringName, THangfireDatabaseConnectionStringName>
             (
-                () => Request<Subscriber>.By(new ConfiguredSubscriber())
+                () => Request<Subscriber>.By(new ConfiguredSubscribers())
             );
         }
     }

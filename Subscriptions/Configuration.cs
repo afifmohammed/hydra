@@ -13,7 +13,7 @@ namespace Hydra.Subscriptions
 {
     public class SubscriberPipeline
     {
-        public static Func<IEnumerable<Subscription>> GetSubscriptions = () => Request<Subscription>.By(new AvailableSubscriptions());
+        public static Func<IEnumerable<Subscription>> GetSubscriptions = () => Request<Subscription>.By(new RegisteredSubscriptions());
 
         public static Response<Unit> Dispatch<TRequest>(TRequest command) where TRequest : IRequest<Unit>, ICorrelated
         {
@@ -31,7 +31,7 @@ namespace Hydra.Subscriptions
             where TSubscriptionStoreConnectionStringName : class
         {
             new RequestsRegistration<IDbConnection>(() => new SqlConnection(ConnectionString.ByName(typeof(TSubscriptionStoreConnectionStringName).FriendlyName())).With(x => x.Open()))
-                .Register<AvailableSubscriptions, Subscription>((q, connection) => subscriptionQuery(connection));
+                .Register<RegisteredSubscriptions, Subscription>((q, connection) => subscriptionQuery(connection));
 
             return configuration;
         }
@@ -48,7 +48,7 @@ namespace Hydra.Subscriptions
         public static EventStoreConfiguration ConfigureSubscriptions(this EventStoreConfiguration configuration, params Subscription[] subscriptions)
         {
             new RequestsRegistration<Disposable<List<Subscription>>>(() => new Disposable<List<Subscription>>(new List<Subscription>(subscriptions)))
-                .Register<AvailableSubscriptions, Subscription>((q, list) => list.Value);
+                .Register<RegisteredSubscriptions, Subscription>((q, list) => list.Value);
 
             return configuration;
         }

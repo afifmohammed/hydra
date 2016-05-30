@@ -3,9 +3,9 @@ using Hydra.Requests;
 
 namespace Hydra.Configuration
 {
-    public sealed class ConfiguredSubscriber : IRequest<Subscriber>
+    public sealed class ConfiguredSubscribers : IRequest<Subscriber>
     { }
 
-    public sealed class AvailableSubscriptions : IRequest<Subscription>
+    public sealed class RegisteredSubscriptions : IRequest<Subscription>
     { }
 }
