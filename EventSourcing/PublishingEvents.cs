@@ -2,11 +2,11 @@
 
 namespace Hydra.Core
 {
-    public static class PostBox<TProvider>
-        where TProvider : IProvider
+    public static class PostBox<TQueueProvider>
+        where TQueueProvider : IProvider
     {
-        public static Enqueue<TProvider> Enqueue { get; set; }
-        public static CommitWork<TProvider> CommitWork { get; set; }
+        public static Enqueue<TQueueProvider> Enqueue { get; set; }
+        public static CommitWork<TQueueProvider> CommitWork { get; set; }
 
         public static Notify Drop = 
             getSubscriptions =>
