@@ -67,9 +67,9 @@
       <Project>{D2396379-DD06-41A6-9BFC-55AF3C2289A2}</Project>
       <Name>Contracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EventSourcing\Core.csproj">
+    <ProjectReference Include="..\EventSourcing\Subscribers.csproj">
       <Project>{E6E5141E-A6AC-434A-9697-784811570ECB}</Project>
-      <Name>Core</Name>
+      <Name>Subscribers</Name>
     </ProjectReference>
     <ProjectReference Include="..\FluentApi\FluentApi.csproj">
       <Project>{A0E76561-ABD7-4739-8D82-BEE6F2AD8EBC}</Project>
@@ -82,6 +82,10 @@
     <ProjectReference Include="..\Requests\Requests.csproj">
       <Project>{EB7A999C-A296-4051-854A-41E5FFABA4D5}</Project>
       <Name>Requests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Subscriptions\Subscriptions.csproj">
+      <Project>{bb656f99-93e3-4e86-ae6e-532c7bc1f5d9}</Project>
+      <Name>Subscriptions</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

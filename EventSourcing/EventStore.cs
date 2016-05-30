@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hydra.Core;
 
-namespace Hydra.Core
+namespace Hydra.Subscribers
 {
     public static class EventStore<TProvider> where TProvider : IProvider
     {

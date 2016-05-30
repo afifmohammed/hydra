@@ -1,7 +1,13 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
 using Hydra.Configuration;
 using Hydra.Core;
 using Hydra.Requests;
+using Hydra.Subscribers;
+using Hydra.Subscriptions;
 
 namespace Hydra.AdoNet
 {
@@ -44,6 +50,17 @@ namespace Hydra.AdoNet
             where TEventStoreConnectionStringName : class
         {
             return new EventStoreConfiguration<TEventStoreConnectionStringName>();
+        }
+
+        public static EventStoreConfiguration<TSubscriptionStoreConnectionStringName> ConfigureSubscriptions<TSubscriptionStoreConnectionStringName>(
+            this EventStoreConfiguration<TSubscriptionStoreConnectionStringName> configuration,
+            Func<IDbConnection, IEnumerable<Subscription>> subscriptionQuery)
+            where TSubscriptionStoreConnectionStringName : class
+        {
+            new RequestsRegistration<IDbConnection>(() => new SqlConnection(ConnectionString.ByName(typeof(TSubscriptionStoreConnectionStringName).FriendlyName())).With(x => x.Open()))
+                .Register<RegisteredSubscriptions, Subscription>((q, connection) => subscriptionQuery(connection));
+
+            return configuration;
         }
     }
 }

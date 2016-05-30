@@ -75,9 +75,9 @@
       <Project>{d2396379-dd06-41a6-9bfc-55af3c2289a2}</Project>
       <Name>Contracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EventSourcing\Core.csproj">
+    <ProjectReference Include="..\EventSourcing\Subscribers.csproj">
       <Project>{e6e5141e-a6ac-434a-9697-784811570ecb}</Project>
-      <Name>Core</Name>
+      <Name>Subscribers</Name>
     </ProjectReference>
     <ProjectReference Include="..\Requests\Requests.csproj">
       <Project>{EB7A999C-A296-4051-854A-41E5FFABA4D5}</Project>

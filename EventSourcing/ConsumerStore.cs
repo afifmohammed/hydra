@@ -1,6 +1,7 @@
 ﻿using System;
+using Hydra.Core;
 
-namespace Hydra.Core
+namespace Hydra.Subscribers
 {
     delegate void Handler<TProvider>(
         SubscriberMessage messageToConsumer,

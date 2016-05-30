@@ -4,6 +4,7 @@ using Hydra.AdoNet;
 using Hydra.Configuration;
 using Hydra.Core;
 using Hydra.Requests;
+using Hydra.Subscribers;
 using Hydra.Subscriptions;
 
 namespace Hydra.SubscriberHost

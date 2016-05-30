@@ -7,6 +7,7 @@ using Hydra.AdoNet;
 using Hydra.Configuration;
 using Hydra.Core;
 using Hydra.Requests;
+using Hydra.Subscriptions;
 
 namespace Hydra.SerializedInvocation
 {

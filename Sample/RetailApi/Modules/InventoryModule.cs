@@ -1,5 +1,4 @@
-﻿using Hydra.Subscriptions;
-using Nancy;
+﻿using Nancy;
 using RetailDomain.Inventory;
 
 namespace WebApi.Modules
@@ -10,9 +9,9 @@ namespace WebApi.Modules
         {
             Get["/inventory/{id}"] = _ => "not available";
 
-            Put["/inventory/{id}/create"] = store => SubscriberPipeline.Dispatch(new CreateInventoryItem { Id = store["id"] });
+            Put["/inventory/{id}/create"] = store => ApplicationSubscriptionDispatcher.Dispatch(new CreateInventoryItem { Id = store["id"] });
 
-            Put["/inventory/{id}/deactivate"] = store => SubscriberPipeline.Dispatch(new DeactivateInventoryItem { Id = store["id"] });
+            Put["/inventory/{id}/deactivate"] = store => ApplicationSubscriptionDispatcher.Dispatch(new DeactivateInventoryItem { Id = store["id"] });
         }
     }
 }

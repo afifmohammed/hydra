@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Hydra.Core;
 using Hydra.PublishOnPull;
+using Hydra.Subscriptions;
 
 namespace Hydra.AdoNet
 {

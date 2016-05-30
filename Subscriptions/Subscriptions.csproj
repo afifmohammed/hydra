@@ -41,13 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration.cs" />
+    <Compile Include="Dispatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AdoNet\AdoNet.csproj">
-      <Project>{223A1668-8FC2-4399-9047-287B9DBF2636}</Project>
-      <Name>AdoNet</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Configuration\Configuration.csproj">
       <Project>{D89C6BA8-8A9B-4278-AC17-42B1476E47D4}</Project>
       <Name>Configuration</Name>
