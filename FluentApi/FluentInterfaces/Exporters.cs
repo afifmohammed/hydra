@@ -15,7 +15,7 @@ namespace Hydra.Core.FluentInterfaces
     public interface ConsumerSubscriptions<TProvider>
         where TProvider : IProvider
     {
-        ExportersBySubscription<TProvider> ExportersBySubscription { get; }
+        ProjectorsBySubscription<TProvider> ProjectorsBySubscription { get; }
     }
 
     public interface CorrelationMap<TSubscriberDataContract, TNotification, TProvider> :
@@ -75,7 +75,7 @@ namespace Hydra.Core.FluentInterfaces
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
                 new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> { Type<TSubscriberDataContract>.Maps(mapper) },
-                new ExportersBySubscription<TProvider>()
+                new ProjectorsBySubscription<TProvider>()
             );
         }
 
@@ -87,7 +87,7 @@ namespace Hydra.Core.FluentInterfaces
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
                 new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> { Type<TSubscriberDataContract>.Maps(mapper) },
-                new ExportersBySubscription<TProvider>()
+                new ProjectorsBySubscription<TProvider>()
             );
         }
 
@@ -98,7 +98,7 @@ namespace Hydra.Core.FluentInterfaces
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
                 new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>>(),
-                new ExportersBySubscription<TProvider>()
+                new ProjectorsBySubscription<TProvider>()
             );
         }
     }
@@ -110,19 +110,19 @@ namespace Hydra.Core.FluentInterfaces
     {
         readonly List<KeyValuePair<TypeContract, CorrelationMap>> _subscriberDataContractMaps;
         readonly List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> _subscriberDataMappers;
-        public ExportersBySubscription<TProvider> ExportersBySubscription { get; }
+        public ProjectorsBySubscription<TProvider> ProjectorsBySubscription { get; }
 
         public ConsumerCorrelationMap(
             List<KeyValuePair<TypeContract, CorrelationMap>> maps,
             List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> mappers,
-            ExportersBySubscription<TProvider> exportersByNotificationContract)
+            ProjectorsBySubscription<TProvider> projectorsByNotificationContract)
         {
             _subscriberDataContractMaps = maps ?? new List<KeyValuePair<TypeContract, CorrelationMap>>();
 
             _subscriberDataMappers = mappers 
                 ?? new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>>();
 
-            ExportersBySubscription = exportersByNotificationContract ?? new ExportersBySubscription<TProvider>();
+            ProjectorsBySubscription = projectorsByNotificationContract ?? new ProjectorsBySubscription<TProvider>();
         }
 
         public CorrelationMap<TSubscriberDataContract, TNotification1, TProvider> Given<TNotification1>(
@@ -134,7 +134,7 @@ namespace Hydra.Core.FluentInterfaces
             return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification1, TProvider>(
                 _subscriberDataContractMaps, 
                 _subscriberDataMappers, 
-                ExportersBySubscription);
+                ProjectorsBySubscription);
         }
 
         public CorrelationMap<TSubscriberDataContract, TNotification1, TProvider> When<TNotification1>(
@@ -146,7 +146,7 @@ namespace Hydra.Core.FluentInterfaces
             return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification1, TProvider>(
                 _subscriberDataContractMaps, 
                 _subscriberDataMappers, 
-                ExportersBySubscription);
+                ProjectorsBySubscription);
         }
 
         public CorrelationMap<TSubscriberDataContract, TNotification1, TProvider> When<TNotification1>()
@@ -158,7 +158,7 @@ namespace Hydra.Core.FluentInterfaces
         public ConsumerContractSubscriptions<TSubscriberDataContract, TProvider> Then(
             Action<TSubscriberDataContract, TNotification, TProvider> handler)
         {
-            ExportersBySubscription.Add
+            ProjectorsBySubscription.Add
             (
                 new Subscription(typeof(TNotification).Contract(), typeof(TSubscriberDataContract).Contract()),
                 (@event, queryNotificationsByCorrelations, clock, provider) => 

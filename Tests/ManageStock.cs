@@ -15,7 +15,7 @@ namespace Tests
         {
             var store = new InMemoryView<InventoryItemStockView>();
             InventoryItemStockViewBuilder.Subscriptions()
-                .ExportersBySubscription
+                .ProjectorsBySubscription
                 .Given(
                     new InventoryItemCreated { Id = "1" },
                     new ItemsCheckedInToInventory { Id = "1", Count = 10 },

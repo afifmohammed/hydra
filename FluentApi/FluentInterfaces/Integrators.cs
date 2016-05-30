@@ -17,7 +17,7 @@ namespace Hydra.Core.FluentInterfaces
         where TEndpoint1 : IProvider
         where TEndpoint2 : IProvider
     {
-        IntegratorsBySubscription<TEndpoint1, TEndpoint2> IntegratorBySubscription { get; }
+        ConnectersBySubscription<TEndpoint1, TEndpoint2> ConnecterBySubscription { get; }
     }
 
     public interface CorrelationMap<TSubscriberDataContract, TNotification, TEndpoint1, TEndpoint2> :
@@ -82,7 +82,7 @@ namespace Hydra.Core.FluentInterfaces
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
                 new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> { Type<TSubscriberDataContract>.Maps(mapper) },
-                new IntegratorsBySubscription<TEndpoint1, TEndpoint2>()
+                new ConnectersBySubscription<TEndpoint1, TEndpoint2>()
             );
         }
 
@@ -94,7 +94,7 @@ namespace Hydra.Core.FluentInterfaces
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
                 new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> { Type<TSubscriberDataContract>.Maps(mapper) },
-                new IntegratorsBySubscription<TEndpoint1, TEndpoint2>()
+                new ConnectersBySubscription<TEndpoint1, TEndpoint2>()
             );
         }
 
@@ -105,7 +105,7 @@ namespace Hydra.Core.FluentInterfaces
             (
                 new List<KeyValuePair<TypeContract, CorrelationMap>>(),
                 new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>>(),
-                new IntegratorsBySubscription<TEndpoint1, TEndpoint2>()
+                new ConnectersBySubscription<TEndpoint1, TEndpoint2>()
             );
         }
     }
@@ -119,19 +119,19 @@ namespace Hydra.Core.FluentInterfaces
     {
         readonly List<KeyValuePair<TypeContract, CorrelationMap>> _subscriberDataContractMaps;
         readonly List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> _subscriberDataMappers;
-        public IntegratorsBySubscription<TEndpoint1, TEndpoint2> IntegratorBySubscription { get; }
+        public ConnectersBySubscription<TEndpoint1, TEndpoint2> ConnecterBySubscription { get; }
 
         public ConsumerCorrelationMap(
             List<KeyValuePair<TypeContract, CorrelationMap>> maps,
             List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>> mappers,
-            IntegratorsBySubscription<TEndpoint1, TEndpoint2> integratorByNotificationAndContract)
+            ConnectersBySubscription<TEndpoint1, TEndpoint2> connecterByNotificationAndContract)
         {
             _subscriberDataContractMaps = maps ?? new List<KeyValuePair<TypeContract, CorrelationMap>>();
 
             _subscriberDataMappers = mappers 
                 ?? new List<KeyValuePair<TypeContract, Func<TSubscriberDataContract, JsonContent, TSubscriberDataContract>>>();
 
-            IntegratorBySubscription = integratorByNotificationAndContract ?? new IntegratorsBySubscription<TEndpoint1, TEndpoint2>();
+            ConnecterBySubscription = connecterByNotificationAndContract ?? new ConnectersBySubscription<TEndpoint1, TEndpoint2>();
         }
 
         public CorrelationMap<TSubscriberDataContract, TNotification1, TEndpoint1, TEndpoint2> Given<TNotification1>(
@@ -142,7 +142,7 @@ namespace Hydra.Core.FluentInterfaces
             return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification1, TEndpoint1, TEndpoint2>(
                 _subscriberDataContractMaps, 
                 _subscriberDataMappers, 
-                IntegratorBySubscription);
+                ConnecterBySubscription);
         }
 
         public CorrelationMap<TSubscriberDataContract, TNotification1, TEndpoint1, TEndpoint2> When<TNotification1>(
@@ -153,7 +153,7 @@ namespace Hydra.Core.FluentInterfaces
             return new ConsumerCorrelationMap<TSubscriberDataContract, TNotification1, TEndpoint1, TEndpoint2>(
                 _subscriberDataContractMaps, 
                 _subscriberDataMappers, 
-                IntegratorBySubscription);
+                ConnecterBySubscription);
         }
 
         public CorrelationMap<TSubscriberDataContract, TNotification1, TEndpoint1, TEndpoint2> When<TNotification1>() 
@@ -165,7 +165,7 @@ namespace Hydra.Core.FluentInterfaces
         public ConsumerContractSubscriptions<TSubscriberDataContract, TEndpoint1, TEndpoint2> Then(
             Action<TSubscriberDataContract, TNotification, TEndpoint1, TEndpoint2> handler)
         {
-            IntegratorBySubscription.Add
+            ConnecterBySubscription.Add
             (
                 new Subscription(typeof(TNotification).Contract(), typeof(TSubscriberDataContract).Contract()),
                 (@event, queryNotificationsByCorrelations, clock, endpoint1, endpoint2) => 

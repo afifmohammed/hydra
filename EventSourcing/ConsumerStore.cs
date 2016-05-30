@@ -4,7 +4,7 @@ namespace Hydra.Core
 {
     delegate void Handler<TProvider>(
         SubscriberMessage messageToConsumer,
-        ExportersBySubscription<TProvider> exportersBySubscription,
+        ProjectorsBySubscription<TProvider> projectorsBySubscription,
         NotificationsByCorrelations notificationsByCorrelations,
         Func<DateTimeOffset> clock,
         TProvider provider)
@@ -18,7 +18,7 @@ namespace Hydra.Core
         public static CommitWork<TEventStoreProvider> CommitEventStoreProvider { get; set; }
         public static NotificationsByCorrelationsFunction<TEventStoreProvider> NotificationsByCorrelationsFunction { get; set; }
 
-        public static Func<ExportersBySubscription<TExportProvider>, Subscriber> Subscriber = 
+        public static Func<ProjectorsBySubscription<TExportProvider>, Subscriber> Subscriber = 
             exportersBySubscription => 
                 message => 
                     HandleAndCommit
@@ -34,7 +34,7 @@ namespace Hydra.Core
 
         internal static void HandleAndCommit(
             SubscriberMessage message,
-            ExportersBySubscription<TExportProvider> exportersBySubscription,
+            ProjectorsBySubscription<TExportProvider> projectorsBySubscription,
             Handler<TExportProvider> handler,
             NotificationsByCorrelationsFunction<TEventStoreProvider> notificationsByCorrelationsFunction,
             CommitWork<TExportProvider> commitExportProvider,
@@ -48,7 +48,7 @@ namespace Hydra.Core
                     eventStoreProvider => handler
                     (
                         message,
-                        exportersBySubscription,
+                        projectorsBySubscription,
                         notificationsByCorrelationsFunction(eventStoreProvider),
                         clock,
                         exportProvider
@@ -59,12 +59,12 @@ namespace Hydra.Core
 
         internal static void Handle(
             SubscriberMessage message,
-            ExportersBySubscription<TExportProvider> exportersBySubscription,
+            ProjectorsBySubscription<TExportProvider> projectorsBySubscription,
             NotificationsByCorrelations notificationsByCorrelations,
             Func<DateTimeOffset> clock,
             TExportProvider integrationProvider)
         {
-            var consumer = exportersBySubscription[message.Subscription];
+            var consumer = projectorsBySubscription[message.Subscription];
 
             consumer
             (

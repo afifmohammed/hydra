@@ -24,7 +24,7 @@ namespace Tests
         }
 
         public static Func<TypeContract, IEnumerable<Action<INotification, TProvider>>> Given<TProvider>(
-            this ExportersBySubscription<TProvider> subscriptions,
+            this ProjectorsBySubscription<TProvider> subscriptions,
             params IDomainEvent[] given)
             where TProvider : IProvider
         {
@@ -33,7 +33,7 @@ namespace Tests
             return n => subscriptions
                 .Where(p => p.Key.NotificationContract.Equals(n))
                 .Select(p => p.Value)
-                .Select<Exporter<TProvider>, Action<INotification, TProvider>>(exporter =>
+                .Select<Projector<TProvider>, Action<INotification, TProvider>>(exporter =>
                     (notification, provider) =>
                             exporter(
                                 new Event { Notification = notification, EventId = list.OrderByDescending(g => g.EventId.Value).First().EventId.With(x => x.Increment()) },
@@ -87,7 +87,7 @@ namespace Tests
                 subscriberDataContract: new TypeContract(typeof(TSubscriberDataContract)));
 
             consumerContractSubscriptions
-                .ExportersBySubscription[subscription]
+                .ProjectorsBySubscription[subscription]
                 (
                     notification,
                     NotificationsByCorrelations(new Event[] {}),

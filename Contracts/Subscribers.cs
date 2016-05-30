@@ -49,14 +49,14 @@ namespace Hydra.Core
         NotificationsByCorrelations queryNotificationsByCorrelations,
         Func<DateTimeOffset> clock);
 
-    public delegate void Exporter<in TProvider>(
+    public delegate void Projector<in TProvider>(
         Event @event,
         NotificationsByCorrelations queryNotificationsByCorrelations,
         Func<DateTimeOffset> clock,
         TProvider provider)
         where TProvider : IProvider;
 
-    public delegate void Integrator<in TLeftProvider, in TRightProvider>(
+    public delegate void Connecter<in TLeftProvider, in TRightProvider>(
         Event @event,
         NotificationsByCorrelations queryNotificationsByCorrelations,
         Func<DateTimeOffset> clock,
@@ -71,14 +71,14 @@ namespace Hydra.Core
         {}
     }
 
-    public class ExportersBySubscription<TProvider> : Dictionary<Subscription, Exporter<TProvider>>, IDisposable
+    public class ProjectorsBySubscription<TProvider> : Dictionary<Subscription, Projector<TProvider>>, IDisposable
         where TProvider : IProvider
     {
         public void Dispose()
         {}
     }
 
-    public class IntegratorsBySubscription<TLeftProvider, TRightProvider> : Dictionary<Subscription, Integrator<TLeftProvider, TRightProvider>>, IDisposable
+    public class ConnectersBySubscription<TLeftProvider, TRightProvider> : Dictionary<Subscription, Connecter<TLeftProvider, TRightProvider>>, IDisposable
         where TLeftProvider : IProvider
         where TRightProvider : IProvider
     {

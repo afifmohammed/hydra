@@ -27,13 +27,13 @@ namespace Hydra.SubscriberHost
 
         public static EventStoreConfiguration<TEventStoreConnectionStringName> ConfigureSubscribers<TEventStoreConnectionStringName, TExportProvider>(
             this EventStoreConfiguration<TEventStoreConnectionStringName> configuration,
-            ExportersBySubscription<TExportProvider> subscribers)
+            ProjectorsBySubscription<TExportProvider> subscribers)
             where TEventStoreConnectionStringName : class 
             where TExportProvider : IProvider
         {
             configuration.ConfigureSubscriptions(subscribers.Select(x => x.Key));
 
-            new RequestsRegistration<ExportersBySubscription<TExportProvider>>(() => subscribers)
+            new RequestsRegistration<ProjectorsBySubscription<TExportProvider>>(() => subscribers)
                 .Register<ConfiguredSubscriber, Subscriber>(
                     (input, provider) => ExporterStore<AdoNetConnectionProvider<TEventStoreConnectionStringName>, TExportProvider>.Subscriber(provider), 
                     Return.List);
