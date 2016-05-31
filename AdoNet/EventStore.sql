@@ -79,27 +79,16 @@ END
 
 GO
 
-CREATE PROCEDURE [dbo].[GetLatestEvents] (@tvpEvents dbo.EventTableType READONLY, @StartEventId bigint = null)
+CREATE PROCEDURE [dbo].[GetLatestEvents] (@tvpEvents dbo.EventTableType READONLY, @LastSeenEventId bigint = 0)
 AS
 BEGIN
 	SET NOCOUNT ON
-	IF @StartEventId IS NULL
-		BEGIN
-			SELECT TOP 100 e.EventName, e.Content
-			FROM [Events] as e INNER JOIN EventCorrelations AS ec ON e.Id = ec.EventId 
-			INNER JOIN @tvpEvents as t ON e.EventName = t.EventName
-			WHERE e.Id > @StartEventId
-			Group by e.Id, e.EventName, e.Content
-			ORDER BY e.Id
-		END
-	ELSE
-		BEGIN
-			SELECT TOP 1 e.EventName, e.Content
-			FROM [Events] as e INNER JOIN EventCorrelations AS ec ON e.Id = ec.EventId 
-			INNER JOIN @tvpEvents as t ON e.EventName = t.EventName
-			Group by e.Id, e.EventName, e.Content
-			ORDER BY e.Id DESC
-		END
+	SELECT TOP 100 e.EventName, e.Content
+	FROM [Events] as e INNER JOIN EventCorrelations AS ec ON e.Id = ec.EventId 
+	INNER JOIN @tvpEvents as t ON e.EventName = t.EventName
+	WHERE  @LastSeenEventId = 0 Or e.Id > @LastSeenEventId
+	Group by e.Id, e.EventName, e.Content
+	ORDER BY e.Id	
 END
 
 GO
