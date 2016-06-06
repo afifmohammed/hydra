@@ -26,17 +26,17 @@ namespace Hydra.SubscriberHost
             return configuration;
         }
 
-        public static EventStoreConfiguration<TEventStoreConnectionStringName> ConfigureSubscribers<TEventStoreConnectionStringName, TExportProvider>(
+        public static EventStoreConfiguration<TEventStoreConnectionStringName> ConfigureSubscribers<TEventStoreConnectionStringName, TProjectionProvider>(
             this EventStoreConfiguration<TEventStoreConnectionStringName> configuration,
-            ProjectorsBySubscription<TExportProvider> subscribers)
+            ProjectorsBySubscription<TProjectionProvider> subscribers)
             where TEventStoreConnectionStringName : class 
-            where TExportProvider : IUowProvider
+            where TProjectionProvider : IUowProvider
         {
             configuration.ConfigureSubscriptions(subscribers.Select(x => x.Key));
 
-            new RequestsRegistration<ProjectorsBySubscription<TExportProvider>>(() => subscribers)
+            new RequestsRegistration<ProjectorsBySubscription<TProjectionProvider>>(() => subscribers)
                 .Register<ConfiguredSubscribers, Subscriber>(
-                    (input, provider) => ProjectorStore<AdoNetConnectionUowProvider<TEventStoreConnectionStringName>, TExportProvider>.Subscriber(provider), 
+                    (input, provider) => ProjectorStore<AdoNetConnectionUowProvider<TEventStoreConnectionStringName>, TProjectionProvider>.Subscriber(provider), 
                     Return.List);
 
             return configuration;

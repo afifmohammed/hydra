@@ -21,11 +21,11 @@ namespace Hydra.Subscribers
             };
         }
 
-        public static Action<TNotification> BuildExporter<TConsumerData, TNotification, TExportProvider>(
-            Action<TConsumerData, TNotification, TExportProvider> consumer,
+        public static Action<TNotification> BuildProjector<TConsumerData, TNotification, TProjectionProvider>(
+            Action<TConsumerData, TNotification, TProjectionProvider> consumer,
             IDictionary<TypeContract, IReadOnlyCollection<CorrelationMap>> correlationMapsByConsumerDataContract,
             NotificationsByCorrelations notificationsByCorrelations,
-            TExportProvider exportProvider,
+            TProjectionProvider projectionProvider,
             IDictionary<TypeContract, Func<TConsumerData, JsonContent, TConsumerData>> consumerDataMappersByNotificationContract,
             Func<DateTimeOffset> clock)
             where TConsumerData : new()
@@ -46,7 +46,7 @@ namespace Hydra.Subscribers
                         new NoEventId()
                     ),
                     notification,
-                    exportProvider
+                    projectionProvider
                 );
             };
         }

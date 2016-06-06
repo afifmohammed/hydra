@@ -33,9 +33,9 @@ namespace Tests
             return n => subscriptions
                 .Where(p => p.Key.NotificationContract.Equals(n))
                 .Select(p => p.Value)
-                .Select<Projector<TUowProvider>, Action<INotification, TUowProvider>>(exporter =>
+                .Select<Projector<TUowProvider>, Action<INotification, TUowProvider>>(projector =>
                     (notification, provider) =>
-                            exporter(
+                            projector(
                                 new Event { Notification = notification, EventId = list.OrderByDescending(g => g.EventId.Value).First().EventId.With(x => x.Increment()) },
                                 NotificationsByCorrelations(list),
                                 () => DateTimeOffset.Now,

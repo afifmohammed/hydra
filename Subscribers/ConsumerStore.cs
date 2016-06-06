@@ -15,20 +15,20 @@ namespace Hydra.Subscribers
         where TProjectorUowProvider : IUowProvider
         where TEventStoreUowProvider : IUowProvider
     {
-        public static CommitWork<TProjectorUowProvider> CommitExportProvider { get; set; }
+        public static CommitWork<TProjectorUowProvider> CommitProjectionProvider { get; set; }
         public static CommitWork<TEventStoreUowProvider> CommitEventStoreProvider { get; set; }
         public static NotificationsByCorrelationsFunction<TEventStoreUowProvider> NotificationsByCorrelationsFunction { get; set; }
 
         public static Func<ProjectorsBySubscription<TProjectorUowProvider>, Subscriber> Subscriber = 
-            exportersBySubscription => 
+            projectorsBySubscription => 
                 message => 
                     HandleAndCommit
                     (
                         message,
-                        exportersBySubscription,
+                        projectorsBySubscription,
                         Handle,
                         NotificationsByCorrelationsFunction,
-                        CommitExportProvider,
+                        CommitProjectionProvider,
                         CommitEventStoreProvider,
                         () => DateTimeOffset.Now
                     );
@@ -38,13 +38,13 @@ namespace Hydra.Subscribers
             ProjectorsBySubscription<TProjectorUowProvider> projectorsBySubscription,
             Handler<TProjectorUowProvider> handler,
             NotificationsByCorrelationsFunction<TEventStoreUowProvider> notificationsByCorrelationsFunction,
-            CommitWork<TProjectorUowProvider> commitExportProvider,
+            CommitWork<TProjectorUowProvider> commitProjectionProvider,
             CommitWork<TEventStoreUowProvider> commitEventStoreProvider,
             Func<DateTimeOffset> clock)
         {
-            commitExportProvider
+            commitProjectionProvider
             (
-                exportProvider => commitEventStoreProvider
+                projectionProvider => commitEventStoreProvider
                 (
                     eventStoreProvider => handler
                     (
@@ -52,7 +52,7 @@ namespace Hydra.Subscribers
                         projectorsBySubscription,
                         notificationsByCorrelationsFunction(eventStoreProvider),
                         clock,
-                        exportProvider
+                        projectionProvider
                     )
                 )
             );

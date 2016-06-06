@@ -163,7 +163,7 @@ namespace Hydra.Core.FluentInterfaces
             (
                 new Subscription(typeof(TNotification).Contract(), typeof(TSubscriberDataContract).Contract()),
                 (@event, queryNotificationsByCorrelations, clock, provider) => 
-                    Functions.BuildExporter
+                    Functions.BuildProjector
                     (
                         handler,
                         _subscriberDataContractMaps.GroupBy(x => x.Key).ToDictionary(x => x.Key, x => (IReadOnlyCollection<CorrelationMap>) x.Select(a => a.Value).ToList()),
