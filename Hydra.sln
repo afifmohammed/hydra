@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{FDE98AB9-264E-41D5-A1A0-271A5099C931}"
 EndProject
@@ -25,7 +25,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subscriptions", "Subscripti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetailApi", "Sample\RetailApi\RetailApi.csproj", "{F8A5A9AD-F680-46F4-806F-653E7E51A030}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubscriberHost", "SubscriberHost\SubscriberHost.csproj", "{0249FC85-834C-489C-8C74-E008AB9C5DE7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subscribers.Host.Hangfire", "SubscriberHost\Subscribers.Host.Hangfire.csproj", "{0249FC85-834C-489C-8C74-E008AB9C5DE7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Configuration", "Configuration\Configuration.csproj", "{D89C6BA8-8A9B-4278-AC17-42B1476E47D4}"
 EndProject
@@ -38,6 +38,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifier", "Notifier\Notifier.csproj", "{CDDCEFE4-144A-40FE-8F95-D22B50283267}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subscribers", "Subscribers\Subscribers.csproj", "{E6E5141E-A6AC-434A-9697-784811570ECB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subscribers.Configuration", "Subscribers.Configuration\Subscribers.Configuration.csproj", "{76D55F0D-3C7B-4E07-AB1B-F1EBC99C8E25}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,6 +115,10 @@ Global
 		{E6E5141E-A6AC-434A-9697-784811570ECB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6E5141E-A6AC-434A-9697-784811570ECB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6E5141E-A6AC-434A-9697-784811570ECB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76D55F0D-3C7B-4E07-AB1B-F1EBC99C8E25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76D55F0D-3C7B-4E07-AB1B-F1EBC99C8E25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76D55F0D-3C7B-4E07-AB1B-F1EBC99C8E25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76D55F0D-3C7B-4E07-AB1B-F1EBC99C8E25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

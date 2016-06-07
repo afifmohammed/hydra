@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0249FC85-834C-489C-8C74-E008AB9C5DE7}</ProjectGuid>
+    <ProjectGuid>{76D55F0D-3C7B-4E07-AB1B-F1EBC99C8E25}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Hydra.SubscriberHost</RootNamespace>
-    <AssemblyName>Hydra.SubscriberHost</AssemblyName>
+    <RootNamespace>Hydra.Subscribers.Configuration</RootNamespace>
+    <AssemblyName>Hydra.Subscribers.Configuration</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,22 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Hangfire.Core, Version=1.5.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hangfire.Core.1.5.6\lib\net45\Hangfire.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Hangfire.SqlServer, Version=1.5.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hangfire.SqlServer.1.5.6\lib\net45\Hangfire.SqlServer.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
-      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -57,7 +41,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration.cs" />
-    <Compile Include="Host.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -66,20 +49,20 @@
       <Name>AdoNet</Name>
     </ProjectReference>
     <ProjectReference Include="..\Configuration\Configuration.csproj">
-      <Project>{D89C6BA8-8A9B-4278-AC17-42B1476E47D4}</Project>
+      <Project>{d89c6ba8-8a9b-4278-ac17-42b1476e47d4}</Project>
       <Name>Configuration</Name>
     </ProjectReference>
     <ProjectReference Include="..\Contracts\Contracts.csproj">
-      <Project>{D2396379-DD06-41A6-9BFC-55AF3C2289A2}</Project>
+      <Project>{d2396379-dd06-41a6-9bfc-55af3c2289a2}</Project>
       <Name>Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RequestPipeline\RequestPipeline.csproj">
+      <Project>{900b7a11-306e-46ed-9267-552bb7840bc1}</Project>
+      <Name>RequestPipeline</Name>
     </ProjectReference>
     <ProjectReference Include="..\Requests\Requests.csproj">
       <Project>{eb7a999c-a296-4051-854a-41e5ffaba4d5}</Project>
       <Name>Requests</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SerializedInvocation\SerializedInvocation.csproj">
-      <Project>{9b9f6273-3b0f-477c-ad7c-1e56cc213a5e}</Project>
-      <Name>SerializedInvocation</Name>
     </ProjectReference>
     <ProjectReference Include="..\Subscribers\Subscribers.csproj">
       <Project>{e6e5141e-a6ac-434a-9697-784811570ecb}</Project>
@@ -89,10 +72,6 @@
       <Project>{bb656f99-93e3-4e86-ae6e-532c7bc1f5d9}</Project>
       <Name>Subscriptions</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

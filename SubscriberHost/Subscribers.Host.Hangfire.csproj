@@ -1,22 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{351C9405-27A8-41AA-9171-6E306733A771}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{0249FC85-834C-489C-8C74-E008AB9C5DE7}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RetailHost</RootNamespace>
-    <AssemblyName>RetailHost</AssemblyName>
+    <RootNamespace>Hydra.SubscriberHost</RootNamespace>
+    <AssemblyName>Hydra.Subscribers.Host.Hangfire</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,89 +20,78 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Hangfire.Core, Version=1.5.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Hangfire.Core.1.5.6\lib\net45\Hangfire.Core.dll</HintPath>
+      <HintPath>..\packages\Hangfire.Core.1.5.6\lib\net45\Hangfire.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Hangfire.SqlServer, Version=1.5.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Hangfire.SqlServer.1.5.6\lib\net45\Hangfire.SqlServer.dll</HintPath>
+      <HintPath>..\packages\Hangfire.SqlServer.1.5.6\lib\net45\Hangfire.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Configuration.cs" />
+    <Compile Include="Host.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlServer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AdoNet\AdoNet.csproj">
+      <Project>{223a1668-8fc2-4399-9047-287b9dbf2636}</Project>
+      <Name>AdoNet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Configuration\Configuration.csproj">
+      <Project>{D89C6BA8-8A9B-4278-AC17-42B1476E47D4}</Project>
+      <Name>Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Contracts\Contracts.csproj">
+      <Project>{D2396379-DD06-41A6-9BFC-55AF3C2289A2}</Project>
+      <Name>Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Requests\Requests.csproj">
+      <Project>{eb7a999c-a296-4051-854a-41e5ffaba4d5}</Project>
+      <Name>Requests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SerializedInvocation\SerializedInvocation.csproj">
+      <Project>{9b9f6273-3b0f-477c-ad7c-1e56cc213a5e}</Project>
+      <Name>SerializedInvocation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Subscribers\Subscribers.csproj">
+      <Project>{e6e5141e-a6ac-434a-9697-784811570ecb}</Project>
+      <Name>Subscribers</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\AdoNet\AdoNet.csproj">
-      <Project>{223A1668-8FC2-4399-9047-287B9DBF2636}</Project>
-      <Name>AdoNet</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Configuration\Configuration.csproj">
-      <Project>{D89C6BA8-8A9B-4278-AC17-42B1476E47D4}</Project>
-      <Name>Configuration</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Contracts\Contracts.csproj">
-      <Project>{d2396379-dd06-41a6-9bfc-55af3c2289a2}</Project>
-      <Name>Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\FluentApi\FluentApi.csproj">
-      <Project>{a0e76561-abd7-4739-8d82-bee6f2ad8ebc}</Project>
-      <Name>FluentApi</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\SerializedInvocation\SerializedInvocation.csproj">
-      <Project>{9B9F6273-3B0F-477C-AD7C-1E56CC213A5E}</Project>
-      <Name>SerializedInvocation</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\SubscriberHost\Subscribers.Host.Hangfire.csproj">
-      <Project>{0249FC85-834C-489C-8C74-E008AB9C5DE7}</Project>
-      <Name>Subscribers.Host.Hangfire</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Subscribers.Configuration\Subscribers.Configuration.csproj">
-      <Project>{76d55f0d-3c7b-4e07-ab1b-f1ebc99c8e25}</Project>
-      <Name>Subscribers.Configuration</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RetailDomain\RetailDomain.csproj">
-      <Project>{D7A08A88-5A12-4053-BB27-09593DC7DEBE}</Project>
-      <Name>RetailDomain</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

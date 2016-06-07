@@ -1,6 +1,7 @@
 ﻿using System;
 using Hydra.Configuration;
 using Hydra.SubscriberHost;
+using Hydra.Subscribers;
 
 namespace RetailHost
 {
